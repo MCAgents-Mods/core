@@ -5,7 +5,7 @@ description: Turning core into the foundation for MCAgents-Mods — Bukkit remov
 
 # Task: core becomes the mods foundation
 
-**Status:** in progress — task 1 of 8
+**Status:** core's eight tasks done; pull requests wait on the owner
 
 ## The request
 
@@ -254,3 +254,13 @@ Chat's switches over `ModelException.Kind` need a `CLOSED` case.
 
 `./gradlew build` passes: 179 tests, with `TokenPoolTest`, `LlmCredentialsTest` and
 `SharedTokenStoreTest` new.
+
+### Task 8 — release/0.5.0
+
+`project-version` is `0.5.0`, as approved. The changelog is
+`wiki/logs/0/5/0/CHANGELOG.md`, with an Upgrading section, since every consumer has to
+change its imports and dependency, and its row is in `logs-index.md`. There were no session
+files under `.agents/memory/sessions/` to fold into a digest.
+
+The PR column above fills in once the owner approves opening the pull requests; they open
+in task order, each based on the branch before it.

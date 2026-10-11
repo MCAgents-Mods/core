@@ -20,6 +20,7 @@ see `{shared}/rules/versioning.md`.
 
 | Version | Summary | Files |
 |---|---|---|
+| [`0/5/0/`](../../wiki/logs/0/5/0/CHANGELOG.md) | Core becomes the mods foundation: Bukkit removed, one jar per loader, and the shared model client and web console. | `CHANGELOG.md` |
 | [`0/4/0/`](../../wiki/logs/0/4/0/CHANGELOG.md) | The request timeout becomes configurable, and stays the only timeout in MCAgents. | `CHANGELOG.md` |
 | [`0/3/0/`](../../wiki/logs/0/3/0/CHANGELOG.md) | The command becomes /agents and can add or revoke tokens in game, with masked handles in tab completion. | `CHANGELOG.md` |
 | [`0/2/0/`](../../wiki/logs/0/2/0/CHANGELOG.md) | Credentials move into core entirely: its own config.yml, the shared mcagents.json, and the /mcagents command. | `CHANGELOG.md` |

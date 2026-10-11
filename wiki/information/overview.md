@@ -59,5 +59,5 @@ the whole repository. The map of this wiki is
 ## Change logs
 
 Released versions are recorded under `wiki/logs/{Major}/{Minor}/{Patch}/`. The
-current version is `0.4.0` — see
+current version is `0.5.0` — see
 [`../../.agents/index/logs-index.md`](../../.agents/index/logs-index.md).
