@@ -4,6 +4,19 @@
 # a one line change in a single file rather than a sweep across the modules.
 
 [versions]
+# The one Minecraft version every loader module builds against. Check each
+# loader's own maven before moving it: Fabric (meta.fabricmc.net), NeoForge
+# (maven.neoforged.net) and Forge (maven.minecraftforge.net) must all publish a
+# build for it. Minecraft 26.x ships unobfuscated, so no module declares a
+# mappings coordinate.
+minecraft = "26.2"
+fabric-loader = "0.19.3"
+fabric-api = "0.157.0+26.2"
+fabric-loom = "1.17.19"
+neoforge = "26.2.0.90"
+moddevgradle = "2.0.148"
+forge = "26.2-65.1.3"
+forgegradle = "7.0.40"
 # JSON codec used to read and write the vendor wire formats. Provided by
 # Minecraft at runtime, so it is only ever a compileOnly dependency.
 gson = "2.14.0"
@@ -12,6 +25,9 @@ gson = "2.14.0"
 junit = "6.1.3"
 
 [libraries]
+minecraft = { module = "com.mojang:minecraft", version.ref = "minecraft" }
+fabric-loader = { module = "net.fabricmc:fabric-loader", version.ref = "fabric-loader" }
+fabric-api = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "fabric-api" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 
 # Versionless on purpose: the BOM above pins both, so there is exactly one
@@ -19,3 +35,8 @@ gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+
+[plugins]
+fabric-loom = { id = "net.fabricmc.fabric-loom", version.ref = "fabric-loom" }
+moddevgradle = { id = "net.neoforged.moddev", version.ref = "moddevgradle" }
+forgegradle = { id = "net.minecraftforge.gradle", version.ref = "forgegradle" }

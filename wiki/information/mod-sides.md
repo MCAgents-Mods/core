@@ -1,7 +1,7 @@
 # Mod Sides
 
-How the mod half of `core` runs on a client and on a dedicated server from one
-jar, without either side loading the other's code.
+How `core` runs on a client and on a dedicated server from one loader jar,
+without either side loading the other's code.
 
 ## The problem this solves
 
@@ -29,15 +29,18 @@ someone else's billing account.
 ## The shape
 
 ```
-platforms/mods/core      shared, both sides, no side-specific assumptions
- ├── platforms/mods/client   client only
- ├── platforms/mods/server   server only
- ├── platforms/mods/neoforge NeoForge entry point
- └── platforms/mods/fabric   Fabric entry point
+platforms/shared              io.github.mcagentsmods.core.shared
+ ├── …shared.client               client only
+ ├── …shared.server               server only
+ └── everything else              both sides, no side-specific assumptions
+platforms/forge               Forge entry point
+platforms/neoforge            NeoForge entry point
+platforms/fabric              Fabric entry points
 ```
 
-`client` and `server` **never depend on each other**, and nothing else names
-either of them by type. That is not a convention — it is the mechanism.
+The `client` and `server` packages **never import each other**, and nothing
+else in `platforms:shared` imports either of them. That is not a convention —
+`SideSeparationTest` fails the build when it stops being true.
 
 ## Three parts
 
@@ -71,11 +74,15 @@ SideEntrypoint running = ModBootstrap.start(
 It resolves only the name matching the side actually running. A dedicated server
 therefore never loads, links, or verifies a client class — not because the class
 was stripped from the jar, but because nothing ever asked for it. Both halves
-travel in the single universal jar and only one is ever touched.
+travel in each loader's jar and only one is ever touched.
 
-`platforms:mods:core` depends on neither half, which is what keeps that true: if
-it did, someone could write `new ClientEntrypoint()` there and the compiler
-would allow it.
+Shared code imports neither half, which is what keeps that true: if it did,
+someone could write `new ClientEntrypoint()` there and the compiler would allow
+it. `SideSeparationTest` is what stops that.
+
+Each loader's entry point does exactly this through `CoreRuntime.start(side,
+gameDirectory)`, with the side the loader itself reported, and calls
+`CoreRuntime.stop()` when the game shuts down.
 
 ### 3. Failing legibly when the wiring is wrong
 
@@ -89,13 +96,11 @@ This is a diagnostic, not a security boundary. The boundary is part 2.
 ## The markers
 
 `@ClientOnly` and `@ServerOnly` are the loader-neutral spelling of Fabric's
-`@Environment` and NeoForge's `@OnlyIn`. Neither of those can be used yet:
-resolving them needs a loader toolchain that remaps Minecraft, and the mod
-family deliberately compiles without one so it stays plain Java — and testable
-without a game. When a loader module gains that toolchain, these are what it
-maps across.
+`@Environment` and Forge's and NeoForge's `@OnlyIn`. Those cannot be used in
+`platforms:shared`, which compiles without a loader toolchain so it stays plain
+Java — and testable without a game.
 
-Marking a class does not make it safe. Putting it in the right module and never
+Marking a class does not make it safe. Putting it in the right package and never
 linking it does.
 
 ## The asymmetry, which is deliberate
@@ -126,11 +131,10 @@ sides rather than one class with a branch in it.
 
 ## Testing it
 
-The two halves are tested in their own modules, and the module graph is the
-isolation: `platforms:mods:server` does not depend on `platforms:mods:client`,
-so its test JVM is in exactly the position a dedicated server is in. Every
-passing test there is a demonstration that the server half boots and serves with
-no client class present anywhere — the claim the split makes, checked rather
-than asserted. The client module's tests are the mirror image.
+Both halves are tested in `platforms:shared`. `SideSeparationTest` reads the
+module's sources and fails if a side imports the other, or if shared code imports
+either — the claim the split makes, checked rather than asserted.
+`ModBootstrapTest` names a class that does not exist to prove a distribution
+missing a half fails with a message naming it.
 
 See [`../environments/setup.md`](../environments/setup.md) for how to run them.

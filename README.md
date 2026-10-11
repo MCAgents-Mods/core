@@ -20,8 +20,10 @@ wants and replays it.
 
 ## What is here today
 
-- A Gradle multi project build on **Java 25**: `api`, `common`, and five
-  `platforms/mods/*` modules, all under `io.github.mcagentsmods.core`. See
+- A Gradle multi project build on **Java 25**: `api`, `common`,
+  `platforms/shared`, and one module per mod loader — `platforms/forge`,
+  `platforms/neoforge` and `platforms/fabric` — each building its own jar for
+  Minecraft 26.2, all under `io.github.mcagentsmods.core`. See
   [`wiki/information/modules.md`](wiki/information/modules.md).
 - `MCAgentsProvider` — the single entry point, and the only class a consumer
   needs to read. See [`wiki/reference/api.md`](wiki/reference/api.md).

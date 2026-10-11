@@ -24,9 +24,8 @@ Full description: [`../../../wiki/information/overview.md`](../../../wiki/inform
 |---|---|
 | `api/` | Pure Java API contracts — chat, llm, token packages. Depends on nothing in the repo. |
 | `common/` | The implementation: `MCAgentsProvider`, the vendor clients, credential pooling. |
-| `platforms/mods/core/` | What every mod module shares, including the side-guard machinery. |
-| `platforms/mods/{client,server}/` | The two physical sides, which the loaders never mix. |
-| `platforms/mods/{neoforge,fabric}/` | Loader entry points. Plain Java modules today — no loader toolchain yet. |
+| `platforms/shared/` | What every loader shares: `CoreRuntime`, the side-guard machinery, and the client and server halves as packages. Plain Java. |
+| `platforms/{forge,neoforge,fabric}/` | One entry point and one manifest per loader, each with its own toolchain and its own mod jar. |
 | `gradle/libs.versions.toml` | Every dependency coordinate. Never declare one inline in a module. |
 | `.agents/` | This repository's own instructions, plus the index, agent-wiki, and memory trees. The universal conventions are **not** here — they come from the connector. |
 | `wiki/` | Human documentation, including `wiki/logs/` release history. |
@@ -50,7 +49,8 @@ that page rather than inferring the layout from the directory listing.
 | Entry point | Where | Notes |
 |---|---|---|
 | `MCAgentsProvider` | `common/…/common/MCAgentsProvider.java` | The single public entry point, and the only class a consumer needs to read. |
-| `SideEntrypoint` / `ModBootstrap` | `platforms/mods/core/…/mods/environment/` | Mod-side bootstrap and the client/server split. |
+| `CoreRuntime` | `platforms/shared/…/shared/` | What each loader's entry point calls to start and stop core. |
+| `SideEntrypoint` / `ModBootstrap` | `platforms/shared/…/shared/environment/` | Mod-side bootstrap and the client/server split. |
 
 Public API surface, method by method:
 [`../../../wiki/reference/api.md`](../../../wiki/reference/api.md).
@@ -93,15 +93,16 @@ None of these are tracked. Do not commit them, and do not document a path under
 * **`compileOnly` does not reach tests.** Modules declare `api` and `common` as
   `compileOnly`, so a module with tests must repeat them as `testImplementation` in
   its own build file.
-* **The mod loaders have no coordinate yet.** `neoforge` and `fabric` are plain Java
-  modules until a real loader toolchain lands. Do not add one speculatively.
+* **The first build is slow.** NeoForge and Forge decompile Minecraft on the first
+  build of a machine; that is minutes, not a hang.
+* **The client and server halves share a module.** Nothing outside
+  `…shared.client` may import it, and the same for `…shared.server`;
+  `SideSeparationTest` fails the build otherwise.
 * **Three constraints are load-bearing** and a change that breaks one is wrong
-  however well it works: `core` is **API only** (no commands, no listeners, no
-  gameplay), holds **no memory** (no conversation or per-player state), and
+  however well it works: `core` is **API only** (no gameplay, even though it ships
+  as a mod jar), holds **no memory** (no conversation or per-player state), and
   **nothing blocks** (every remote call returns a `CompletableFuture`). See
   [`../../rules/repository.md`](../../rules/repository.md).
-* **The `platforms/*` modules that are empty are scope guidance**, not a description
-  of code that exists.
 
 ## Before you write a file
 

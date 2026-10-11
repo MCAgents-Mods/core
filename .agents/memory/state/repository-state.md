@@ -25,21 +25,22 @@ history, read `wiki/logs/`.
   completion.
 - One request timeout, 60 seconds (`LlmCredentials.DEFAULT_TIMEOUT`). It is the only
   timeout in MCAgents; consumers cannot override it.
-- Seven build modules. `platforms/mods/*` covers the two loaders plus the client and
-  server physical sides. The Bukkit family and the universal engine jar were removed
-  on 2026-10-11 — see [`../tasks/mods-foundation.md`](../tasks/mods-foundation.md).
+- Six build modules: `api`, `common`, `platforms/shared` (the loader-agnostic mod
+  code, with the client and server halves as packages) and one module per loader —
+  `platforms/forge`, `platforms/neoforge`, `platforms/fabric` — each building its own
+  mod jar, id `mcagents_core`, for Minecraft 26.2. The Bukkit family and the
+  universal engine jar were removed on 2026-10-11 — see [`../tasks/mods-foundation.md`](../tasks/mods-foundation.md).
 - A JUnit 5 test harness wired once in the root `build.gradle`. Tests exist for
-  `common` token handling and for the mod-side environment, client, and server
-  packages.
+  `common` token handling and for `platforms/shared`: the environment, client and
+  server packages, `CoreRuntime`, and the side separation check.
 
 **What is not built yet.**
 
 - **No CI pipeline.** `./gradlew test` is the only thing that runs the tests.
-- **No loader toolchain.** `platforms/mods/neoforge` and `platforms/mods/fabric` are
-  plain Java modules; resolving NeoForge or Fabric needs ModDevGradle or Loom, which
-  has not landed.
-- **No decided Minecraft version range.** Nothing version-specific has been written,
-  deliberately.
+- **Never launched in a game.** The three jars build and their manifests agree with
+  their entry points, but none has been loaded in a real client or server yet.
+- **The `/agents` client commands are not wired** into any loader's command tree;
+  `ModTokenCommands` holds the logic only.
 
 **Agent system.** This is a **consuming repository**. The universal conventions are
 served by the `lxagents-agents-base` MCP connector and addressed as
