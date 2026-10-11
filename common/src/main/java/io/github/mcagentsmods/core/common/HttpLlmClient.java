@@ -7,6 +7,7 @@ import com.google.gson.JsonSyntaxException;
 import io.github.mcagentsmods.core.api.AgentException;
 import io.github.mcagentsmods.core.api.llm.AbstractLlmClient;
 import io.github.mcagentsmods.core.api.llm.LlmCredentials;
+import io.github.mcagentsmods.core.common.http.HttpLimits;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -49,6 +50,9 @@ abstract class HttpLlmClient extends AbstractLlmClient {
      */
     private static final int MAX_ERROR_BODY = 512;
 
+    /** The largest response read, in bytes. */
+    private static final int MAX_RESPONSE_BYTES = 16 * 1024 * 1024;
+
     /**
      * The HTTP client every request from this instance goes through.
      *
@@ -67,7 +71,10 @@ abstract class HttpLlmClient extends AbstractLlmClient {
         super(credentials);
         this.http = HttpClient.newBuilder()
                 .connectTimeout(CONNECT_TIMEOUT)
-                .followRedirects(HttpClient.Redirect.NORMAL)
+                // Never followed: the client re-sends its headers to wherever a redirect
+                // points, Authorization included, so a provider or a proxy answering 3xx
+                // could hand the key to another host. A redirect reads as a failed request.
+                .followRedirects(HttpClient.Redirect.NEVER)
                 .build();
     }
 
@@ -157,7 +164,12 @@ abstract class HttpLlmClient extends AbstractLlmClient {
      * @return A CompletableFuture containing the parsed response document.
      */
     private CompletableFuture<JsonObject> send(HttpRequest request) {
-        return http.sendAsync(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8))
+        // Bounded in size and in time: the JDK reads a body of any size, and stops timing the
+        // exchange once the headers arrive. Ample for a model catalogue, which is the largest
+        // thing any vendor sends.
+        return HttpLimits.withDeadline(
+                        http.sendAsync(request, HttpLimits.ofString(MAX_RESPONSE_BYTES)),
+                        credentials.timeout().plusSeconds(10))
                 .handle((response, failure) -> {
                     if (failure != null) {
                         throw new CompletionException(new AgentException(
@@ -215,14 +227,18 @@ abstract class HttpLlmClient extends AbstractLlmClient {
             if (parsed.isJsonObject()) {
                 String message = findMessage(parsed.getAsJsonObject());
                 if (message != null) {
-                    return message;
+                    return truncate(message);
                 }
             }
         } catch (JsonSyntaxException ignored) {
             // Not JSON at all — a proxy's HTML error page, most likely. The
             // truncated body below is the best that can be said about it.
         }
-        return body.length() > MAX_ERROR_BODY ? body.substring(0, MAX_ERROR_BODY) + "…" : body;
+        return truncate(body);
+    }
+
+    private static String truncate(String text) {
+        return text.length() > MAX_ERROR_BODY ? text.substring(0, MAX_ERROR_BODY) + "…" : text;
     }
 
     /**
@@ -278,7 +294,9 @@ abstract class HttpLlmClient extends AbstractLlmClient {
     private AgentException asAgentException(RuntimeException failure) {
         return failure instanceof AgentException agentFailure
                 ? agentFailure
-                : new AgentException(vendor(), "Could not build the request: " + failure.getMessage(), failure);
+                // Never the failure's own text: the JDK's header check quotes the value it
+                // refused, and the value it refuses most often is the Authorization header.
+                : new AgentException(vendor(), "Could not build the request to " + vendor().code(), failure);
     }
 
     /**

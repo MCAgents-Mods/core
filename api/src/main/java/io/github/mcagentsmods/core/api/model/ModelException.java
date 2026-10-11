@@ -29,7 +29,32 @@ public class ModelException extends RuntimeException {
          */
         MALFORMED_RESPONSE,
         /** The player has no usable key stored. */
-        NO_KEY
+        NO_KEY,
+        /**
+         * The client was closed before the request finished — the game is shutting down,
+         * or the mod replaced its client. Retrying on the same client cannot help.
+         */
+        CLOSED;
+
+        /**
+         * What an HTTP error status says about a request.
+         *
+         * <p>Only 401 says a key is dead, and 402 that it is out of credit. A 403 is
+         * deliberately not one of them: providers answer 403 for a prompt their moderation
+         * flagged, for a region they do not serve, and for a permission the key lacks — none
+         * of which a different key fixes, and treating it as a dead key would let one flagged
+         * prompt deactivate every key the player has.
+         *
+         * @param status an HTTP status outside the 2xx range
+         * @return the kind of failure it is
+         */
+        public static Kind forStatus(int status) {
+            return switch (status) {
+                case 401, 402 -> AUTHENTICATION;
+                case 429 -> RATE_LIMIT;
+                default -> status >= 500 ? SERVER : REQUEST;
+            };
+        }
     }
 
     private final Kind kind;

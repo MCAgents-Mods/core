@@ -234,6 +234,55 @@ class OpenRouterClientTest {
         assertTrue(transport.isClosed());
     }
 
+    @Test
+    void failsARequestWaitingOnABackoffWhenTheClientCloses() {
+        // A backoff long enough that only close() can end the wait.
+        var transport = TestAccess.transport().reply(429, "{}");
+        var client = new OpenRouterClient(transport, TestAccess.keys("k"),
+                io.github.mcagentsmods.core.api.model.ProviderRoutes.throughOpenRouter(),
+                OpenRouterClient.Attribution.CORE,
+                new java.util.concurrent.ScheduledThreadPoolExecutor(1), true,
+                java.time.Duration.ofMinutes(10));
+
+        CompletableFuture<?> waiting = client.complete(request());
+        client.close();
+
+        assertEquals(ModelException.Kind.CLOSED, failureOf(waiting).kind());
+        assertEquals(ModelException.Kind.CLOSED, failureOf(client.complete(request())).kind(),
+                "and a closed client refuses new work rather than hanging on it");
+        client.close();
+    }
+
+    @Test
+    void neverRetriesAnAnswerOfTheWrongShapeBecauseItWasAlreadyBilled() {
+        // choices[0] is a string, not an object: Gson throws IllegalStateException.
+        var transport = TestAccess.transport()
+                .reply(200, "{\"choices\":[\"surprise\"]}")
+                .reply(200, ANSWER);
+
+        try (var client = TestAccess.client(transport, TestAccess.keys("k"))) {
+            assertEquals(ModelException.Kind.MALFORMED_RESPONSE,
+                    failureOf(client.complete(request())).kind());
+        }
+        assertEquals(1, transport.callCount());
+    }
+
+    @Test
+    void neverPassesOnARefusalThatQuotesTheKey() {
+        var transport = TestAccess.transport()
+                .refuse(new IllegalArgumentException("invalid header value: Bearer sk-or-v1-leaked"));
+
+        try (var client = TestAccess.client(transport, TestAccess.keys("sk-or-v1-leaked"))) {
+            ModelException failure = failureOf(client.complete(request()));
+
+            assertEquals(ModelException.Kind.REQUEST, failure.kind());
+            for (Throwable t = failure; t != null; t = t.getCause()) {
+                assertFalse(String.valueOf(t.getMessage()).contains("leaked"));
+            }
+            assertEquals(1, transport.callCount());
+        }
+    }
+
     private static java.util.Set<String> Set(String... values) {
         return java.util.Set.of(values);
     }

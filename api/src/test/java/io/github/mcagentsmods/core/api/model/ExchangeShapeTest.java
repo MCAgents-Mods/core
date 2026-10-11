@@ -2,9 +2,13 @@ package io.github.mcagentsmods.core.api.model;
 
 import io.github.mcagentsmods.core.api.chat.ChatMessage;
 import io.github.mcagentsmods.core.api.chat.ChatRole;
+import io.github.mcagentsmods.core.api.http.HttpCall;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -85,5 +89,43 @@ class ExchangeShapeTest {
         // Already billed: sending it again bills the player again for the same broken answer.
         assertFalse(new ModelException(ModelException.Kind.MALFORMED_RESPONSE, "").isRetryable());
         assertFalse(new ModelException(ModelException.Kind.AUTHENTICATION, "").isRetryable());
+    }
+
+    @Test
+    void namesACallsHeadersWithoutPrintingTheKey() {
+        HttpCall call = HttpCall.post("https://openrouter.ai/api/v1/chat/completions",
+                Map.of("Authorization", "Bearer sk-or-v1-neverprinted"), "{\"secret\":1}");
+
+        assertTrue(call.toString().contains("Authorization"));
+        assertFalse(call.toString().contains("neverprinted"));
+        assertFalse(call.toString().contains("secret"));
+    }
+
+    @Test
+    void neverHandsAGatewayKeyToAnotherPlatformByDefault() {
+        ApiKeySource gatewayOnly = new ApiKeySource() {
+            @Override
+            public CompletableFuture<Optional<String>> next() {
+                return CompletableFuture.completedFuture(Optional.of("sk-or-v1-gateway"));
+            }
+
+            @Override
+            public CompletableFuture<Void> reject(String key) {
+                return CompletableFuture.completedFuture(null);
+            }
+        };
+
+        assertEquals(Optional.of("sk-or-v1-gateway"), gatewayOnly.next("openrouter").join());
+        assertEquals(Optional.empty(), gatewayOnly.next("openai").join());
+    }
+
+    @Test
+    void treatsOnlyAnUnauthorisedOrUnpaidAnswerAsADeadKey() {
+        assertEquals(ModelException.Kind.AUTHENTICATION, ModelException.Kind.forStatus(401));
+        assertEquals(ModelException.Kind.AUTHENTICATION, ModelException.Kind.forStatus(402));
+        // A 403 is a refusal of this request — a moderated prompt, a region — not of the key.
+        assertEquals(ModelException.Kind.REQUEST, ModelException.Kind.forStatus(403));
+        assertEquals(ModelException.Kind.RATE_LIMIT, ModelException.Kind.forStatus(429));
+        assertEquals(ModelException.Kind.SERVER, ModelException.Kind.forStatus(503));
     }
 }

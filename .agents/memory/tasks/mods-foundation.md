@@ -212,3 +212,45 @@ That needs a real launch, with the rest of the "never launched" list from Task 4
 
 `./gradlew build` passes: 162 tests, with `LocalWebHostTest` and `CoreWebRegistryTest` new, and all
 three jars carry `common.web` and the shell resources.
+
+### Task 7 — fix/security-review
+
+A review of core for leaked memory, exploits and duplicate code, after tasks 5 and 6
+brought chat's code in. Fixed here:
+
+| Finding | Fix |
+|---|---|
+| `TokenPool.reject` and `rotate` acted on whichever key was first, so a request that finished late could evict a key it never used | Both take the key the request used and act on that key only; the provider passes it, and swaps the client only by compare-and-replace (`ClientRegistry.replace`) |
+| Store and client construction ran inside the pool and registry locks | Both moved outside the locks |
+| A 403 evicted the key, though providers send it for a refused prompt or a region | `ModelException.Kind.forStatus`: 401 and 402 are a dead key, 403 is `REQUEST`; `AgentException.isAuthFailure()` is 401 only |
+| `isUsableBaseUrl` matched by prefix, so `http://localhost.example.com` passed | Parsed as a URI; http only for exactly `localhost`, `127.0.0.1` or `[::1]`; no userinfo, query or fragment; `LlmCredentials` enforces it |
+| Both HTTP clients followed redirects with `Authorization` | `Redirect.NEVER` |
+| No cap on an answer's size and no deadline on its body | `HttpLimits`: 8 MiB (routed client) and 16 MiB (`HttpLlmClient`) caps, and a deadline over the whole exchange |
+| `close()` left requests waiting on a backoff hanging, and `HttpClient.close()` blocks | Waiters fail with the new `Kind.CLOSED`; the transport uses `shutdownNow()` |
+| An answer of the wrong shape was retried as `TRANSPORT`, billing it again | Read failures are `MALFORMED_RESPONSE` |
+| A refused header could quote the key in an exception | Keys must be printable ASCII without spaces (`LlmCredentials.isWellFormedKey`), checked by `LlmCredentials`, the key file and the commands; a synchronous `send` failure is replaced by a fixed message with no cause; `HttpCall.toString()` names headers only; `HttpLlmClient` errors are truncated and use fixed text |
+| The token commands echoed what was typed, which may be a key | They never repeat input |
+| A key file that failed to parse could be overwritten, and the parser's text was logged | Nothing is written while the last read failed; only the exception type is logged |
+| Two stores on one file in one process (single player) could interleave | One lock per file across the process; the move is `ATOMIC_MOVE` where supported |
+| The server's store followed the client's `MCAGENTS_DIR` override | `SharedTokenStore.atFile` opens exactly the file the server logs |
+| `ApiKeySource.next(platform)` handed gateway keys to any platform by default | The default answers only for `openrouter` |
+| The web console's fixed pool had an unbounded queue any local process could fill | 64 queued requests, then the connection is closed |
+| `LlmVendor` and `ModelPlatform` each listed the base URLs; `directBaseUrls` lost its order | `LlmVendor` reads `ModelPlatform`; the key file's template reads `LlmVendor`; the map keeps its order |
+
+**Deferred, reported to owen:**
+
+- **D1–D5, two request stacks.** `MCAgentsProvider`/`HttpLlmClient` and `OpenRouterClient`
+  still each have their own request records, JSON handling and transport. Folding the
+  provider's OpenAI-dialect vendors onto `OpenRouterClient`, `TokenPool` onto
+  `ApiKeySource`, and `HttpLlmClient` onto `HttpTransport` is an API change for the next
+  minor version, not a fix.
+- **`ping` downloads the whole model catalogue** to test a key.
+- **A cross-process lock on `mcagents.json`.** Two game instances sharing one file can still
+  interleave a read and a write; the in-process lock and atomic move do not cover that.
+- **The web console's 400** passes a handler's `IllegalArgumentException` text to the page,
+  which is the token holder; a JDK exception thrown inside a handler can reach it too.
+
+Chat's switches over `ModelException.Kind` need a `CLOSED` case.
+
+`./gradlew build` passes: 179 tests, with `TokenPoolTest`, `LlmCredentialsTest` and
+`SharedTokenStoreTest` new.

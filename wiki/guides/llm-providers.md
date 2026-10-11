@@ -199,7 +199,9 @@ models.complete(request).thenAccept(answer -> {
 
 Core never stores keys. Your mod implements `ApiKeySource`: `next(platform)`
 hands over the key to use, and `reject(key)` is called when a provider refuses
-one, so you can mark it inactive. The client tries up to five keys per request.
+one with a 401 or 402, so you can mark it inactive. A 403 is a refused request,
+not a dead key. If you implement only `next()`, those keys are used for
+OpenRouter and nothing else. The client tries up to five keys per request.
 
 Model names follow `{platform}/{model}`, lowercase — `ModelName` builds and
 reads them. A `ProviderRoutes` decides whether a request goes through
@@ -215,8 +217,9 @@ Failures arrive as a `ModelException` whose `kind()` says what happened. Rate
 limits, server errors, and dropped connections are retried up to three times
 with backoff before you see them.
 
-Close the client when your mod shuts down. That closes the transport and
-cancels pending retries.
+Close the client when your mod shuts down. That aborts requests in flight and
+fails every request waiting to retry with `ModelException.Kind.CLOSED`, so no
+future is left hanging. A switch over `Kind` needs a case for it.
 
 ## Shut down
 

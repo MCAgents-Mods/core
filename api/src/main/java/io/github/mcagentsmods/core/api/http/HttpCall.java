@@ -2,6 +2,7 @@ package io.github.mcagentsmods.core.api.http;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.TreeSet;
 
 /**
  * One HTTP request, described without reference to any HTTP library.
@@ -29,4 +30,13 @@ public record HttpCall(String method, String url, Map<String, String> headers, S
         return new HttpCall("POST", url, headers, body);
     }
 
+    /**
+     * Names the headers but never prints their values or the body: the {@code Authorization}
+     * value is an API key, and a call printed into a log or an exception would publish it.
+     */
+    @Override
+    public String toString() {
+        return "HttpCall[" + method + " " + url + ", headers=" + new TreeSet<>(headers.keySet())
+                + ", body=" + body.length() + " chars]";
+    }
 }

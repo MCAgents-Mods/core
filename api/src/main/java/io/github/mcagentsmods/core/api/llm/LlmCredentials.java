@@ -1,5 +1,7 @@
 package io.github.mcagentsmods.core.api.llm;
 
+import io.github.mcagentsmods.core.api.model.ModelPlatform;
+
 import java.time.Duration;
 import java.util.Map;
 import java.util.Objects;
@@ -48,8 +50,10 @@ public record LlmCredentials(
      * and defensively copies the headers.
      *
      * @throws NullPointerException When any component is {@code null}.
-     * @throws IllegalArgumentException When the key or base URL is blank, or
-     *                                  the timeout is zero or negative.
+     * @throws IllegalArgumentException When the key or base URL is blank, the
+     *                                  base URL is neither https nor a loopback
+     *                                  http address, or the timeout is zero or
+     *                                  negative.
      */
     public LlmCredentials {
         Objects.requireNonNull(vendor, "vendor cannot be null");
@@ -61,8 +65,21 @@ public record LlmCredentials(
         if (apiKey.isBlank()) {
             throw new IllegalArgumentException("apiKey cannot be blank");
         }
+        // Checked here rather than left to the HTTP client, whose refusal quotes the header
+        // value, which is this key. The message names no character and no position.
+        if (!isWellFormedKey(apiKey)) {
+            throw new IllegalArgumentException(
+                    "apiKey may hold only printable ASCII without spaces");
+        }
         if (baseUrl.isBlank()) {
             throw new IllegalArgumentException("baseUrl cannot be blank");
+        }
+        // The key travels in a header on every request, so a plain-text URL to another
+        // machine would put it on the wire in the clear. Loopback is allowed for a local
+        // gateway.
+        if (!ModelPlatform.isUsableBaseUrl(baseUrl)) {
+            throw new IllegalArgumentException(
+                    "baseUrl must be https, or http on a loopback address");
         }
         if (timeout.isZero() || timeout.isNegative()) {
             throw new IllegalArgumentException("timeout must be positive");
@@ -74,6 +91,30 @@ public record LlmCredentials(
             baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
         }
         headers = Map.copyOf(headers);
+    }
+
+    /**
+     * Whether a string can be an API key: non-empty, and printable ASCII with no space.
+     *
+     * <p>Every provider's keys fit that, and anything outside it is a paste gone wrong — a
+     * newline, a trailing space, a smart quote. Such a value cannot be sent as a header, and
+     * a newline in one could start a second header. Callers check with this before storing a
+     * key, so the refusal never has to repeat the value.
+     *
+     * @param apiKey the candidate, may be {@code null}
+     * @return {@code true} if the value can be stored and sent as a key
+     */
+    public static boolean isWellFormedKey(String apiKey) {
+        if (apiKey == null || apiKey.isEmpty()) {
+            return false;
+        }
+        for (int i = 0; i < apiKey.length(); i++) {
+            char c = apiKey.charAt(i);
+            if (c < 0x21 || c > 0x7e) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**

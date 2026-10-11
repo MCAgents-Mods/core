@@ -16,11 +16,11 @@ import java.util.Optional;
  * when a request fails, and what it does then depends entirely on why:</p>
  *
  * <ul>
- *   <li><strong>Rejected</strong> — the credential is dead. {@link #reject()}
+ *   <li><strong>Rejected</strong> — the credential is dead. {@link #reject(String)}
  *       drops it from the pool <em>and from storage</em>, so a key that will
  *       never work again is not retried on every request forever.</li>
  *   <li><strong>Rate limited</strong> — the credential is fine and came too
- *       fast. {@link #rotate()} moves to the next one and <em>keeps</em> this
+ *       fast. {@link #rotate(String)} moves to the next one and <em>keeps</em> this
  *       one. Evicting here would destroy something the user paid for, and
  *       nothing inside the game can undo that.</li>
  * </ul>
@@ -122,24 +122,38 @@ public final class TokenPool {
     }
 
     /**
-     * Drops the current credential permanently, because the vendor rejected it.
+     * Drops a credential permanently, because the vendor rejected it.
      *
      * <p>Removes it from the pool and from storage. Call this <strong>only</strong>
      * for an authentication failure or an explicit "this key is invalid" — never
      * for a rate limit, a timeout, or a server error, none of which say anything
      * about the credential.</p>
      *
-     * @return The next usable credential, or empty when that was the last one.
+     * <p>Names the credential the failed request used rather than acting on
+     * whichever is first. Two requests failing on the same dead key both report
+     * it; the second finds it gone and removes nothing, where acting on "the
+     * current one" would have deleted the good key that replaced it.</p>
+     *
+     * <p>The store is written after the pool's lock is released, so a caller
+     * reading the pool never waits on the disk.</p>
+     *
+     * @param rejected The credential the vendor refused.
+     * @return The next usable credential, or empty when none is left.
      */
-    public synchronized Optional<String> reject() {
-        if (tokens.isEmpty()) {
-            return Optional.empty();
+    public Optional<String> reject(String rejected) {
+        boolean removed;
+        Optional<String> next;
+        synchronized (this) {
+            removed = rejected != null && tokens.remove(rejected);
+            if (removed) {
+                exhausted = true;
+            }
+            next = current();
         }
-
-        String dead = tokens.remove(0);
-        exhausted = true;
-        store.evict(vendor.code(), dead);
-        return current();
+        if (removed) {
+            store.evict(vendor.code(), rejected);
+        }
+        return next;
     }
 
     /**
@@ -149,12 +163,16 @@ public final class TokenPool {
      * rotated credential goes to the back of the queue, so a pool of several
      * keys spreads load rather than hammering one.</p>
      *
+     * <p>Rotates only while {@code busy} is still first. Two requests rate
+     * limited on the same key rotate once, not twice back onto it.</p>
+     *
+     * @param busy The credential the rate-limited request used.
      * @return The credential to try next, or empty when the pool is empty. With
      *         a single credential this returns that same one — there is nowhere
      *         else to go, and refusing to return it would be worse.
      */
-    public synchronized Optional<String> rotate() {
-        if (tokens.size() > 1) {
+    public synchronized Optional<String> rotate(String busy) {
+        if (tokens.size() > 1 && tokens.get(0).equals(busy)) {
             tokens.add(tokens.remove(0));
         }
         return current();
@@ -168,18 +186,24 @@ public final class TokenPool {
      * flag, so a credential the owner has just fixed gets a fresh chance and an
      * evicted one does not come back.</p>
      */
-    public synchronized void reload() {
+    public void reload() {
+        // Read before the lock, so a request asking the pool for its state
+        // never waits on the disk.
         store.reload();
-
-        tokens.clear();
-        exhausted = false;
+        List<String> loaded = new ArrayList<>();
         for (String token : store.load(vendor.code())) {
             // A blank entry is a placeholder the owner never filled in, not a
             // credential. Treating it as one produces a rejection, which would
             // then silently delete the line they were about to edit.
             if (token != null && !token.isBlank()) {
-                tokens.add(token.trim());
+                loaded.add(token.trim());
             }
+        }
+
+        synchronized (this) {
+            tokens.clear();
+            tokens.addAll(loaded);
+            exhausted = false;
         }
     }
 }

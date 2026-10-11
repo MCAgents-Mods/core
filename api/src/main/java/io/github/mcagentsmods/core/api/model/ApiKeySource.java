@@ -21,14 +21,17 @@ public interface ApiKeySource {
      * The key {@code platform} should be called with next, or empty when the player has none
      * active for it.
      *
-     * <p>Defaults to {@link #next()}, which is what a source that predates direct routes — or
-     * a test double holding one list of keys — should do: every request went to the gateway,
-     * so every key was a gateway key.
+     * <p>By default the gateway key answers for the gateway and nothing answers for any other
+     * platform. A source that holds one list of keys holds gateway keys, and handing one to
+     * another provider would send it to a host it was never issued for. A source that stores
+     * keys per platform overrides this.
      *
      * @param platform the platform id a route resolved to
      */
     default CompletableFuture<Optional<String>> next(String platform) {
-        return next();
+        return ModelPlatform.isOpenRouter(platform)
+                ? next()
+                : CompletableFuture.completedFuture(Optional.empty());
     }
 
     /**

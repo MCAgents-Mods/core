@@ -27,8 +27,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -56,7 +58,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * a module may take a minute to answer — asking a model a question, say — and the player
  * will keep browsing while they wait. Bounded, because this runs inside a game and an
  * unbounded pool answering a page that opened twenty requests is memory the game does not
- * have. Daemon, so the game can exit with a page half loaded.
+ * have. The queue in front of the pool is bounded too: anything on the machine can reach the
+ * port, and a fixed pool's unbounded queue would hold every connection it opened. A request
+ * that finds the queue full has its connection closed. Daemon, so the game can exit with a
+ * page half loaded.
  */
 final class LocalWebHost implements WebConsole {
 
@@ -76,6 +81,9 @@ final class LocalWebHost implements WebConsole {
 
     /** Enough to answer a page's parallel fetches without letting the pool grow unbounded. */
     private static final int WORKER_THREADS = 4;
+
+    /** Requests that may wait for a worker before more are refused. */
+    private static final int QUEUED_REQUESTS = 64;
 
     /** Seconds {@link #close()} allows a request already in flight to finish. */
     private static final int STOP_GRACE_SECONDS = 2;
@@ -126,11 +134,14 @@ final class LocalWebHost implements WebConsole {
             throw new WebConsoleException("Could not open a local port for the web console", e);
         }
 
-        ExecutorService workers = Executors.newFixedThreadPool(WORKER_THREADS, runnable -> {
-            Thread thread = new Thread(runnable, "MCAgents-web-console");
-            thread.setDaemon(true);
-            return thread;
-        });
+        // A full queue refuses the request; the server closes that connection and keeps
+        // serving the rest.
+        ExecutorService workers = new ThreadPoolExecutor(WORKER_THREADS, WORKER_THREADS,
+                0L, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(QUEUED_REQUESTS), runnable -> {
+                    Thread thread = new Thread(runnable, "MCAgents-web-console");
+                    thread.setDaemon(true);
+                    return thread;
+                }, new ThreadPoolExecutor.AbortPolicy());
         server.setExecutor(workers);
 
         LocalWebHost host = new LocalWebHost(server, workers, registry, randomHex());

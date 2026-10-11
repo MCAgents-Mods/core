@@ -4,6 +4,8 @@ import io.github.mcagentsmods.core.api.AgentException;
 import io.github.mcagentsmods.core.api.AgentProvider;
 import io.github.mcagentsmods.core.api.chat.ChatRequest;
 import io.github.mcagentsmods.core.api.chat.ChatResponse;
+import io.github.mcagentsmods.core.api.llm.AbstractLlmClient;
+import io.github.mcagentsmods.core.api.llm.LlmClient;
 import io.github.mcagentsmods.core.api.llm.LlmCredentials;
 import io.github.mcagentsmods.core.api.llm.LlmVendor;
 import io.github.mcagentsmods.core.api.llm.ModelInfo;
@@ -261,12 +263,19 @@ public class MCAgentsProvider implements AgentProvider {
     private CompletableFuture<ChatResponse> attempt(
             LlmVendor vendor, ChatRequest request, TokenPool pool, int attemptsLeft) {
 
+        LlmClient client;
         CompletableFuture<ChatResponse> sent;
         try {
-            sent = clients.require(vendor).chat(request);
+            client = clients.require(vendor);
+            sent = client.chat(request);
         } catch (AgentException e) {
             return CompletableFuture.failedFuture(e);
         }
+        // The key this request actually used. A rotation acts on it, never on
+        // whatever the pool holds first by the time the failure arrives.
+        String used = client instanceof AbstractLlmClient sending
+                ? sending.credentials().apiKey()
+                : null;
 
         return sent.handle((response, failure) -> {
             if (failure == null) {
@@ -277,10 +286,10 @@ public class MCAgentsProvider implements AgentProvider {
             Optional<String> next;
             if (cause.isAuthFailure()) {
                 // The credential is dead: drop it from the pool and the store.
-                next = pool.reject();
+                next = pool.reject(used);
             } else if (cause.isRateLimited()) {
                 // The credential is healthy and busy: move on, but keep it.
-                next = pool.rotate();
+                next = pool.rotate(used);
             } else {
                 // Nothing was learned about the credential. Do not touch it.
                 next = Optional.empty();
@@ -290,10 +299,18 @@ public class MCAgentsProvider implements AgentProvider {
                 return CompletableFuture.<ChatResponse>failedFuture(exhausted(pool, cause));
             }
 
+            // The vendor was unregistered or its pool reloaded while this
+            // request ran. Its rotation is no longer this request's to make.
+            if (tokens.find(vendor).orElse(null) != pool) {
+                return CompletableFuture.<ChatResponse>failedFuture(cause);
+            }
             // Rebuilt from the vendor's stored connection settings, so a
             // rotation never silently moves a proxied deployment onto the
-            // public endpoint.
-            register(tokens.credentialsFor(vendor, next.get()));
+            // public endpoint. Installed only if no other failing request got
+            // there first; either way the retry uses whichever client is current.
+            if (!next.get().equals(used)) {
+                clients.replace(client, tokens.credentialsFor(vendor, next.get()));
+            }
             return attempt(vendor, request, pool, attemptsLeft - 1);
         }).thenCompose(future -> future);
     }

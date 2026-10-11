@@ -22,12 +22,24 @@ public final class JdkHttpTransport implements HttpTransport {
     private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(10);
     private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(120);
 
+    /** The whole exchange, body included; a little past the request timeout. */
+    private static final Duration EXCHANGE_DEADLINE = REQUEST_TIMEOUT.plusSeconds(10);
+
+    /**
+     * The largest response read. A chat answer or an embedding is kilobytes; anything near
+     * this is a misbehaving server, and reading it would be the game's memory.
+     */
+    static final int MAX_RESPONSE_BYTES = 8 * 1024 * 1024;
+
     private final HttpClient httpClient;
 
     public JdkHttpTransport() {
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(CONNECT_TIMEOUT)
-                .followRedirects(HttpClient.Redirect.NORMAL)
+                // Never followed: the client re-sends its headers to wherever a redirect
+                // points, Authorization included, so a provider or a proxy answering 3xx
+                // could hand the key to another host. A redirect reads as a failed request.
+                .followRedirects(HttpClient.Redirect.NEVER)
                 .build();
     }
 
@@ -42,13 +54,21 @@ public final class JdkHttpTransport implements HttpTransport {
 
         call.headers().forEach(builder::header);
 
-        return httpClient
-                .sendAsync(builder.build(), HttpResponse.BodyHandlers.ofString())
+        return HttpLimits.withDeadline(
+                        httpClient.sendAsync(builder.build(),
+                                HttpLimits.ofString(MAX_RESPONSE_BYTES)),
+                        EXCHANGE_DEADLINE)
                 .thenApply(response -> new HttpReply(response.statusCode(), response.body()));
     }
 
+    /**
+     * Aborts every request in flight and returns at once.
+     *
+     * <p>Not {@code HttpClient.close()}, which waits for requests in flight to finish — up to
+     * the request timeout, on whatever thread closed the client, which is often the game's.
+     */
     @Override
     public void close() {
-        httpClient.close();
+        httpClient.shutdownNow();
     }
 }
