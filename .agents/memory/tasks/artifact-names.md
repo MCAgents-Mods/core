@@ -5,7 +5,7 @@ description: Renaming every core module's jar base name to MCAgentsCore{Module} 
 
 # Task: artifact names
 
-**Status:** in progress
+**Status:** done — pull requests #9 and #10 merged in order by rebase
 
 ## The request
 
@@ -33,8 +33,8 @@ one pattern, in this repository and in `chat`:
 
 | # | Title | Branch | PR |
 |---|---|---|---|
-| 1 | Task record | `chore/artifact-names-plan` | |
-| 2 | Rename base names and artifact ids | `refactor/artifact-names` | |
+| 1 | Task record | `chore/artifact-names-plan` | #9 |
+| 2 | Rename base names and artifact ids | `refactor/artifact-names` | #10 |
 
 `chat` merges after this repository, since it depends on the new coordinates.
 
