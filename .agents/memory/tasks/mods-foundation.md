@@ -5,7 +5,7 @@ description: Turning core into the foundation for MCAgents-Mods — Bukkit remov
 
 # Task: core becomes the mods foundation
 
-**Status:** core's eight tasks done; pull requests wait on the owner
+**Status:** done — pull requests #1 to #8 merged in order by rebase
 
 ## The request
 
@@ -40,14 +40,14 @@ Minecraft mods only, and asked for four things across `core` and `chat`:
 
 | # | Title | Scope | Branch | PR |
 |---|---|---|---|---|
-| 1 | Task record | This file, its index row, the `.agents/plans/` ignore | `chore/mods-foundation-plan` | |
-| 2 | Remove Bukkit | `platforms/bukkit/*`, `platforms/engine`, the Spigot, Paper and Folia coordinates, and the docs describing them | `refactor/bukkit-removal` | |
-| 3 | New namespace | `io.github.mcagents.core` → `io.github.mcagentsmods.core`, group, root name, org property | `refactor/core-namespace` | |
-| 4 | Platform layout | `platforms/{shared,forge,neoforge,fabric}`, loader toolchains, one jar per loader | `refactor/platform-layout` | |
-| 5 | Shared language model client | Tool calls, embeddings, prompt-cache hints, retries, provider routes, one HTTP transport | `feat/shared-llm-client` | |
-| 6 | Web registry | The loopback web host and `WebRegistry`, the shared page shell | `feat/web-registry` | |
-| 7 | Security review | Fixes for confirmed findings | `fix/security-review` | |
-| 8 | Release | `0.5.0`, changelog, indexes, closing this record | `release/0.5.0` | |
+| 1 | Task record | This file, its index row, the `.agents/plans/` ignore | `chore/mods-foundation-plan` | #1 |
+| 2 | Remove Bukkit | `platforms/bukkit/*`, `platforms/engine`, the Spigot, Paper and Folia coordinates, and the docs describing them | `refactor/bukkit-removal` | #2 |
+| 3 | New namespace | `io.github.mcagents.core` → `io.github.mcagentsmods.core`, group, root name, org property | `refactor/core-namespace` | #3 |
+| 4 | Platform layout | `platforms/{shared,forge,neoforge,fabric}`, loader toolchains, one jar per loader | `refactor/platform-layout` | #4 |
+| 5 | Shared language model client | Tool calls, embeddings, prompt-cache hints, retries, provider routes, one HTTP transport | `feat/shared-llm-client` | #5 |
+| 6 | Web registry | The loopback web host and `WebRegistry`, the shared page shell | `feat/web-registry` | #6 |
+| 7 | Security review | Fixes for confirmed findings | `fix/security-review` | #7 |
+| 8 | Release | `0.5.0`, changelog, indexes, closing this record | `release/0.5.0` | #8 |
 
 `chat` carries the other half under the same branch names for tasks 5–7, and its pull
 requests merge after this repository's.
@@ -262,5 +262,6 @@ Chat's switches over `ModelException.Kind` need a `CLOSED` case.
 change its imports and dependency, and its row is in `logs-index.md`. There were no session
 files under `.agents/memory/sessions/` to fold into a digest.
 
-The PR column above fills in once the owner approves opening the pull requests; they open
-in task order, each based on the branch before it.
+The owner approved opening and merging the pull requests. They were #1 to #8, merged into
+`master` in task order by rebase, with the rest of the stack rebased onto `master` after
+each merge.
