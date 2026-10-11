@@ -12,9 +12,10 @@ whatever history it wants and replays it.
 
 ## Current state
 
-The `api` and `common` modules carry the agent API and its implementation. The
-`platforms/mods/*` modules hold the mod side: what every loader shares, the two
-physical sides, and the two mod loaders. What exists today is:
+The `api` and `common` modules carry the agent API and its implementation.
+`platforms/shared` holds what every loader shares, including the two physical
+sides, and `platforms/{forge,neoforge,fabric}` each build one mod jar for
+Minecraft 26.2. What exists today is:
 
 | Path | What it is |
 |---|---|
@@ -23,7 +24,7 @@ physical sides, and the two mod loaders. What exists today is:
 | `LICENSE` | MIT license, `Copyright (c) 2026 MCAgents`. |
 | `settings.gradle`, `build.gradle`, `gradle.properties` | The Gradle multi project build configuration. |
 | `gradlew`, `gradlew.bat`, `gradle/` | The Gradle wrapper and the version catalog. |
-| `api/`, `common/`, `platforms/` | The seven build modules — see [`modules.md`](modules.md). |
+| `api/`, `common/`, `platforms/` | The six build modules — see [`modules.md`](modules.md). |
 | `.agents/` | The agent instruction set — rules, git conventions, planning, platform knowledge, prompts, creators — plus the index, agent-wiki, and memory trees. |
 | `wiki/` | This documentation tree. |
 

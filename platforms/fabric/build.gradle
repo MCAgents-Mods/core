@@ -1,0 +1,51 @@
+// The Fabric mod jar: core's api, common and shared code, plus the two Fabric
+// entry points. The only module that may reference Fabric types.
+
+plugins {
+    id 'net.fabricmc.fabric-loom'
+}
+
+loom {
+    mods {
+        'mcagents_core' {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+dependencies {
+    minecraft libs.minecraft
+    implementation libs.fabric.loader
+    implementation libs.fabric.api
+
+    implementation project(':api')
+    implementation project(':common')
+    implementation project(':platforms:shared')
+}
+
+// api, common and shared are plain Java, so their classes are merged into the
+// mod jar rather than nested as separate Fabric mods. Every other loader jar
+// does the same, which is what makes each one self-contained.
+def bundledModules = [':api', ':common', ':platforms:shared']
+
+tasks.named('jar', Jar) {
+    bundledModules.each { path ->
+        from project(path).sourceSets.main.output
+    }
+    from(rootProject.file('LICENSE')) {
+        rename { "${it}_mcagents_core" }
+    }
+}
+
+processResources {
+    def modVersion = project.version
+    inputs.property 'version', modVersion
+
+    filesMatching('fabric.mod.json') {
+        expand version: modVersion
+    }
+}
+
+base {
+    archivesName = "${rootProject.name}-fabric"
+}

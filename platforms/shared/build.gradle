@@ -1,0 +1,37 @@
+plugins {
+    id 'java-library'
+}
+
+dependencies {
+    // The shared layers are bundled once, by each loader's jar. This module
+    // declares them compileOnly so its own jar never carries a second copy.
+    compileOnly project(':api')
+    compileOnly project(':common')
+
+    // JSON codec for the shared credential file under the Minecraft directory.
+    // compileOnly because Minecraft itself puts Gson on the classpath.
+    compileOnly libs.gson
+}
+
+// No loader coordinate is declared here. This module is the loader-agnostic
+// half of the mod side — plain Java, so it stays testable without a game. The
+// loader toolchains live in platforms/forge, platforms/neoforge and
+// platforms/fabric, each of which bundles this module into its own jar.
+
+dependencies {
+    // `compileOnly` does not reach the test compile classpath, so what this
+    // module compiles against is declared again for the tests.
+    testImplementation project(':api')
+    testImplementation project(':common')
+    testImplementation libs.gson
+}
+
+tasks.named('test', Test) {
+    // SideSeparationTest reads the sources this module compiles.
+    inputs.dir('src/main/java')
+    systemProperty 'shared.sources', file('src/main/java').absolutePath
+}
+
+base {
+    archivesName = "${rootProject.name}-shared"
+}

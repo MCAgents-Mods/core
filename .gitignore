@@ -42,3 +42,8 @@ Thumbs.db
 # The working plan for a task in flight. Scratch, never committed; the task record
 # under .agents/memory/tasks/ is what outlives it.
 .agents/plans/
+
+# --- [ Mod loaders ] ---
+# Development game directories the loader toolchains create for their run tasks.
+run/
+run-data/

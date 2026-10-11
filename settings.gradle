@@ -6,6 +6,25 @@
  * `artifactId` rule in the root `build.gradle`.
  */
 
+pluginManagement {
+    repositories {
+        maven {
+            name = 'Fabric'
+            url = 'https://maven.fabricmc.net/'
+        }
+        maven {
+            name = 'NeoForged'
+            url = 'https://maven.neoforged.net/releases/'
+        }
+        maven {
+            name = 'MinecraftForge'
+            url = 'https://maven.minecraftforge.net/'
+        }
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
 plugins {
     // Apply the foojay-resolver plugin to allow automatic download of JDKs
     id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
@@ -18,13 +37,13 @@ rootProject.name = 'core'
 include 'api'
 include 'common'
 
-// Mod loader family, all under `platforms/mods`. `platforms:mods:core` holds
-// what every mod module shares; `client`
-// and `server` hold the two physical sides, which the loaders never mix; the
-// loader entry points add only what NeoForge or Fabric itself needs.
-include 'platforms:mods:core'
-include 'platforms:mods:client'
-include 'platforms:mods:server'
-include 'platforms:mods:neoforge'
-include 'platforms:mods:fabric'
+// The loader-agnostic mod code: both physical sides, and what decides which
+// one is running. Plain Java, compiled without any loader toolchain.
+include 'platforms:shared'
 
+// One module per mod loader. Each brings its own toolchain and builds its own
+// jar carrying api, common and shared — a loader never loads another loader's
+// classes, so the jars are never merged.
+include 'platforms:forge'
+include 'platforms:neoforge'
+include 'platforms:fabric'

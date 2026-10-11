@@ -88,3 +88,35 @@ Runtime names a player can see were deliberately left alone: the shared credenti
 `mcagents.json` and the `mcagents.side` system property. Released changelogs and older
 task records keep the old names as history. The mod packages still sit under
 `…core.mods`; task 4 moves them into `…core.shared`.
+
+### Task 4 — refactor/platform-layout
+
+`platforms/mods/{core,client,server}` became one module, `platforms/shared`, package
+`…core.shared`, with the two physical sides as the `…shared.client` and
+`…shared.server` packages. The guarantee the old module boundary gave — neither half
+links the other — is now `SideSeparationTest`, which reads the module's sources and
+fails if a side imports the other or if shared code imports either. `ModBootstrap`
+gained a package-private `load(side, className)` so the missing-half failure is still
+tested now that both halves are always on the test classpath.
+
+`CoreRuntime` in `platforms/shared` is the one start and stop every loader calls, so the
+three entry points stay a few lines each.
+
+Three loader modules, each with its own toolchain and its own jar carrying `api`,
+`common` and `platforms/shared`:
+
+| Module | Toolchain | Loader | Entry point | Shutdown hook |
+|---|---|---|---|---|
+| `platforms/forge` | ForgeGradle 7.0.40 | Forge 26.2-65.1.3 | `CoreForgeMod` | `GameShuttingDownEvent` |
+| `platforms/neoforge` | ModDevGradle 2.0.148 | NeoForge 26.2.0.90 | `CoreNeoForgeMod` | `GameShuttingDownEvent` |
+| `platforms/fabric` | Loom 1.17.19 | Fabric 0.19.3, API 0.157.0+26.2 | `CoreFabricMod` (server), `CoreFabricClient` (client) | `SERVER_STOPPED`, `CLIENT_STOPPING` |
+
+All three declare mod id `mcagents_core` and Minecraft `[26.2,26.3)`. Minecraft 26.2 is
+recorded in `knowledge/minecraft-platform.md`; the "no decided version" note is gone.
+`run/` and `run-data/` are ignored for the loaders' dev runs.
+
+**Not proven:** none of the three jars has been loaded in a real game. They compile
+against each loader's real API and their manifests name the classes that exist, nothing
+more. The `/agents` client commands are still not wired into a command tree.
+
+`./gradlew build` passes: 82 tests, all three mod jars produced.

@@ -17,8 +17,9 @@ are:
 * `LICENSE` — MIT, `Copyright (c) 2026 MCAgents`
 * `settings.gradle`, `build.gradle`, `gradle.properties`, `gradlew`,
   `gradlew.bat`, `gradle/` — the build, the wrapper, and the version catalog
-* `api/`, `common/`, `platforms/` — the seven modules, all packaged under
-  `io.github.mcagentsmods.core`
+* `api/`, `common/`, `platforms/` — the six modules, all packaged under
+  `io.github.mcagentsmods.core`; `platforms/{forge,neoforge,fabric}` each build
+  one mod jar for Minecraft 26.2
 * `.agents/` — this repository's own instructions (`rules/`, `knowledge/`), plus
   three reserved structural trees: `.agents/index/` (every index), `.agents/wiki/`
   (agent knowledge), and `.agents/memory/` (dynamic state)
@@ -61,8 +62,10 @@ OpenRouter, OpenAI, DeepSeek, and Anthropic — through
 Three constraints define the project, and a change that breaks one of them is
 wrong regardless of how well it works:
 
-* **API only.** No commands, no permissions, no listeners, no gameplay. `core` is
-  consumed by mods; it is not one.
+* **API only.** No gameplay: no items, blocks, gameplay listeners, or
+  permissions. `core` ships as one mod jar per loader so that every MCAgents mod
+  calls the same copy of it, but the jar adds nothing to the game — it is the
+  foundation other mods are built on, never a feature a player uses directly.
 * **No memory.** Nothing stores a conversation, a cache, or per player state. A
   shared core that accumulated history would leak memory in every consumer at
   once.
@@ -70,9 +73,8 @@ wrong regardless of how well it works:
   off the calling thread. A tick or a rendered frame must never wait on a network
   call.
 
-The `platforms/*` modules exist and compile but hold no code yet. That is scope
-guidance for *where* platform code will live — never a description of code that
-exists.
+The loader modules hold only an entry point and a manifest each; everything they
+start lives in `platforms/shared`, through `CoreRuntime`.
 
 ## Rules
 

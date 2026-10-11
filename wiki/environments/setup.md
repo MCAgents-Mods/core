@@ -9,7 +9,10 @@
   [foojay resolver](https://github.com/gradle/foojay-toolchains) configured in
   `settings.gradle`.
 * **Network access** on the first build, to fetch Gradle 9.5.0, the Java 25
-  toolchain, and the libraries from Maven Central.
+  toolchain, the libraries from Maven Central, the three loader toolchains from
+  the Fabric, NeoForged and MinecraftForge mavens, and Minecraft itself from
+  Mojang. The first build decompiles Minecraft for NeoForge and Forge, which takes
+  a few minutes; later builds reuse the cache.
 
 Gradle itself does not need to be installed — use the wrapper (`./gradlew`)
 checked into the repository.
@@ -30,12 +33,22 @@ The default branch is `master`.
 ```
 
 That compiles every module, runs the tests, and produces one jar per module under
-`{module}/build/libs/`.
+`{module}/build/libs/`. The three that matter are the mod jars:
+
+| Loader | Jar |
+|---|---|
+| Forge | `platforms/forge/build/libs/core-forge-{version}.jar` |
+| NeoForge | `platforms/neoforge/build/libs/core-neoforge-{version}.jar` |
+| Fabric | `platforms/fabric/build/libs/core-fabric-{version}.jar` |
+
+Drop the one matching your loader into the game's `mods/` folder. Fabric also
+needs Fabric API.
 
 Useful variants:
 
 ```sh
 ./gradlew :api:build                 # one module only
+./gradlew :platforms:fabric:build    # one loader's jar
 ./gradlew clean                      # delete the root build directory
 ./gradlew javaToolchains             # show which JDK the build resolved
 ```

@@ -1,20 +1,19 @@
 # Modules
 
 The build is a Gradle multi project defined in `settings.gradle`, with
-`rootProject.name = core`. It has seven modules, and every package under
-them is prefixed `io.github.mcagentsmods.core`.
+`rootProject.name = core`. It has six modules, and every package under them is
+prefixed `io.github.mcagentsmods.core`.
 
 ## The module graph
 
 ```
-api          pure Java contracts
- └── common  pure Java implementations
+api                 pure Java contracts
+ └── common         pure Java implementations
 
-platforms/mods/core          shared mod code, both physical sides
- ├── platforms/mods/client       client-only half
- ├── platforms/mods/server       dedicated-server-only half
- ├── platforms/mods/neoforge     NeoForge entry point
- └── platforms/mods/fabric       Fabric entry point
+platforms/shared    loader-agnostic mod code, both physical sides
+ ├── platforms/forge      Forge entry point     → core-forge-{version}.jar
+ ├── platforms/neoforge   NeoForge entry point  → core-neoforge-{version}.jar
+ └── platforms/fabric     Fabric entry points   → core-fabric-{version}.jar
 ```
 
 ## What each module holds
@@ -23,34 +22,55 @@ platforms/mods/core          shared mod code, both physical sides
 |---|---|---|
 | `api` | `…core.api` | Pure Java contracts: interfaces, records, enums, abstract types, and the `token` package holding the credential storage contract. No implementation, and no platform type anywhere. |
 | `common` | `…core.common` | Pure Java implementations of those contracts. Still no platform type. |
-| `platforms:mods:core` | `…core.mods` | The code every mod module shares, including the machinery that decides which physical side is running. |
-| `platforms:mods:client` | `…core.mods.client` | The client-only half: the player's own credential file, the client commands, anything drawn on screen. |
-| `platforms:mods:server` | `…core.mods.server` | The dedicated-server-only half: the server's credential file, and the checks that decide who may do what. |
-| `platforms:mods:neoforge` | `…core.neoforge` | Only what NeoForge needs on top of `platforms:mods:core`. |
-| `platforms:mods:fabric` | `…core.fabric` | Only what Fabric needs on top of `platforms:mods:core`. |
+| `platforms:shared` | `…core.shared` | The code every loader shares: `CoreRuntime` (start and stop), the machinery that decides which physical side is running, and the two sides as packages — `…shared.client` and `…shared.server`. Plain Java, no loader toolchain. |
+| `platforms:forge` | `…core.forge` | Only what Forge needs: the `@Mod` class and `META-INF/mods.toml`. |
+| `platforms:neoforge` | `…core.neoforge` | Only what NeoForge needs: the `@Mod` class and `META-INF/neoforge.mods.toml`. |
+| `platforms:fabric` | `…core.fabric` | Only what Fabric needs: the main and client entry points and `fabric.mod.json`. |
 
-## Why the mod family has two sides
+## One jar per loader
+
+Each loader module builds its own mod jar, and **the jars are never merged**: a
+loader never loads another loader's classes, and a merged jar would carry two
+loaders' worth of dead code into every game. All three declare the mod id
+`mcagents_core`.
+
+Each jar carries the classes of `api`, `common` and `platforms:shared` merged in
+beside its own entry point, so it is self-contained. Those three modules are
+plain Java, so they are merged rather than nested as separate mods. Gson is not
+bundled: Minecraft puts it on the classpath for every loader.
+
+## Why the mod side has two physical sides
 
 A mod runs in two physically different places — a client with a window and a
 player in front of it, and a dedicated server with neither — and the classes
 that exist differ between them. Client-only code reached on a dedicated server
 is not a logic error; it is a `NoClassDefFoundError` that takes the server down.
 
-So the mod family splits by **physical side** rather than by loader:
-`platforms:mods:client` and `platforms:mods:server` never depend on each other,
-and neither is named by type from anywhere else. The loaders — NeoForge and
-Fabric — sit beside them and differ only in how they announce an entry point,
-which is a much smaller difference than the one between the two sides.
+So `platforms:shared` splits by **physical side** rather than by loader: the
+`…shared.client` and `…shared.server` packages never import each other, and
+nothing else imports either of them — `SideSeparationTest` fails the build if
+that changes. The loaders sit beside `platforms:shared` and differ only in how
+they announce an entry point, which is a much smaller difference than the one
+between the two sides.
 
 How the right half is started without linking the other is on
 [`mod-sides.md`](mod-sides.md).
 
-## Why the dependencies are `compileOnly`
+## Toolchains
 
-Every platform module declares `api`, `common`, and `platforms:mods:core` as
-**`compileOnly`**. They compile against those classes but never bundle them, so
-the mod jar that ships them carries exactly one copy of each class instead of one
-copy per module that happened to depend on it.
+| Module | Gradle plugin | Loader coordinate |
+|---|---|---|
+| `platforms:forge` | ForgeGradle (`net.minecraftforge.gradle`) | `net.minecraftforge:forge` |
+| `platforms:neoforge` | ModDevGradle (`net.neoforged.moddev`) | `net.neoforged:neoforge` |
+| `platforms:fabric` | Fabric Loom (`net.fabricmc.fabric-loom`) | `net.fabricmc:fabric-loader`, `net.fabricmc.fabric-api:fabric-api` |
+
+The three plugins are declared once in the root `build.gradle` with
+`apply false`, so they share one build classloader. Every loader targets
+**Minecraft 26.2**. Minecraft 26.x ships unobfuscated, so no module declares a
+mappings coordinate.
+
+`api`, `common` and `platforms:shared` use none of these toolchains. That is
+what keeps them testable without a game running.
 
 ## Published artifacts
 
@@ -62,31 +82,25 @@ Only `api` and `common` carry a publication:
 | `common` | `io.github.mcagentsmods:core-common` |
 
 The `artifactId` is qualified with the root project name deliberately. Without
-it, every MCAgents project in this group would publish a colliding
-`io.github.mcagentsmods:api`, and a consumer could not depend on `core` and another
-project at the same time.
+it, every project in this group would publish a colliding
+`io.github.mcagentsmods:api`, and a consumer could not depend on `core` and
+another project at the same time.
 
-The platform modules are distributed as mod artifacts rather than libraries, so
-they are not published to a Maven repository.
+The loader modules are distributed as mod jars rather than libraries, so they
+are not published to a Maven repository.
 
 ## Dependency versions
 
-Coordinates live in `gradle/libs.versions.toml`, so a version bump is one change
-in one file:
+Every coordinate lives in `gradle/libs.versions.toml`, so a version bump is one
+change in one file:
 
 | Catalog entry | Coordinate | Used by |
 |---|---|---|
-| `gson` | `com.google.code.gson:gson` | `common`, the mod family |
-
-Gson is `compileOnly` because Minecraft itself puts it on the classpath for every
-mod loader, so no jar here carries a copy of it.
-
-No module under `platforms/mods` declares a **mod loader coordinate yet**.
-Resolving `net.neoforged:neoforge` or the Fabric loader requires a toolchain
-(ModDevGradle, Loom) that remaps Minecraft as part of the build. Those are
-introduced together with the first real loader code rather than scaffolded
-ahead of it. Everything the mod family holds today is plain Java, which is also
-what keeps it testable without a game running.
+| `gson` | `com.google.code.gson:gson` | `common`, `platforms:shared` (compileOnly) |
+| `minecraft` | `com.mojang:minecraft` | `platforms:fabric` |
+| `fabric-loader`, `fabric-api` | Fabric | `platforms:fabric` |
+| `neoforge` (version only) | `net.neoforged:neoforge` | `platforms:neoforge` |
+| `forge` (version only) | `net.minecraftforge:forge` | `platforms:forge` |
 
 ## Java version
 

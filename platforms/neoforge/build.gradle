@@ -1,0 +1,49 @@
+// The NeoForge mod jar: core's api, common and shared code, plus the NeoForge
+// entry point. The only module that may reference NeoForge types.
+
+plugins {
+    id 'net.neoforged.moddev'
+}
+
+neoForge {
+    version = libs.versions.neoforge.get()
+
+    mods {
+        'mcagents_core' {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+dependencies {
+    implementation project(':api')
+    implementation project(':common')
+    implementation project(':platforms:shared')
+}
+
+// api, common and shared are plain Java, so their classes are merged into the
+// mod jar. Every loader jar does the same, which is what makes each one
+// self-contained.
+def bundledModules = [':api', ':common', ':platforms:shared']
+
+tasks.named('jar', Jar) {
+    bundledModules.each { path ->
+        from project(path).sourceSets.main.output
+    }
+    from(rootProject.file('LICENSE')) {
+        rename { "${it}_mcagents_core" }
+    }
+}
+
+processResources {
+    def modVersion = project.version
+    inputs.property 'version', modVersion
+
+    filesMatching('META-INF/neoforge.mods.toml') {
+        expand version: modVersion
+    }
+}
+
+base {
+    archivesName = "${rootProject.name}-neoforge"
+}

@@ -1,6 +1,6 @@
 ---
 name: minecraft-platform-knowledge
-description: Platform targets — the mod loaders core builds for, the two physical sides, and the threading constraints shared code must honour.
+description: Platform targets — the three mod loaders core builds for, Minecraft 26.2, the two physical sides, and the threading constraints shared code must honour.
 ---
 
 # Minecraft Platform
@@ -14,10 +14,17 @@ instructions targeting them until that decision changes.
 
 | Loader | What it is | Module |
 |---|---|---|
-| **NeoForge** | A Forge fork, and the mainline Forge-lineage loader. | `platforms:mods:neoforge` |
-| **Fabric** | A lightweight loader with its own API. | `platforms:mods:fabric` |
+| **Forge** | The original Forge loader, MinecraftForge. | `platforms:forge` |
+| **NeoForge** | A Forge fork with its own API and event bus. | `platforms:neoforge` |
+| **Fabric** | A lightweight loader with its own API. | `platforms:fabric` |
 
-`platforms:mods:core` holds what the loaders share.
+`platforms:shared` holds what the loaders share. **Each loader builds its own jar**
+and the jars are never merged: a loader never loads another loader's classes.
+
+**Minecraft 26.2** is the one version every loader targets — decided with the owner on
+2026-10-11, because `MCAgents-Mods/chat` already targets it. Minecraft 26.x ships
+unobfuscated, so there is no mappings coordinate. Moving the version means moving all
+three loaders at once, and only after each loader's maven publishes a build for it.
 
 ## Two physical sides
 
@@ -56,20 +63,14 @@ every consumer:
 Every coordinate is declared once, in `gradle/libs.versions.toml`, and never inline in
 a module.
 
-**The mod loaders have no coordinate yet.** Resolving `net.neoforged:neoforge` or the
-Fabric loader requires a toolchain (ModDevGradle, Loom) that remaps Minecraft as part of
-the build. The loader modules are plain Java modules until the first real loader code
-lands and brings its toolchain with it. Do not add one speculatively.
+| Catalog entry | Toolchain | Module |
+|---|---|---|
+| `forge`, `forgegradle` | ForgeGradle 7 | `platforms:forge` |
+| `neoforge`, `moddevgradle` | ModDevGradle | `platforms:neoforge` |
+| `minecraft`, `fabric-loader`, `fabric-api`, `fabric-loom` | Fabric Loom | `platforms:fabric` |
 
-## Not yet decided
-
-Do not fill these in by guessing:
-
-* The **Minecraft versions** `core` targets. Until they are decided, write no
-  version-specific code, no compatibility shims, and no documentation claiming a
-  supported range.
-
-Record each one here in the same change that introduces it.
+Loader types are referenced **only** in the module for that loader. `api`, `common` and
+`platforms:shared` use no toolchain and must never name a loader or Minecraft type.
 
 ## Changing this rule
 

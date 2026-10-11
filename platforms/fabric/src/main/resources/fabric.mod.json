@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "mcagents_core",
+  "version": "${version}",
+  "name": "MCAgents Core",
+  "description": "The shared foundation MCAgents mods build on: the language model client and the local web console that other mods register their pages into.",
+  "authors": [
+    "MCAgents"
+  ],
+  "contact": {
+    "homepage": "https://github.com/MCAgents-Mods/core",
+    "sources": "https://github.com/MCAgents-Mods/core",
+    "issues": "https://github.com/MCAgents-Mods/core/issues"
+  },
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "io.github.mcagentsmods.core.fabric.CoreFabricMod"
+    ],
+    "client": [
+      "io.github.mcagentsmods.core.fabric.CoreFabricClient"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.19.3",
+    "minecraft": "~26.2",
+    "java": ">=25",
+    "fabric-api": "*"
+  }
+}
