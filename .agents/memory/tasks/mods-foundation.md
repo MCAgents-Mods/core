@@ -120,3 +120,53 @@ against each loader's real API and their manifests name the classes that exist, 
 more. The `/agents` client commands are still not wired into a command tree.
 
 `./gradlew build` passes: 82 tests, all three mod jars produced.
+
+### Task 5 — feat/shared-llm-client
+
+`MCAgents-Mods/chat`'s model client moved into core, so chat and any later mod call the
+same code:
+
+| Where | What |
+|---|---|
+| `api.model` | `ModelClient`, `ChatRequest`, `ChatCompletion`, `PromptMessage`, `ToolDefinition`, `ToolCall`, `TokenUsage`, `ApiKeySource`, `ProviderRoute`, `ProviderRoutes`, `ModelException`, `ModelName`, `ModelPlatform` |
+| `api.http` | `HttpTransport`, `HttpCall`, `HttpReply` |
+| `common.model` | `OpenRouterClient` and its package-private `OpenRouterPayloads` |
+| `common.http` | `JdkHttpTransport` |
+| `common` test fixtures | `StubTransport`, `StubKeySource`, published as `core-common`'s test-fixtures variant |
+
+Decisions:
+
+- **One `ChatRole`.** `api.chat.ChatRole` gained `TOOL` rather than core carrying a second
+  role enum. `ChatMessage` refuses `TOOL`, because it cannot name the call a result
+  answers and every vendor rejects a tool turn without one. Chat switches from
+  `wireName()` to `code()`.
+- **Attribution is the caller's.** `OpenRouterClient.Attribution` carries `HTTP-Referer`
+  and `X-Title`; the default names core, `NONE` sends neither, and a control character is
+  refused so a name cannot inject a header. Chat passes its own.
+- **Keys stay with the mod.** Core never stores a key for this client; the mod supplies an
+  `ApiKeySource`.
+- `ModelPlatform.baseUrlSettingKey` came along unchanged. It is a naming convention, not
+  storage, and chat's screens and website already use it.
+
+Chat's tests for these behaviours came with the code: client, direct routes, tool payloads,
+and the `ModelName` and `ModelPlatform` half of chat's naming test. The `ModelCatalog` and
+`ModelPreferences` half stays in chat with those classes. `AttributionTest` and
+`ExchangeShapeTest` are new.
+
+**Left for task 7**, found while porting:
+
+- Core now has two request shapes: `api.chat` with `MCAgentsProvider` and `LlmClient`, and
+  `api.model` with `OpenRouterClient`. `TokenUsage` and `ChatRequest` exist in both, and
+  `LlmVendor` and `ModelPlatform` both list the OpenAI-dialect base URLs.
+- `ModelPlatform.isUsableBaseUrl` matches by prefix, so `http://localhost.example.com`
+  passes as loopback and would receive a key in clear text.
+- `JdkHttpTransport` follows redirects, which can carry the `Authorization` header to
+  another host.
+- `close()` shuts the retry scheduler down with `shutdownNow()`, so a request waiting on a
+  backoff never completes.
+- A response whose `choices[0]` or `message` is not a JSON object throws
+  `IllegalStateException`, which is classed as `TRANSPORT` and retried, billing the request
+  again.
+
+`./gradlew build` passes: 136 tests, all three mod jars produced, and each jar carries the
+new packages but not the fixtures.

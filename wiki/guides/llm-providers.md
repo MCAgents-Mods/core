@@ -143,9 +143,9 @@ agents.askDeepSeek(model, prompt)
 The message carries the vendor's own error text, so an HTTP 400 tells you what
 was actually wrong.
 
-The core does not retry. `LlmCredentials.timeout()` bounds one exchange, and
-that is the whole of its patience — a retry policy belongs to the mod that
-knows whether the work is worth repeating.
+`MCAgentsProvider` does not retry. `LlmCredentials.timeout()` bounds one
+exchange, and that is the whole of its patience. If you want retries, use the
+routed model client below, which retries the failures worth retrying.
 
 ## What differs per vendor
 
@@ -170,6 +170,53 @@ agents.register(LlmCredentials
         .withTimeout(Duration.ofSeconds(120))
         .withHeader("X-Tenant", "survival-1"));
 ```
+
+## Tools, embeddings, and caching: the routed model client
+
+`MCAgentsProvider` sends a conversation and returns text. When a mod needs more
+— the model calling tools, embeddings for retrieval, prompt caching, retries,
+or keys that rotate on their own — use `OpenRouterClient` instead:
+
+```java
+ApiKeySource keys = myKeyStore;                       // your storage, your encryption
+ModelClient models = new OpenRouterClient(
+        new JdkHttpTransport(), keys, ProviderRoutes.throughOpenRouter(),
+        new OpenRouterClient.Attribution("https://github.com/you/your-mod", "YourMod"));
+
+ChatRequest request = new ChatRequest("openai/gpt-4o-mini", List.of(
+        PromptMessage.system(persona).asCacheBreakpoint(),
+        PromptMessage.user(question)));
+
+models.complete(request).thenAccept(answer -> {
+    if (answer.wantsTools()) {
+        // run answer.toolCalls(), then send request.continuedWith(…) with
+        // PromptMessage.assistantToolCalls(…) and one PromptMessage.toolResult(…) per call
+    } else {
+        minecraft.execute(() -> show(answer.text()));
+    }
+});
+```
+
+Core never stores keys. Your mod implements `ApiKeySource`: `next(platform)`
+hands over the key to use, and `reject(key)` is called when a provider refuses
+one, so you can mark it inactive. The client tries up to five keys per request.
+
+Model names follow `{platform}/{model}`, lowercase — `ModelName` builds and
+reads them. A `ProviderRoutes` decides whether a request goes through
+OpenRouter or straight to the platform; the default sends everything through
+OpenRouter. A direct base URL must be `https`, or `http` on a loopback address,
+so a key is never sent in the clear to another machine.
+
+Put everything stable at the front of the message list and mark the end of it
+with `asCacheBreakpoint()`. `answer.usage().cacheHitRate()` tells you whether
+the provider reused it.
+
+Failures arrive as a `ModelException` whose `kind()` says what happened. Rate
+limits, server errors, and dropped connections are retried up to three times
+with backoff before you see them.
+
+Close the client when your mod shuts down. That closes the transport and
+cancels pending retries.
 
 ## Shut down
 
