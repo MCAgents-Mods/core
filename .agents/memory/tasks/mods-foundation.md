@@ -170,3 +170,45 @@ and the `ModelName` and `ModelPlatform` half of chat's naming test. The `ModelCa
 
 `./gradlew build` passes: 136 tests, all three mod jars produced, and each jar carries the
 new packages but not the fixtures.
+
+### Task 6 — feat/web-registry
+
+Chat's `LocalWebConsole` became core's console, generalised from one mod's pages to every
+mod's:
+
+| Where | What |
+|---|---|
+| `api.web` | `WebRegistry`, `WebModule`, `NavLink`, `WebRequest`, `WebResponse`, `WebConsole`, `WebConsoleException` |
+| `common.web` | `CoreWebRegistry` (public, `shared()`), and package-private `LocalWebHost`, `ShellModule`, `WebResources` |
+| `common/src/main/resources/mcagents_core/web/` | The shell moved from chat: `main.css`, `layout.css`, `components.css`, `site.js`, the header and footer partials; plus core's own front page and `index.js` |
+
+Decisions:
+
+- **Paths are namespaced per module**: `/{id}/…` pages, `/assets/{id}/…` assets,
+  `/api/{id}/…` handlers. Core's shell is itself a module under the reserved id `core`, so
+  it routes the same way and no mod can take its paths. `api` and `assets` are reserved too.
+- **The console starts on demand**, on the first `open()`, not when core loads. A port is
+  opened only when a player asks for the console, which is how chat already behaved. Core
+  closes it in `CoreRuntime.stop()`.
+- **The header is built from the registry.** `GET /api/core/navigation` lists every module
+  and its links; `site.js` builds the header from it with `textContent`, one group per mod
+  when there is more than one.
+- **A page names itself on `<body>`** (`data-module`, `data-section`) instead of setting
+  `window.SITE_ROOT` and `window.PAGE_SECTION` in an inline script, because the console now
+  sends a `Content-Security-Policy` with `script-src 'self'`. Chat's pages change to match.
+- Kept from chat: loopback bind, the 256-bit per-run token in the URL or
+  `X-MCAgents-Token`, the `Host` check, no CORS, constant-time token comparison, four
+  daemon workers, and the character whitelist on asset paths.
+- Changed from chat while moving it: a body over 256 KiB is refused with a 413 instead of
+  silently cut short; the `Host` check no longer accepts junk after a port (`127.0.0.1:80:x`)
+  or a name after `[::1]`; `.class` files are never served as assets; the API path is
+  decoded once, where chat's routes decoded it twice; and every answer adds
+  `X-Frame-Options`, `Cross-Origin-Resource-Policy` and the content security policy.
+
+**Not proven:** `com.sun.net.httpserver` and `java.net.http` are in the JDK, and chat uses
+both in game on Fabric, but neither has been checked on Forge or NeoForge, whose module
+layers may not resolve `jdk.httpserver` or `java.net.http` unless something requires them.
+That needs a real launch, with the rest of the "never launched" list from Task 4.
+
+`./gradlew build` passes: 162 tests, with `LocalWebHostTest` and `CoreWebRegistryTest` new, and all
+three jars carry `common.web` and the shell resources.

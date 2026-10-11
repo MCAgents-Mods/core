@@ -23,6 +23,9 @@ history, read `wiki/logs/`.
   `MCAgents-Mods/chat` with tool calling, embeddings, prompt-cache hints, retries,
   key rotation and direct provider routes. `core-common` publishes `StubTransport`
   and `StubKeySource` as test fixtures.
+- The local web console, in `common.web`: one loopback server, started on demand, that
+  every mod registers its pages into through `CoreWebRegistry.shared()`, and the shared
+  page shell under `mcagents_core/web/`.
 - Credential pooling, rotation, and storage owned entirely by `core`: the shared
   `mcagents.json` and the `/agents` client command logic with masked handles in tab
   completion.

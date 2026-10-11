@@ -23,7 +23,7 @@ Full description: [`../../../wiki/information/overview.md`](../../../wiki/inform
 | Path | What it is |
 |---|---|
 | `api/` | Pure Java API contracts — chat, llm, token, model and http packages. Depends on nothing in the repo. |
-| `common/` | The implementation: `MCAgentsProvider`, the vendor clients, credential pooling, the routed `OpenRouterClient` (`common.model`) and `JdkHttpTransport` (`common.http`). |
+| `common/` | The implementation: `MCAgentsProvider`, the vendor clients, credential pooling, the routed `OpenRouterClient` (`common.model`), `JdkHttpTransport` (`common.http`), and the web console (`common.web`, its shell under `common/src/main/resources/mcagents_core/web/`). |
 | `common/src/testFixtures/` | `StubTransport` and `StubKeySource`, published for consumers' tests. |
 | `platforms/shared/` | What every loader shares: `CoreRuntime`, the side-guard machinery, and the client and server halves as packages. Plain Java. |
 | `platforms/{forge,neoforge,fabric}/` | One entry point and one manifest per loader, each with its own toolchain and its own mod jar. |
@@ -51,6 +51,7 @@ that page rather than inferring the layout from the directory listing.
 |---|---|---|
 | `MCAgentsProvider` | `common/…/common/MCAgentsProvider.java` | One registered client per vendor. |
 | `OpenRouterClient` | `common/…/common/model/OpenRouterClient.java` | The routed client: tools, embeddings, caching, retries, key rotation. What `MCAgents-Mods/chat` calls. |
+| `CoreWebRegistry` | `common/…/common/web/CoreWebRegistry.java` | Where mods register web pages; `shared()` is the game's one instance, `open()` starts the console. |
 | `CoreRuntime` | `platforms/shared/…/shared/` | What each loader's entry point calls to start and stop core. |
 | `SideEntrypoint` / `ModBootstrap` | `platforms/shared/…/shared/environment/` | Mod-side bootstrap and the client/server split. |
 

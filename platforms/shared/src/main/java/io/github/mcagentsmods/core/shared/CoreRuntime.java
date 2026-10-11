@@ -1,5 +1,6 @@
 package io.github.mcagentsmods.core.shared;
 
+import io.github.mcagentsmods.core.common.web.CoreWebRegistry;
 import io.github.mcagentsmods.core.shared.environment.ModBootstrap;
 import io.github.mcagentsmods.core.shared.environment.ModContext;
 import io.github.mcagentsmods.core.shared.environment.ModEnvironment;
@@ -58,7 +59,8 @@ public final class CoreRuntime {
     }
 
     /**
-     * Stops the running half, if any. Safe to call more than once.
+     * Stops the running half, if any, and the web console if it is open. Safe to
+     * call more than once.
      */
     public static synchronized void stop() {
         SideEntrypoint current = running;
@@ -66,6 +68,9 @@ public final class CoreRuntime {
         if (current != null) {
             current.stop();
         }
+        // The web console's port must not outlive the game. Registrations are kept: they
+        // are a mod's pages, not state, and cost nothing while nothing listens.
+        CoreWebRegistry.shared().close();
     }
 
     /**
