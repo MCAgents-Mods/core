@@ -56,8 +56,10 @@ Anything you would have to guess at is not a rule — it is a fabrication.
 
 `core` holds the shared agent and API code that MCAgents' Minecraft mods build
 on. Today that is one capability: driving language model agents —
-OpenRouter, OpenAI, DeepSeek, and Anthropic — through
-`io.github.mcagentsmods.core.common.MCAgentsProvider`, the single public entry point.
+OpenRouter, OpenAI, DeepSeek, and Anthropic — through two public entry points:
+`io.github.mcagentsmods.core.common.MCAgentsProvider`, one client per vendor, and
+`io.github.mcagentsmods.core.common.model.OpenRouterClient`, the routed client with
+tool calling, embeddings, prompt caching, and retries.
 
 Three constraints define the project, and a change that breaks one of them is
 wrong regardless of how well it works:

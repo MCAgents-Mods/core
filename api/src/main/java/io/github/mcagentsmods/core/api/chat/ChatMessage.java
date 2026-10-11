@@ -21,10 +21,16 @@ public record ChatMessage(ChatRole role, String content) {
      *
      * @throws NullPointerException When {@code role} or {@code content} is
      *                              {@code null}.
+     * @throws IllegalArgumentException When {@code role} is
+     *                                  {@link ChatRole#TOOL}.
      */
     public ChatMessage {
         Objects.requireNonNull(role, "role cannot be null");
         Objects.requireNonNull(content, "content cannot be null");
+        if (role == ChatRole.TOOL) {
+            throw new IllegalArgumentException(
+                    "A tool result names the call it answers; use PromptMessage.toolResult");
+        }
     }
 
     /**

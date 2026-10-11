@@ -4,7 +4,7 @@ Shared foundation repository for **MCAgents-Mods**. It holds the agent and API
 code that MCAgents' Minecraft mods build on, so that behavior common to several
 mods lives in one place instead of being copied between them. Today that means
 one thing: driving language model agents — OpenRouter, OpenAI, DeepSeek, and
-Anthropic — from a mod, through a single class.
+Anthropic — from a mod, with no network code of its own.
 
 ```java
 MCAgentsProvider agents = MCAgentsProvider.create();
@@ -25,8 +25,10 @@ wants and replays it.
   `platforms/neoforge` and `platforms/fabric` — each building its own jar for
   Minecraft 26.2, all under `io.github.mcagentsmods.core`. See
   [`wiki/information/modules.md`](wiki/information/modules.md).
-- `MCAgentsProvider` — the single entry point, and the only class a consumer
-  needs to read. See [`wiki/reference/api.md`](wiki/reference/api.md).
+- `MCAgentsProvider` — one registered client per vendor, for a simple question
+  and answer — and `OpenRouterClient`, the routed client with tool calling,
+  embeddings, prompt caching, retries and key rotation. See
+  [`wiki/reference/api.md`](wiki/reference/api.md).
 - An agent instruction set under `.agents/` — placement rules, git conventions,
   task workflow, and the creator agents that maintain the trees.
 - A documentation tree under `wiki/` for people, and an agent-facing knowledge and

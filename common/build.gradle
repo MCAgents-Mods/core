@@ -1,5 +1,11 @@
 plugins {
     id 'java-library'
+
+    // StubTransport and StubKeySource are the doubles this module's tests drive
+    // the model client with, and a consuming mod tests its own code against
+    // them too. A test source set is private to its project, so they live in
+    // src/testFixtures, which this project's own tests still see.
+    id 'java-test-fixtures'
 }
 
 dependencies {
@@ -20,6 +26,10 @@ dependencies {
     // bundles exactly one copy; nothing here changes what ships.
     testImplementation project(':api')
     testImplementation libs.gson
+
+    // The fixtures implement api contracts, so a consumer of the fixtures needs
+    // the api on its test classpath as well.
+    testFixturesApi project(':api')
 }
 
 base {

@@ -22,8 +22,9 @@ Full description: [`../../../wiki/information/overview.md`](../../../wiki/inform
 
 | Path | What it is |
 |---|---|
-| `api/` | Pure Java API contracts — chat, llm, token packages. Depends on nothing in the repo. |
-| `common/` | The implementation: `MCAgentsProvider`, the vendor clients, credential pooling. |
+| `api/` | Pure Java API contracts — chat, llm, token, model and http packages. Depends on nothing in the repo. |
+| `common/` | The implementation: `MCAgentsProvider`, the vendor clients, credential pooling, the routed `OpenRouterClient` (`common.model`) and `JdkHttpTransport` (`common.http`). |
+| `common/src/testFixtures/` | `StubTransport` and `StubKeySource`, published for consumers' tests. |
 | `platforms/shared/` | What every loader shares: `CoreRuntime`, the side-guard machinery, and the client and server halves as packages. Plain Java. |
 | `platforms/{forge,neoforge,fabric}/` | One entry point and one manifest per loader, each with its own toolchain and its own mod jar. |
 | `gradle/libs.versions.toml` | Every dependency coordinate. Never declare one inline in a module. |
@@ -48,7 +49,8 @@ that page rather than inferring the layout from the directory listing.
 
 | Entry point | Where | Notes |
 |---|---|---|
-| `MCAgentsProvider` | `common/…/common/MCAgentsProvider.java` | The single public entry point, and the only class a consumer needs to read. |
+| `MCAgentsProvider` | `common/…/common/MCAgentsProvider.java` | One registered client per vendor. |
+| `OpenRouterClient` | `common/…/common/model/OpenRouterClient.java` | The routed client: tools, embeddings, caching, retries, key rotation. What `MCAgents-Mods/chat` calls. |
 | `CoreRuntime` | `platforms/shared/…/shared/` | What each loader's entry point calls to start and stop core. |
 | `SideEntrypoint` / `ModBootstrap` | `platforms/shared/…/shared/environment/` | Mod-side bootstrap and the client/server split. |
 

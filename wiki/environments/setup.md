@@ -53,9 +53,9 @@ Useful variants:
 ./gradlew javaToolchains             # show which JDK the build resolved
 ```
 
-## The request timeout
+## The request timeouts
 
-One request either answers or fails within 60 seconds —
+Through `MCAgentsProvider`, one request either answers or fails within 60 seconds —
 `LlmCredentials.DEFAULT_TIMEOUT`. **This is the only place a timeout is
 defined.** Consumer mods have no timeout setting, pass none, and cannot override
 it, so a consumer can rely on its future completing without owning a timer of its
@@ -64,6 +64,11 @@ own.
 A timeout is not a credential failure. Nothing is evicted and nothing is retried:
 a model that has not answered in this long is unlikely to answer sooner on a
 second attempt, and retrying doubles the bill.
+
+The routed client, `OpenRouterClient`, sends through `JdkHttpTransport`, which
+allows 10 seconds to connect and 120 seconds for an answer. There a timeout is a
+`TRANSPORT` failure and **is** retried, up to three attempts, so a request can
+take up to six minutes before its future fails.
 
 ## Test
 

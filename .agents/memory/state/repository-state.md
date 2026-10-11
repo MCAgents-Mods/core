@@ -17,21 +17,26 @@ history, read `wiki/logs/`.
 
 **What exists and works.**
 
-- `api` and `common` — the language model API and its implementation.
-  `MCAgentsProvider` is the single public entry point, driving OpenRouter, OpenAI,
-  DeepSeek, and Anthropic.
+- `api` and `common` — the language model API and its implementation, with two
+  entry points: `MCAgentsProvider`, one client per vendor for OpenRouter, OpenAI,
+  DeepSeek, and Anthropic; and `OpenRouterClient`, the routed client moved from
+  `MCAgents-Mods/chat` with tool calling, embeddings, prompt-cache hints, retries,
+  key rotation and direct provider routes. `core-common` publishes `StubTransport`
+  and `StubKeySource` as test fixtures.
 - Credential pooling, rotation, and storage owned entirely by `core`: the shared
   `mcagents.json` and the `/agents` client command logic with masked handles in tab
   completion.
-- One request timeout, 60 seconds (`LlmCredentials.DEFAULT_TIMEOUT`). It is the only
-  timeout in MCAgents; consumers cannot override it.
+- Two request timeouts: 60 seconds on the `MCAgentsProvider` path
+  (`LlmCredentials.DEFAULT_TIMEOUT`), and 10 seconds to connect and 120 to answer in
+  `JdkHttpTransport`, which the routed client uses.
 - Six build modules: `api`, `common`, `platforms/shared` (the loader-agnostic mod
   code, with the client and server halves as packages) and one module per loader —
   `platforms/forge`, `platforms/neoforge`, `platforms/fabric` — each building its own
   mod jar, id `mcagents_core`, for Minecraft 26.2. The Bukkit family and the
   universal engine jar were removed on 2026-10-11 — see [`../tasks/mods-foundation.md`](../tasks/mods-foundation.md).
 - A JUnit 5 test harness wired once in the root `build.gradle`. Tests exist for
-  `common` token handling and for `platforms/shared`: the environment, client and
+  the `api.model` records, `common` token handling, the routed model client, and
+  `platforms/shared`: the environment, client and
   server packages, `CoreRuntime`, and the side separation check.
 
 **What is not built yet.**

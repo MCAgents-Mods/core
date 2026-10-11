@@ -3,8 +3,10 @@ package io.github.mcagentsmods.core.api.chat;
 /**
  * Who authored a {@link ChatMessage}.
  *
- * <p>These three roles are the subset every supported vendor understands. The
- * wire name each vendor expects is carried by {@link #code()} rather than being
+ * <p>{@link #SYSTEM}, {@link #USER} and {@link #ASSISTANT} are the roles every
+ * supported vendor understands. {@link #TOOL} exists only for the tool exchange
+ * of {@link io.github.mcagentsmods.core.api.model.PromptMessage}, and a
+ * {@link ChatMessage} refuses it. The wire name each vendor expects is carried by {@link #code()} rather than being
  * derived from {@link #name()}, so renaming a constant here can never silently
  * change what goes over the network.</p>
  */
@@ -30,7 +32,17 @@ public enum ChatRole {
      * A turn authored by the model. Used when replaying an earlier exchange
      * back to the model, since the core keeps no conversation history itself.
      */
-    ASSISTANT("assistant");
+    ASSISTANT("assistant"),
+
+    /**
+     * The result of a tool the model asked for.
+     *
+     * <p>A wire role only, and only meaningful in a
+     * {@link io.github.mcagentsmods.core.api.model.PromptMessage} that names
+     * the call it answers. A {@link ChatMessage} cannot carry that id, so it
+     * refuses this role rather than sending a turn every vendor rejects.</p>
+     */
+    TOOL("tool");
 
     /**
      * The identifier this role is sent as. Fixed per constant at construction

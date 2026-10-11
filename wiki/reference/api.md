@@ -1,8 +1,10 @@
 # API Reference
 
 Every public type in `core-api` and `core-common`, and what each one is
-for. If you only read one section, read
-[`MCAgentsProvider`](#mcagentsprovider) — it is the whole surface.
+for. There are two ways in:
+[`MCAgentsProvider`](#mcagentsprovider), one registered client per vendor, and
+the [routed model client](#the-routed-model-client), for tools, embeddings,
+prompt caching, and retries.
 
 For a task-oriented walkthrough instead, see
 [`../guides/llm-providers.md`](../guides/llm-providers.md).
@@ -161,9 +163,13 @@ replayed in the next request.
 ### ChatMessage and ChatRole
 
 `ChatMessage(ChatRole role, String content)`, with `ChatMessage.system(…)`,
-`.user(…)`, and `.assistant(…)` factories. `ChatRole` is `SYSTEM`, `USER`, or
-`ASSISTANT`; each carries a fixed wire `code()`, and `fromCode` resolves one
-case-insensitively.
+`.user(…)`, and `.assistant(…)` factories. `ChatRole` is `SYSTEM`, `USER`,
+`ASSISTANT`, or `TOOL`; each carries a fixed wire `code()`, and `fromCode`
+resolves one case-insensitively.
+
+`TOOL` belongs to the routed model client's `PromptMessage`, which names the
+call a result answers. A `ChatMessage` has nowhere to carry that id, so it
+refuses `TOOL` with `IllegalArgumentException`.
 
 ### TokenUsage
 
@@ -197,7 +203,7 @@ tokens can be billed differently.
 | `vendor()` | `LlmVendor` | Which service these reach. |
 | `apiKey()` | `String` | The secret. Never blank. |
 | `baseUrl()` | `String` | The endpoint. Trailing slashes are stripped. |
-| `timeout()` | `Duration` | Bounds one HTTP exchange, not a retry sequence — the core does not retry. Defaults to 60s (`DEFAULT_TIMEOUT`). Carried on the credential template, so it survives every rotation. |
+| `timeout()` | `Duration` | Bounds one HTTP exchange, not a retry sequence — this path does not retry; the [routed model client](#the-routed-model-client) does. Defaults to 60s (`DEFAULT_TIMEOUT`). Carried on the credential template, so it survives every rotation. |
 | `headers()` | `Map<String,String>` | Extra headers on every request. Unmodifiable copy. |
 
 Build with `LlmCredentials.of(vendor, apiKey)` or
@@ -222,10 +228,104 @@ implementations are package-private. They are documented here because they are
 public types in the published `api` jar, not because there is anything to do
 with them.
 
+## The routed model client
+
+A second way to call a model, for a mod that needs tool calling, embeddings,
+prompt caching, retries, or per-request routing. It is the client
+`MCAgents-Mods/chat` was built on, moved here so every mod shares it.
+
+### ModelClient and OpenRouterClient
+
+`io.github.mcagentsmods.core.api.model.ModelClient` is the contract;
+`io.github.mcagentsmods.core.common.model.OpenRouterClient` implements it.
+
+| Method | Returns | Meaning |
+|---|---|---|
+| `complete(ChatRequest)` | `CompletableFuture<ChatCompletion>` | Sends a conversation and returns the answer, or the tools the model wants run first. |
+| `embed(String model, String text)` | `CompletableFuture<float[]>` | Embeds text for retrieval. |
+| `close()` | | Closes the transport and stops pending retries. |
+
+A client is built from three seams, so nothing in it knows where keys or
+settings live:
+
+| Constructor argument | Type | What it supplies |
+|---|---|---|
+| `transport` | `HttpTransport` | Sends a request. `JdkHttpTransport` is the real one: 10s connect timeout, 120s request timeout. |
+| `keys` | `ApiKeySource` | The key to use next, per platform, and where to report one the provider rejected. |
+| `routes` | `ProviderRoutes` | Where a stored model name goes. Defaults to `ProviderRoutes.throughOpenRouter()`. |
+| `attribution` | `OpenRouterClient.Attribution` | The `HTTP-Referer` and `X-Title` OpenRouter is sent. Defaults to `Attribution.CORE`; `Attribution.NONE` sends neither. A value with a control character is refused. |
+
+What it does so callers do not have to:
+
+* **Key rotation.** A 401, 403, or 402 rejects the key through
+  `ApiKeySource.reject` and tries the next, up to five keys per request.
+* **Retries.** A rate limit, a server error, or a transport failure is retried
+  up to three attempts in total, with exponential backoff and jitter. A bad
+  request and a malformed answer are never retried — the second has already
+  been billed.
+* **Routing.** Through OpenRouter the whole `{platform}/{model}` name is sent,
+  with the gateway's own extensions (`cache_control`, `usage.include`) and the
+  attribution headers. Directly to a platform the bare model id is sent, with
+  none of those, because the platform rejects them.
+
+### The request and the answer
+
+`io.github.mcagentsmods.core.api.model`
+
+| Type | What it is |
+|---|---|
+| `ChatRequest(model, messages, tools)` | One request. `continuedWith(messages)` keeps the model and tools for the next round of a tool exchange. |
+| `PromptMessage(role, text, cacheBreakpoint, toolCalls, toolCallId)` | One message on the wire. `system`, `user`, `assistant`, `assistantToolCalls`, and `toolResult` build one; `asCacheBreakpoint()` asks the provider to cache the prefix ending here. |
+| `ToolDefinition(name, description, parametersSchema)` | A tool offered to the model. The name must be 1–64 letters, digits, `-`, or `_`, because a provider rejects the whole request over one bad name. |
+| `ToolCall(id, name, arguments)` | The model asking for a tool. `arguments` stays the raw JSON text. |
+| `ChatCompletion(text, model, usage, toolCalls)` | The answer. `wantsTools()` is true when it asks for tools instead. |
+| `TokenUsage(promptTokens, completionTokens, cachedTokens)` | What it cost. `hadCacheHit()` and `cacheHitRate()` say whether caching worked. |
+
+### Naming and routing
+
+| Type | What it is |
+|---|---|
+| `ModelName` | A stored model id in the shape `{platform}/{model}`, lowercase. `of`, `parse`, and `normalise` build and read one. |
+| `ModelPlatform` | Platform ids, OpenRouter's base URL, the known direct base URLs, and `isUsableBaseUrl` — `https`, or a loopback `http` address. |
+| `ProviderRoute` | Where one request goes: a platform, a base URL, and the model id to send. |
+| `ProviderRoutes` | Resolves a stored name to a route. It never fails; anything unknown goes through OpenRouter. |
+| `ApiKeySource` | `next()`, `next(platform)`, and `reject(key)`. |
+
+### When it fails
+
+`ModelException` — unchecked, and the cause of every failed future this client
+hands back. Its `kind()` says what to do:
+
+| Kind | Meaning | Retried by the client |
+|---|---|---|
+| `AUTHENTICATION` | Every key tried was rejected. | Rotated, not retried. |
+| `RATE_LIMIT` | Rate limited. | Yes. |
+| `SERVER` | The provider failed. | Yes. |
+| `TRANSPORT` | Nothing answered. | Yes. |
+| `REQUEST` | The request was wrong. | No. |
+| `MALFORMED_RESPONSE` | The answer could not be read. | No — it was already billed. |
+| `NO_KEY` | No usable key for the platform. | No. |
+
+### The transport
+
+`io.github.mcagentsmods.core.api.http` holds `HttpTransport`, `HttpCall`, and
+`HttpReply`, so a mod can drive any HTTP client through the same seam.
+`JdkHttpTransport` is in `io.github.mcagentsmods.core.common.http`.
+
+### Test fixtures
+
+`core-common` publishes test fixtures in
+`io.github.mcagentsmods.core.common.testing`: `StubTransport` answers from a
+script and records each call, and `StubKeySource` holds keys per platform and
+records which were rejected. Depend on them with
+`testImplementation testFixtures('io.github.mcagentsmods:core-common:{version}')`.
+
 ## Failure
 
 `io.github.mcagentsmods.core.api.AgentException` — unchecked, and the cause of every
-failed future the core hands back.
+failed future `MCAgentsProvider` and an `LlmClient` hand back. The routed model
+client fails with `ModelException` instead — see
+[When it fails](#when-it-fails).
 
 | Method | Meaning |
 |---|---|

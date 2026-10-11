@@ -8,8 +8,9 @@
  * <p>{@link io.github.mcagentsmods.core.common.MCAgentsProvider} is the only public
  * class in the package, and the only one a consumer reads. Everything it
  * delegates to — the client registry, the factory, the HTTP transport, and the
- * two vendor dialects — is package-private, so this facade is the single route
- * to a language model and cannot be routed around.</p>
+ * two vendor dialects — is package-private, so this facade cannot be routed
+ * around. The routed model client is a separate entry point, in
+ * {@code io.github.mcagentsmods.core.common.model}.</p>
  *
  * <p>The whole package is deliberately one flat namespace for that reason:
  * splitting the internals into subpackages would force them public and undo the
