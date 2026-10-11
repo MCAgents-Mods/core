@@ -21,7 +21,7 @@ history, read `wiki/logs/`.
   entry points: `MCAgentsProvider`, one client per vendor for OpenRouter, OpenAI,
   DeepSeek, and Anthropic; and `OpenRouterClient`, the routed client moved from
   `MCAgents-Mods/chat` with tool calling, embeddings, prompt-cache hints, retries,
-  key rotation and direct provider routes. `core-common` publishes `StubTransport`
+  key rotation and direct provider routes. `mcagents-core-common` publishes `StubTransport`
   and `StubKeySource` as test fixtures.
 - The local web console, in `common.web`: one loopback server, started on demand, that
   every mod registers its pages into through `CoreWebRegistry.shared()`, and the shared

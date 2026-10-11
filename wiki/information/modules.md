@@ -11,9 +11,9 @@ api                 pure Java contracts
  └── common         pure Java implementations
 
 platforms/shared    loader-agnostic mod code, both physical sides
- ├── platforms/forge      Forge entry point     → core-forge-{version}.jar
- ├── platforms/neoforge   NeoForge entry point  → core-neoforge-{version}.jar
- └── platforms/fabric     Fabric entry points   → core-fabric-{version}.jar
+ ├── platforms/forge      Forge entry point     → MCAgentsCoreForge-{version}.jar
+ ├── platforms/neoforge   NeoForge entry point  → MCAgentsCoreNeoforge-{version}.jar
+ └── platforms/fabric     Fabric entry points   → MCAgentsCoreFabric-{version}.jar
 ```
 
 ## What each module holds
@@ -74,25 +74,32 @@ what keeps them testable without a game running.
 
 ## Published artifacts
 
-Only `api` and `common` carry a publication:
+Every module carries a publication. The jar a module builds is named
+`MCAgentsCore{Module}-{version}.jar`; its Maven coordinates are:
 
-| Module | Coordinates |
-|---|---|
-| `api` | `io.github.mcagentsmods:core-api` |
-| `common` | `io.github.mcagentsmods:core-common` |
+| Module | Jar base name | Coordinates |
+|---|---|---|
+| `api` | `MCAgentsCoreApi` | `io.github.mcagentsmods:mcagents-core-api` |
+| `common` | `MCAgentsCoreCommon` | `io.github.mcagentsmods:mcagents-core-common` |
+| `platforms/shared` | `MCAgentsCoreShared` | `io.github.mcagentsmods:mcagents-core-shared` |
+| `platforms/forge` | `MCAgentsCoreForge` | `io.github.mcagentsmods:mcagents-core-forge` |
+| `platforms/neoforge` | `MCAgentsCoreNeoforge` | `io.github.mcagentsmods:mcagents-core-neoforge` |
+| `platforms/fabric` | `MCAgentsCoreFabric` | `io.github.mcagentsmods:mcagents-core-fabric` |
 
-`core-common` also publishes its test fixtures as a variant, so a consumer can
+`mcagents-core-common` also publishes its test fixtures as a variant, so a consumer can
 test against `StubTransport` and `StubKeySource` with
-`testFixtures('io.github.mcagentsmods:core-common:{version}')`. The fixtures
+`testFixtures('io.github.mcagentsmods:mcagents-core-common:{version}')`. The fixtures
 are never bundled into a loader jar.
 
-The `artifactId` is qualified with the root project name deliberately. Without
-it, every project in this group would publish a colliding
+The `artifactId` is qualified with `mcagents-` and the root project name
+deliberately. Without it, every project in this group would publish a colliding
 `io.github.mcagentsmods:api`, and a consumer could not depend on `core` and
-another project at the same time.
+another mod at the same time.
 
-The loader modules are distributed as mod jars rather than libraries, so they
-are not published to a Maven repository.
+A loader module publishes its mod jar alone, with no dependency list: the jar
+already carries `api`, `common` and `shared`, and the loader supplies the rest.
+A mod compiles against `mcagents-core-api` and `mcagents-core-common`; the
+loader artifacts are for a development run that needs core loaded.
 
 ## Dependency versions
 

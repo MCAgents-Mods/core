@@ -1,6 +1,6 @@
 # API Reference
 
-Every public type in `core-api` and `core-common`, and what each one is
+Every public type in `mcagents-core-api` and `mcagents-core-common`, and what each one is
 for. There are two ways in:
 [`MCAgentsProvider`](#mcagentsprovider), one registered client per vendor, and
 the [routed model client](#the-routed-model-client), for tools, embeddings,
@@ -14,8 +14,8 @@ For a task-oriented walkthrough instead, see
 
 ```groovy
 dependencies {
-    compileOnly 'io.github.mcagentsmods:core-api:0.1.0'
-    compileOnly 'io.github.mcagentsmods:core-common:0.1.0'
+    compileOnly 'io.github.mcagentsmods:mcagents-core-api:{version}'
+    compileOnly 'io.github.mcagentsmods:mcagents-core-common:{version}'
 }
 ```
 
@@ -329,11 +329,11 @@ would refuse with a message quoting the key.
 
 ### Test fixtures
 
-`core-common` publishes test fixtures in
+`mcagents-core-common` publishes test fixtures in
 `io.github.mcagentsmods.core.common.testing`: `StubTransport` answers from a
 script and records each call, and `StubKeySource` holds keys per platform and
 records which were rejected. Depend on them with
-`testImplementation testFixtures('io.github.mcagentsmods:core-common:{version}')`.
+`testImplementation testFixtures('io.github.mcagentsmods:mcagents-core-common:{version}')`.
 
 ## The web console
 

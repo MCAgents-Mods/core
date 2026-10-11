@@ -33,7 +33,7 @@ dependencies {
 }
 
 base {
-    archivesName = "${rootProject.name}-common"
+    archivesName = 'MCAgentsCoreCommon'
 }
 
 publishing {
@@ -42,7 +42,7 @@ publishing {
             from components.java
 
             pom {
-                name = "${rootProject.name}-${project.name}"
+                name = 'MCAgentsCoreCommon'
                 description = "MCAgents Core Common"
             }
         }
