@@ -1,6 +1,6 @@
 # API Reference
 
-Every public type in `mcagents-api` and `mcagents-common`, and what each one is
+Every public type in `core-api` and `core-common`, and what each one is
 for. If you only read one section, read
 [`MCAgentsProvider`](#mcagentsprovider) — it is the whole surface.
 
@@ -11,16 +11,16 @@ For a task-oriented walkthrough instead, see
 
 ```groovy
 dependencies {
-    compileOnly 'io.github.mcagents:mcagents-api:0.1.0'
-    compileOnly 'io.github.mcagents:mcagents-common:0.1.0'
+    compileOnly 'io.github.mcagentsmods:core-api:0.1.0'
+    compileOnly 'io.github.mcagentsmods:core-common:0.1.0'
 }
 ```
 
-Published to GitHub Packages at `https://maven.pkg.github.com/MCAgents/core`.
+Published to GitHub Packages at `https://maven.pkg.github.com/MCAgents-Mods/core`.
 
 ## MCAgentsProvider
 
-`io.github.mcagents.core.common.MCAgentsProvider` — the single entry point. It
+`io.github.mcagentsmods.core.common.MCAgentsProvider` — the single entry point. It
 is the only public class in `common`; everything behind it is package-private
 and cannot be reached from outside.
 
@@ -116,7 +116,7 @@ Named per vendor, if you prefer them over passing the enum:
 
 ## The exchange model
 
-`io.github.mcagents.core.api.chat`
+`io.github.mcagentsmods.core.api.chat`
 
 ### ChatRequest
 
@@ -177,7 +177,7 @@ tokens can be billed differently.
 
 ## The vendor layer
 
-`io.github.mcagents.core.api.llm`
+`io.github.mcagentsmods.core.api.llm`
 
 ### LlmVendor
 
@@ -224,7 +224,7 @@ with them.
 
 ## Failure
 
-`io.github.mcagents.core.api.AgentException` — unchecked, and the cause of every
+`io.github.mcagentsmods.core.api.AgentException` — unchecked, and the cause of every
 failed future the core hands back.
 
 | Method | Meaning |

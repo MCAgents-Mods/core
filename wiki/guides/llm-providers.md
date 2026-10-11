@@ -8,7 +8,7 @@ supports. For the full surface, see [`../reference/api.md`](../reference/api.md)
 ```groovy
 repositories {
     maven {
-        url = 'https://maven.pkg.github.com/MCAgents/core'
+        url = 'https://maven.pkg.github.com/MCAgents-Mods/core'
         credentials {
             username = System.getenv('GITHUB_ACTOR')
             password = System.getenv('GITHUB_TOKEN')
@@ -17,8 +17,8 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'io.github.mcagents:mcagents-api:0.1.0'
-    compileOnly 'io.github.mcagents:mcagents-common:0.1.0'
+    compileOnly 'io.github.mcagentsmods:core-api:0.1.0'
+    compileOnly 'io.github.mcagentsmods:core-common:0.1.0'
 }
 ```
 

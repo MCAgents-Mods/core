@@ -75,3 +75,16 @@ timeout left — `request_timeout_seconds` was read by the deleted Bukkit config
 Released changelogs under `wiki/logs/` are history and were not touched.
 
 `./gradlew build` passes with seven modules.
+
+### Task 3 — refactor/core-namespace
+
+Every package moved from `io.github.mcagents.core` to `io.github.mcagentsmods.core`,
+directories with them. Gradle identity: `project-group=io.github.mcagentsmods`,
+`git-org-name=MCAgents-Mods`, root project `core`, so the jars and the published
+artifacts are `core-api` and `core-common`. The POM's project URL now points at the
+GitHub repository instead of the old website.
+
+Runtime names a player can see were deliberately left alone: the shared credential file
+`mcagents.json` and the `mcagents.side` system property. Released changelogs and older
+task records keep the old names as history. The mod packages still sit under
+`…core.mods`; task 4 moves them into `…core.shared`.

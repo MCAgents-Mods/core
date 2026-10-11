@@ -1,19 +1,19 @@
 ---
 name: agent-wiki-context-repository-map
-description: Orientation before touching MCAgents/core — what lives where, the real build and test commands, entry points, and the gotchas.
+description: Orientation before touching MCAgents-Mods/core — what lives where, the real build and test commands, entry points, and the gotchas.
 ---
 
 # Repository Map
 
-Read this before touching anything in `MCAgents/core`. It is the agent-facing
+Read this before touching anything in `MCAgents-Mods/core`. It is the agent-facing
 orientation page: **where things are, what to run, and what will bite you.** The
 underlying facts are documented once for humans in `wiki/` — this page links there
 rather than restating them.
 
 ## What this repository is
 
-A **Gradle multi project build on Java 25**, root project `mcagents`, group
-`io.github.mcagents`, version `0.4.0` in `gradle.properties`. It holds the shared
+A **Gradle multi project build on Java 25**, root project `core`, group
+`io.github.mcagentsmods`, version `0.4.0` in `gradle.properties`. It holds the shared
 agent and API code that MCAgents' Minecraft mods build on.
 
 Full description: [`../../../wiki/information/overview.md`](../../../wiki/information/overview.md).
@@ -38,7 +38,7 @@ memory policy, the discovery protocol, and the creators are served by the
 **`lxagents-agents-base`** MCP connector, not stored here. Read
 `agents://manifest.json` once to see what exists, then
 `agents://index/root-index.md` to route. `.agents/` holds only what is specific to
-`MCAgents/core` — see [`../../rules/repository.md`](../../rules/repository.md).
+`MCAgents-Mods/core` — see [`../../rules/repository.md`](../../rules/repository.md).
 
 The module graph, the dependency rules, and the published coordinates are documented
 once, in
