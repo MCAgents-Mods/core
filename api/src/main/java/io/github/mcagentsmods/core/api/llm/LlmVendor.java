@@ -1,5 +1,7 @@
 package io.github.mcagentsmods.core.api.llm;
 
+import io.github.mcagentsmods.core.api.model.ModelPlatform;
+
 /**
  * The language model services the core can talk to.
  *
@@ -20,18 +22,18 @@ public enum LlmVendor {
      * OpenAI compatible endpoint. Its model identifiers are namespaced by
      * provider, for example {@code "anthropic/claude-opus-4"}.
      */
-    OPENROUTER("openrouter", "https://openrouter.ai/api/v1", true),
+    OPENROUTER("openrouter", ModelPlatform.OPENROUTER_BASE_URL, true),
 
     /**
      * OpenAI — the reference implementation of the chat completions dialect.
      */
-    OPENAI("openai", "https://api.openai.com/v1", true),
+    OPENAI("openai", ModelPlatform.knownBaseUrl("openai").orElseThrow(), true),
 
     /**
      * DeepSeek — OpenAI compatible, with its own model identifiers such as
      * {@code "deepseek-chat"}.
      */
-    DEEPSEEK("deepseek", "https://api.deepseek.com/v1", true),
+    DEEPSEEK("deepseek", ModelPlatform.knownBaseUrl("deepseek").orElseThrow(), true),
 
     /**
      * Anthropic — the Claude Messages API. Framing instructions travel as a

@@ -78,10 +78,41 @@ public final class ModTokenCommands {
      *                              {@code null}.
      */
     public ModTokenCommands(Path loaderDirectory, Logger logger, Duration requestTimeout) {
+        this(new SharedTokenStore(loaderDirectory, logger), logger, requestTimeout);
+    }
+
+    /**
+     * Opens the commands over a store the caller has already opened.
+     *
+     * <p>The server uses this, with a store on the exact file it resolved: it must
+     * not follow the client's {@code MCAGENTS_DIR} override to a file it never
+     * reports.</p>
+     *
+     * @param store The credential store.
+     * @param logger Where to report problems.
+     * @param requestTimeout How long one request may take before it is
+     *                       abandoned.
+     * @throws NullPointerException When any argument is {@code null}.
+     */
+    public ModTokenCommands(SharedTokenStore store, Logger logger, Duration requestTimeout) {
         this.logger = Objects.requireNonNull(logger, "logger cannot be null");
         this.requestTimeout = Objects.requireNonNull(requestTimeout, "requestTimeout cannot be null");
-        this.store = new SharedTokenStore(loaderDirectory, logger);
+        this.store = Objects.requireNonNull(store, "store cannot be null");
         reload();
+    }
+
+    /**
+     * Refuses a platform name without repeating it: a player who pasted a key into
+     * the wrong argument would otherwise see it echoed into chat.
+     *
+     * @return The refusal, naming the platforms that exist.
+     */
+    private static String unknownPlatform() {
+        List<String> codes = new ArrayList<>();
+        for (LlmVendor vendor : LlmVendor.values()) {
+            codes.add(vendor.code());
+        }
+        return "Unknown platform. Use one of: " + String.join(", ", codes) + ".";
     }
 
     /**
@@ -124,16 +155,21 @@ public final class ModTokenCommands {
     public String add(String platform, String token) {
         Optional<LlmVendor> vendor = vendor(platform);
         if (vendor.isEmpty()) {
-            return "Unknown platform: " + platform;
+            return unknownPlatform();
         }
-        if (!store.add(vendor.get().code(), token)) {
+        String trimmed = token == null ? "" : token.trim();
+        if (!LlmCredentials.isWellFormedKey(trimmed)) {
+            // Never repeated back: a near-miss key is still most of a key.
+            return "That is not a usable token: it must be printable characters with no spaces.";
+        }
+        if (!store.add(vendor.get().code(), trimmed)) {
             return "That token is already stored for " + vendor.get().code()
                     + ", or the file could not be written.";
         }
 
         reload();
         List<String> tokens = store.load(vendor.get().code());
-        return "Added " + TokenHandles.of(tokens.size() - 1, token.trim())
+        return "Added " + TokenHandles.of(tokens.indexOf(trimmed), trimmed)
                 + " to " + vendor.get().code() + ". " + tokens.size() + " token(s) stored.";
     }
 
@@ -147,13 +183,14 @@ public final class ModTokenCommands {
     public String remove(String platform, String typed) {
         Optional<LlmVendor> vendor = vendor(platform);
         if (vendor.isEmpty()) {
-            return "Unknown platform: " + platform;
+            return unknownPlatform();
         }
 
         List<String> tokens = store.load(vendor.get().code());
         Optional<String> target = TokenHandles.resolve(tokens, typed);
         if (target.isEmpty()) {
-            return "No stored token matches " + typed + " for " + vendor.get().code() + ".";
+            // What was typed is not repeated: it may be a key, typed in full.
+            return "No stored token for " + vendor.get().code() + " matches that.";
         }
 
         store.evict(vendor.get().code(), target.get());

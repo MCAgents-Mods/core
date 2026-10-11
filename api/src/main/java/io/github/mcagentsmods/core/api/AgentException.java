@@ -112,10 +112,15 @@ public class AgentException extends RuntimeException {
     /**
      * Reports whether the vendor rejected the credentials.
      *
-     * @return {@code true} for HTTP 401 and 403.
+     * <p>HTTP 401 only. A 403 is a refusal of the request — a moderation flag, a
+     * region, a permission — not of the key, and {@code MCAgentsProvider} deletes
+     * a key it reads as rejected, so one flagged prompt answered with 403 would
+     * otherwise delete every stored key in turn.</p>
+     *
+     * @return {@code true} for HTTP 401.
      */
     public boolean isAuthFailure() {
-        return statusCode == 401 || statusCode == 403;
+        return statusCode == 401;
     }
 
     /**

@@ -79,8 +79,10 @@ Two ways to register a vendor, and the difference matters.
 With a store registered, core handles the whole credential lifecycle so a
 consumer never sees a key again:
 
-* a **rejected** credential (401/403) is retried on the next one, and the dead
-  one is **deleted from the store**;
+* a **rejected** credential (401) is retried on the next one, and the dead
+  one is **deleted from the store**. A 403 is not a rejection: providers send
+  it for a refused prompt or a region, and deleting a key over that would
+  destroy a working one;
 * a **rate limited** credential (429) is retried on the next one and **kept** —
   it is healthy, merely busy;
 * **anything else** is not retried and touches no credential, because nothing
@@ -258,8 +260,10 @@ settings live:
 
 What it does so callers do not have to:
 
-* **Key rotation.** A 401, 403, or 402 rejects the key through
-  `ApiKeySource.reject` and tries the next, up to five keys per request.
+* **Key rotation.** A 401 or 402 rejects the key through
+  `ApiKeySource.reject` and tries the next, up to five keys per request. A 403
+  refuses the request, not the key, and fails as `REQUEST`.
+  `ModelException.Kind.forStatus(status)` is the mapping.
 * **Retries.** A rate limit, a server error, or a transport failure is retried
   up to three attempts in total, with exponential backoff and jitter. A bad
   request and a malformed answer are never retried — the second has already
@@ -290,7 +294,7 @@ What it does so callers do not have to:
 | `ModelPlatform` | Platform ids, OpenRouter's base URL, the known direct base URLs, and `isUsableBaseUrl` — `https`, or a loopback `http` address. |
 | `ProviderRoute` | Where one request goes: a platform, a base URL, and the model id to send. |
 | `ProviderRoutes` | Resolves a stored name to a route. It never fails; anything unknown goes through OpenRouter. |
-| `ApiKeySource` | `next()`, `next(platform)`, and `reject(key)`. |
+| `ApiKeySource` | `next()`, `next(platform)`, and `reject(key)`. By default `next(platform)` answers only for `openrouter`, so a source holding one list of gateway keys never sends one to another platform; a source that stores keys per platform overrides it. |
 
 ### When it fails
 
@@ -306,12 +310,22 @@ hands back. Its `kind()` says what to do:
 | `REQUEST` | The request was wrong. | No. |
 | `MALFORMED_RESPONSE` | The answer could not be read. | No — it was already billed. |
 | `NO_KEY` | No usable key for the platform. | No. |
+| `CLOSED` | The client was closed, before the request or while it waited to retry. | No. |
 
 ### The transport
 
 `io.github.mcagentsmods.core.api.http` holds `HttpTransport`, `HttpCall`, and
 `HttpReply`, so a mod can drive any HTTP client through the same seam.
-`JdkHttpTransport` is in `io.github.mcagentsmods.core.common.http`.
+`JdkHttpTransport` is in `io.github.mcagentsmods.core.common.http`. It never
+follows a redirect, because the JDK client would re-send `Authorization` to
+wherever one points. It reads at most 8 MiB of an answer and abandons an
+exchange after 130 seconds, body included. `HttpCall.toString()` names the
+headers and never prints their values.
+
+A key must be printable ASCII with no space (`LlmCredentials.isWellFormedKey`).
+`LlmCredentials`, the shared key file and the token commands all refuse
+anything else, without repeating it, so the HTTP client never gets a header it
+would refuse with a message quoting the key.
 
 ### Test fixtures
 
@@ -396,7 +410,7 @@ client fails with `ModelException` instead — see
 |---|---|
 | `vendor()` | Which service the failing call was aimed at. |
 | `statusCode()` | The HTTP status, or `AgentException.NO_STATUS` (`-1`) when the call never got an answer. |
-| `isAuthFailure()` | HTTP 401 or 403. |
+| `isAuthFailure()` | HTTP 401. A 403 refuses the request, not the key. |
 | `isRateLimited()` | HTTP 429 — the one failure where retrying later is reasonable. |
 
 The message includes the text the vendor put in its error body, so an HTTP 400

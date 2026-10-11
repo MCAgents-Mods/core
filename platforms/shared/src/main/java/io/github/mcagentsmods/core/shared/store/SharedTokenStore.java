@@ -6,13 +6,16 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
+import com.google.gson.JsonParseException;
+import io.github.mcagentsmods.core.api.llm.LlmCredentials;
+import io.github.mcagentsmods.core.api.llm.LlmVendor;
 import io.github.mcagentsmods.core.api.token.TokenStore;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -21,7 +24,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * The credential store shared by every MCAgents mod on a client.
@@ -50,9 +56,15 @@ import java.util.logging.Logger;
  *
  * <h2>Threading</h2>
  *
- * <p>Every method touches disk and is synchronized. Eviction arrives on
+ * <p>Every method touches disk and holds a lock shared by every store open on
+ * the same file in this process, so the client's and the server's stores in a
+ * single player game cannot interleave a read and a write. Eviction arrives on
  * whichever thread a failed request completed on, and must never run on the
  * client's render thread.</p>
+ *
+ * <p>A file that could not be read is never written. The keys it holds are the
+ * player's, and a write would replace them with whatever this store had left —
+ * usually nothing.</p>
  */
 public final class SharedTokenStore implements TokenStore {
 
@@ -65,7 +77,14 @@ public final class SharedTokenStore implements TokenStore {
      * Written into a new file so the vendor sections are discoverable without
      * documentation.
      */
-    private static final Set<String> KNOWN_VENDORS = Set.of("openrouter", "openai", "deepseek", "anthropic");
+    private static final Set<String> KNOWN_VENDORS = Stream.of(LlmVendor.values())
+            .map(LlmVendor::code)
+            .collect(Collectors.toUnmodifiableSet());
+
+    /**
+     * One lock per file, shared by every store in this process open on it.
+     */
+    private static final ConcurrentHashMap<Path, Object> LOCKS = new ConcurrentHashMap<>();
 
     /**
      * Pretty printing is deliberate: a player edits this file by hand, and a
@@ -84,6 +103,23 @@ public final class SharedTokenStore implements TokenStore {
     private final Logger logger;
 
     /**
+     * Held for every read and write of {@link #file}.
+     */
+    private final Object lock;
+
+    /**
+     * Whether the last read failed. While it is set nothing is written, so a file
+     * the player broke by hand keeps their keys until they fix it.
+     */
+    private boolean readFailed;
+
+    /**
+     * Platforms already warned about an unusable entry, so a list read on every
+     * keystroke of tab completion does not repeat the warning.
+     */
+    private final Set<String> warnedUnusable = ConcurrentHashMap.newKeySet();
+
+    /**
      * The parsed contents. Replaced wholesale by {@link #reload()} rather than
      * merged into, so an evicted credential cannot come back from a stale copy.
      */
@@ -100,18 +136,38 @@ public final class SharedTokenStore implements TokenStore {
      * @throws NullPointerException When {@code logger} is {@code null}.
      */
     public SharedTokenStore(Path loaderDirectory, Logger logger) {
-        this.logger = Objects.requireNonNull(logger, "logger cannot be null");
-        this.file = MinecraftDirectory.resolveFile(loaderDirectory);
+        this(MinecraftDirectory.resolveFile(loaderDirectory), Objects.requireNonNull(logger, "logger cannot be null"),
+                "Set the " + MinecraftDirectory.OVERRIDE_ENV + " environment variable to choose another.");
+    }
+
+    /**
+     * Opens the store on exactly this file, with no environment override.
+     *
+     * @param file The credential file.
+     * @param logger Where to report problems.
+     * @return The store.
+     * @throws NullPointerException When either argument is {@code null}.
+     */
+    public static SharedTokenStore atFile(Path file, Logger logger) {
+        return new SharedTokenStore(Objects.requireNonNull(file, "file cannot be null"),
+                Objects.requireNonNull(logger, "logger cannot be null"), "");
+    }
+
+    private SharedTokenStore(Path file, Logger logger, String unusableHint) {
+        this.logger = logger;
+        this.file = file;
+        this.lock = LOCKS.computeIfAbsent(file.toAbsolutePath().normalize(), ignored -> new Object());
 
         if (!MinecraftDirectory.isUsable(file.getParent())) {
-            logger.warning("The Minecraft directory " + file.getParent()
-                    + " is missing or not writable. Tokens cannot be saved there. "
-                    + "Set the " + MinecraftDirectory.OVERRIDE_ENV + " environment variable to choose another.");
+            logger.warning("The directory " + file.getParent()
+                    + " is missing or not writable. Tokens cannot be saved there. " + unusableHint);
         }
 
-        reload();
-        if (!Files.exists(file)) {
-            writeTemplate();
+        synchronized (lock) {
+            reload();
+            if (!Files.exists(file)) {
+                writeTemplate();
+            }
         }
     }
 
@@ -128,11 +184,16 @@ public final class SharedTokenStore implements TokenStore {
      * {@inheritDoc}
      */
     @Override
-    public synchronized List<String> load(String vendorCode) {
+    public List<String> load(String vendorCode) {
         if (vendorCode == null || vendorCode.isBlank()) {
             return List.of();
         }
+        synchronized (lock) {
+            return loadLocked(vendorCode);
+        }
+    }
 
+    private List<String> loadLocked(String vendorCode) {
         JsonElement section = document.get(vendorCode.trim().toLowerCase(Locale.ROOT));
         if (section == null || !section.isJsonObject()) {
             return List.of();
@@ -141,14 +202,19 @@ public final class SharedTokenStore implements TokenStore {
         JsonElement tokens = section.getAsJsonObject().get(TOKEN_FIELD);
         List<String> found = new ArrayList<>();
 
+        boolean skipped = false;
         if (tokens != null && tokens.isJsonArray()) {
             for (JsonElement entry : tokens.getAsJsonArray()) {
-                addIfUsable(found, entry);
+                skipped |= !addIfUsable(found, entry);
             }
         } else {
             // A player who wrote one token without the brackets has made a
             // reasonable guess. Rejecting it would look like the token was bad.
-            addIfUsable(found, tokens);
+            skipped = !addIfUsable(found, tokens);
+        }
+        if (skipped && warnedUnusable.add(vendorCode.trim().toLowerCase(Locale.ROOT))) {
+            logger.warning("A " + vendorCode.trim().toLowerCase(Locale.ROOT) + " entry in " + file.getFileName()
+                    + " is not a usable token (it holds a space or an unusual character) and was skipped.");
         }
         return found;
     }
@@ -160,21 +226,26 @@ public final class SharedTokenStore implements TokenStore {
      * since this store last loaded survives.</p>
      */
     @Override
-    public synchronized boolean add(String vendorCode, String token) {
-        if (vendorCode == null || token == null || token.isBlank()) {
+    public boolean add(String vendorCode, String token) {
+        if (vendorCode == null || token == null || !LlmCredentials.isWellFormedKey(token.trim())) {
             return false;
         }
 
-        reload();
-        String vendor = vendorCode.trim().toLowerCase(Locale.ROOT);
-        List<String> tokens = new ArrayList<>(load(vendor));
-        if (tokens.contains(token.trim())) {
-            return false;
-        }
+        synchronized (lock) {
+            reload();
+            if (readFailed) {
+                return false;
+            }
+            String vendor = vendorCode.trim().toLowerCase(Locale.ROOT);
+            List<String> tokens = new ArrayList<>(loadLocked(vendor));
+            if (tokens.contains(token.trim())) {
+                return false;
+            }
 
-        tokens.add(token.trim());
-        setTokens(vendor, tokens);
-        return write();
+            tokens.add(token.trim());
+            setTokens(vendor, tokens);
+            return write();
+        }
     }
 
     /**
@@ -184,25 +255,30 @@ public final class SharedTokenStore implements TokenStore {
      * since this store last loaded is preserved rather than overwritten.</p>
      */
     @Override
-    public synchronized void evict(String vendorCode, String token) {
+    public void evict(String vendorCode, String token) {
         if (vendorCode == null || token == null) {
             return;
         }
 
-        reload();
+        synchronized (lock) {
+            reload();
+            if (readFailed) {
+                return;
+            }
 
-        String vendor = vendorCode.trim().toLowerCase(Locale.ROOT);
-        List<String> remaining = new ArrayList<>(load(vendor));
-        if (!remaining.remove(token.trim())) {
-            // Already gone — another mod evicted it, most likely. Not an error,
-            // and rewriting the file would be pointless work.
-            return;
-        }
+            String vendor = vendorCode.trim().toLowerCase(Locale.ROOT);
+            List<String> remaining = new ArrayList<>(loadLocked(vendor));
+            if (!remaining.remove(token.trim())) {
+                // Already gone — another mod evicted it, most likely. Not an error,
+                // and rewriting the file would be pointless work.
+                return;
+            }
 
-        setTokens(vendor, remaining);
-        if (write()) {
-            logger.warning("A " + vendor + " token was rejected and has been removed from " + file.getFileName()
-                    + ". " + remaining.size() + " token(s) remain for that platform.");
+            setTokens(vendor, remaining);
+            if (write()) {
+                logger.warning("A " + vendor + " token was rejected and has been removed from " + file.getFileName()
+                        + ". " + remaining.size() + " token(s) remain for that platform.");
+            }
         }
     }
 
@@ -210,21 +286,35 @@ public final class SharedTokenStore implements TokenStore {
      * {@inheritDoc}
      */
     @Override
-    public synchronized void reload() {
+    public void reload() {
+        synchronized (lock) {
+            reloadLocked();
+        }
+    }
+
+    private void reloadLocked() {
         if (!Files.exists(file)) {
             document = new JsonObject();
+            readFailed = false;
             return;
         }
 
         try (Reader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
             JsonElement parsed = JsonParser.parseReader(reader);
-            document = parsed != null && parsed.isJsonObject() ? parsed.getAsJsonObject() : new JsonObject();
-        } catch (IOException | JsonSyntaxException | IllegalStateException e) {
+            if (parsed == null || !parsed.isJsonObject()) {
+                throw new IllegalStateException("the top level is not an object");
+            }
+            document = parsed.getAsJsonObject();
+            readFailed = false;
+        } catch (IOException | JsonParseException | IllegalStateException e) {
             // A malformed file must not be overwritten — it holds the player's
             // keys, and rewriting it would destroy them. Report and carry on
-            // with nothing loaded.
+            // with nothing loaded, and refuse every write until it reads.
+            // The exception's own text is not logged: a parser quotes what it
+            // choked on, and here that is a key.
             document = new JsonObject();
-            logger.warning(file.getFileName() + " could not be read (" + e.getMessage()
+            readFailed = true;
+            logger.warning(file.getFileName() + " could not be read (" + e.getClass().getSimpleName()
                     + "). Tokens will be treated as unset until it is fixed. The file has not been modified.");
         }
     }
@@ -233,7 +323,7 @@ public final class SharedTokenStore implements TokenStore {
      * {@inheritDoc}
      */
     @Override
-    public synchronized String describe() {
+    public String describe() {
         return file.toString();
     }
 
@@ -242,18 +332,28 @@ public final class SharedTokenStore implements TokenStore {
      *
      * @param target Where to add it.
      * @param entry The element to consider, possibly {@code null}.
+     * @return {@code false} only when the entry held text that is not a usable
+     *         key; an absent or blank entry is not worth a warning.
      */
-    private void addIfUsable(List<String> target, JsonElement entry) {
+    private boolean addIfUsable(List<String> target, JsonElement entry) {
         if (entry == null || !entry.isJsonPrimitive()) {
-            return;
+            return true;
         }
         String value = entry.getAsString();
         // A blank entry is a placeholder the player never filled in, not a
         // credential. Treating it as one would produce a rejection, which would
         // then delete the line they were about to edit.
-        if (value != null && !value.isBlank()) {
+        if (value == null || value.isBlank()) {
+            return true;
+        }
+        // Not sent: the HTTP client would refuse it with a message quoting it.
+        if (!LlmCredentials.isWellFormedKey(value.trim())) {
+            return false;
+        }
+        if (!target.contains(value.trim())) {
             target.add(value.trim());
         }
+        return true;
     }
 
     /**
@@ -282,6 +382,9 @@ public final class SharedTokenStore implements TokenStore {
      * and where a key goes, without needing documentation open beside it.</p>
      */
     private void writeTemplate() {
+        if (readFailed) {
+            return;
+        }
         for (String vendor : KNOWN_VENDORS) {
             setTokens(vendor, List.of());
         }
@@ -313,7 +416,13 @@ public final class SharedTokenStore implements TokenStore {
             try (Writer writer = Files.newBufferedWriter(temporary, StandardCharsets.UTF_8)) {
                 GSON.toJson(document, writer);
             }
-            Files.move(temporary, file, StandardCopyOption.REPLACE_EXISTING);
+            try {
+                Files.move(temporary, file, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+            } catch (AtomicMoveNotSupportedException e) {
+                // Some filesystems cannot. A plain replace is still better than
+                // losing the write.
+                Files.move(temporary, file, StandardCopyOption.REPLACE_EXISTING);
+            }
             restrictPermissions();
             return true;
         } catch (IOException e) {

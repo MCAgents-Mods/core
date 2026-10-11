@@ -79,6 +79,14 @@ class ModelNamingTest {
         // A key on the wire in the clear, to somewhere that is not this machine.
         assertFalse(ModelPlatform.isUsableBaseUrl("http://example.invalid/v1"));
         assertFalse(ModelPlatform.isUsableBaseUrl(""));
+        // The host is compared whole: each of these sends the key in the clear to a
+        // machine that merely starts with a loopback name.
+        assertFalse(ModelPlatform.isUsableBaseUrl("http://localhost.example.com/v1"));
+        assertFalse(ModelPlatform.isUsableBaseUrl("http://127.0.0.1.nip.io/v1"));
+        assertFalse(ModelPlatform.isUsableBaseUrl("http://localhost@example.com/v1"));
+        assertFalse(ModelPlatform.isUsableBaseUrl("https://user:secret@api.example.com/v1"));
+        assertFalse(ModelPlatform.isUsableBaseUrl("ftp://api.example.com/v1"));
+        assertTrue(ModelPlatform.isUsableBaseUrl("http://[::1]:8080/v1"));
         assertFalse(ModelPlatform.isUsableBaseUrl(null));
     }
 

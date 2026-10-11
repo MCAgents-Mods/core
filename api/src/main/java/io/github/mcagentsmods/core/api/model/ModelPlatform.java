@@ -1,5 +1,8 @@
 package io.github.mcagentsmods.core.api.model;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -59,7 +62,8 @@ public final class ModelPlatform {
         urls.put("groq", "https://api.groq.com/openai/v1");
         urls.put("xai", "https://api.x.ai/v1");
         urls.put("together", "https://api.together.xyz/v1");
-        return Map.copyOf(urls);
+        // Not Map.copyOf, which would lose the order this map exists to keep.
+        return Collections.unmodifiableMap(urls);
     }
 
     private ModelPlatform() {
@@ -116,12 +120,26 @@ public final class ModelPlatform {
         if (url == null || url.isBlank()) {
             return false;
         }
-        String trimmed = url.trim().toLowerCase(Locale.ROOT);
-        if (trimmed.startsWith("https://")) {
+        URI uri;
+        try {
+            uri = new URI(url.trim());
+        } catch (URISyntaxException e) {
+            return false;
+        }
+        String scheme = uri.getScheme() == null ? "" : uri.getScheme().toLowerCase(Locale.ROOT);
+        String host = uri.getHost() == null ? "" : uri.getHost().toLowerCase(Locale.ROOT);
+        // Credentials in the authority would travel in the URL, and an unparsed authority
+        // means the host is not what it looks like.
+        if (host.isEmpty() || uri.getRawUserInfo() != null || uri.getRawQuery() != null
+                || uri.getRawFragment() != null) {
+            return false;
+        }
+        if (scheme.equals("https")) {
             return true;
         }
-        return trimmed.startsWith("http://localhost")
-                || trimmed.startsWith("http://127.0.0.1")
-                || trimmed.startsWith("http://[::1]");
+        // The whole host, never a prefix of it: http://localhost.example.com is somebody
+        // else's machine.
+        return scheme.equals("http")
+                && (host.equals("localhost") || host.equals("127.0.0.1") || host.equals("[::1]"));
     }
 }

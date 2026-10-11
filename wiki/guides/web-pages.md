@@ -115,7 +115,9 @@ Inline `style` attributes are allowed.
 ## Handle a request
 
 `handle` runs on one of the console's four worker threads, never on the game
-thread, and may block. A request carries:
+thread, and may block. Up to 64 more requests wait for a worker; past that the
+console closes the connection, so a slow handler holds up the console, never
+the game. A request carries:
 
 * `method()`, upper case;
 * `path()`, everything after `/api/{id}/`, decoded once — do not decode it again;

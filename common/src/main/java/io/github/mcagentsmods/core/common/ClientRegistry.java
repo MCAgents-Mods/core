@@ -59,10 +59,16 @@ final class ClientRegistry implements AutoCloseable {
         Objects.requireNonNull(credentials, "credentials cannot be null");
         LlmVendor vendor = credentials.vendor();
 
+        // Built before the lock: building one starts an HTTP client, and every
+        // request's require() waits on this lock.
+        LlmClient created = LlmClientFactory.create(credentials);
         LlmClient replaced;
         synchronized (this) {
+            if (closed.get()) {
+                created.close();
+            }
             ensureOpen(vendor);
-            replaced = clients.put(vendor, LlmClientFactory.create(credentials));
+            replaced = clients.put(vendor, created);
         }
 
         // Closed outside the lock: shutting a client down is the slowest thing
@@ -70,6 +76,37 @@ final class ClientRegistry implements AutoCloseable {
         if (replaced != null) {
             replaced.close();
         }
+    }
+
+    /**
+     * Replaces a vendor's client only if it is still {@code expected}.
+     *
+     * <p>For a rotation after a failure. Several requests failing at once each
+     * try to rotate; the first one wins, and the rest find a client other than
+     * the one that failed them and simply use it. Nothing is registered for a
+     * vendor that was unregistered meanwhile.</p>
+     *
+     * @param expected The client the failed request used.
+     * @param credentials The credentials to build its replacement from.
+     * @return Whether the replacement was installed.
+     */
+    boolean replace(LlmClient expected, LlmCredentials credentials) {
+        Objects.requireNonNull(credentials, "credentials cannot be null");
+        LlmVendor vendor = credentials.vendor();
+        LlmClient created = LlmClientFactory.create(credentials);
+        boolean installed;
+        synchronized (this) {
+            installed = !closed.get() && clients.get(vendor) == expected;
+            if (installed) {
+                clients.put(vendor, created);
+            }
+        }
+        if (installed) {
+            expected.close();
+        } else {
+            created.close();
+        }
+        return installed;
     }
 
     /**

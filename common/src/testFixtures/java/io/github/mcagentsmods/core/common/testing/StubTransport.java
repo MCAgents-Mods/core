@@ -34,6 +34,18 @@ public final class StubTransport implements HttpTransport {
         return this;
     }
 
+    /**
+     * Queues a refusal thrown by {@code send} itself, before anything is sent — what the JDK
+     * client does with a header value it will not write.
+     */
+    public StubTransport refuse(RuntimeException refusal) {
+        scripted.add(new Refusal(refusal));
+        return this;
+    }
+
+    private record Refusal(RuntimeException exception) {
+    }
+
     @Override
     public CompletableFuture<HttpReply> send(HttpCall call) {
         calls.add(call);
@@ -42,6 +54,9 @@ public final class StubTransport implements HttpTransport {
                     new AssertionError("The client sent more requests than the test scripted"));
         }
         Object next = scripted.poll();
+        if (next instanceof Refusal refusal) {
+            throw refusal.exception();
+        }
         if (next instanceof Throwable failure) {
             return CompletableFuture.failedFuture(failure);
         }

@@ -28,10 +28,14 @@ history, read `wiki/logs/`.
   page shell under `mcagents_core/web/`.
 - Credential pooling, rotation, and storage owned entirely by `core`: the shared
   `mcagents.json` and the `/agents` client command logic with masked handles in tab
-  completion.
+  completion. Reviewed for security on 2026-10-11 (task 7 in
+  [`../tasks/mods-foundation.md`](../tasks/mods-foundation.md)): only a 401 or 402 evicts a
+  key, keys must be printable ASCII, no redirect is followed, answers are size- and
+  time-capped, and an unreadable key file is never written.
 - Two request timeouts: 60 seconds on the `MCAgentsProvider` path
   (`LlmCredentials.DEFAULT_TIMEOUT`), and 10 seconds to connect and 120 to answer in
-  `JdkHttpTransport`, which the routed client uses.
+  `JdkHttpTransport`, which the routed client uses. Each path also has a deadline over the
+  whole exchange, body included.
 - Six build modules: `api`, `common`, `platforms/shared` (the loader-agnostic mod
   code, with the client and server halves as packages) and one module per loader —
   `platforms/forge`, `platforms/neoforge`, `platforms/fabric` — each building its own
@@ -47,6 +51,8 @@ history, read `wiki/logs/`.
 - **No CI pipeline.** `./gradlew test` is the only thing that runs the tests.
 - **Never launched in a game.** The three jars build and their manifests agree with
   their entry points, but none has been loaded in a real client or server yet.
+- **Two request stacks remain**: `MCAgentsProvider` and `OpenRouterClient` each have their
+  own records, JSON and transport. Folding them together is deferred to a later minor.
 - **The `/agents` client commands are not wired** into any loader's command tree;
   `ModTokenCommands` holds the logic only.
 

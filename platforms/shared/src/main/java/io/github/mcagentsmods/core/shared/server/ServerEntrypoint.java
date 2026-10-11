@@ -6,6 +6,7 @@ import io.github.mcagentsmods.core.shared.environment.PhysicalSide;
 import io.github.mcagentsmods.core.shared.environment.ServerOnly;
 import io.github.mcagentsmods.core.shared.environment.SideEntrypoint;
 import io.github.mcagentsmods.core.shared.environment.WrongSideException;
+import io.github.mcagentsmods.core.shared.store.SharedTokenStore;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -81,9 +82,11 @@ public final class ServerEntrypoint implements SideEntrypoint {
     public void start(ModContext context) {
         Objects.requireNonNull(context, "context cannot be null");
 
-        Path directory = ServerRunDirectory.resolveDirectory(context.gameDirectory());
         this.credentialFile = ServerRunDirectory.resolveFile(context.gameDirectory());
-        this.commands = new ModTokenCommands(directory, context.logger(), context.requestTimeout());
+        // The exact file, so the store cannot follow the client's MCAGENTS_DIR override
+        // somewhere other than the path logged below.
+        this.commands = new ModTokenCommands(SharedTokenStore.atFile(credentialFile, context.logger()),
+                context.logger(), context.requestTimeout());
 
         context.logger().info("MCAgents server ready. Credentials: " + credentialFile
                 + ". Managing them needs permission level " + authority.requiredLevel() + ".");

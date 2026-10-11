@@ -15,15 +15,20 @@ import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.time.Duration;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
 /**
@@ -74,6 +79,14 @@ public final class OpenRouterClient implements ModelClient {
     private final boolean ownsScheduler;
     private final Duration initialBackoff;
     private final Attribution attribution;
+    private final AtomicBoolean closed = new AtomicBoolean();
+
+    /**
+     * Backoffs not yet over. Held so {@link #close()} can fail them: a scheduler shut down
+     * with {@code shutdownNow} drops its queue, and a request waiting on a dropped backoff
+     * would otherwise never complete.
+     */
+    private final Set<CompletableFuture<Void>> pendingDelays = ConcurrentHashMap.newKeySet();
 
     /** A client that sends everything through the gateway, attributed to core. */
     public OpenRouterClient(HttpTransport transport, ApiKeySource keys) {
@@ -129,6 +142,9 @@ public final class OpenRouterClient implements ModelClient {
     @Override
     public CompletableFuture<ChatCompletion> complete(ChatRequest request) {
         Objects.requireNonNull(request, "request");
+        if (closed.get()) {
+            return CompletableFuture.failedFuture(closedException());
+        }
         return routes.route(request.model()).thenCompose(route -> {
             // The route decides what the model is called on the wire: the whole stored name
             // through the gateway, the platform's own id when the platform is called directly.
@@ -145,6 +161,9 @@ public final class OpenRouterClient implements ModelClient {
     public CompletableFuture<float[]> embed(String model, String text) {
         Objects.requireNonNull(model, "model");
         Objects.requireNonNull(text, "text");
+        if (closed.get()) {
+            return CompletableFuture.failedFuture(closedException());
+        }
         if (model.isBlank()) {
             return CompletableFuture.failedFuture(new ModelException(
                     ModelException.Kind.REQUEST, "An embedding request needs a model"));
@@ -204,9 +223,18 @@ public final class OpenRouterClient implements ModelClient {
             ProviderRoute route, String url, String body, String apiKey,
             Function<String, T> reader, int attempt) {
 
-        HttpCall call = HttpCall.post(url, headers(apiKey, route), body);
+        CompletableFuture<HttpReply> sent;
+        try {
+            sent = transport.send(HttpCall.post(url, headers(apiKey, route), body));
+        } catch (RuntimeException e) {
+            // Thrown before anything left the machine, most often by a header the HTTP client
+            // refuses. Its message can quote that header, which is the key, so neither the
+            // message nor the exception travels on.
+            return CompletableFuture.failedFuture(new ModelException(
+                    ModelException.Kind.REQUEST, "The request to the provider could not be built"));
+        }
 
-        return transport.send(call)
+        return sent
                 .handle((reply, failure) -> {
                     if (failure != null) {
                         throw new ModelException(ModelException.Kind.TRANSPORT,
@@ -218,7 +246,7 @@ public final class OpenRouterClient implements ModelClient {
                     if (!reply.isSuccess()) {
                         throw errorFor(reply);
                     }
-                    return reader.apply(reply.body());
+                    return read(reader, reply.body());
                 })
                 .handle((result, failure) -> {
                     if (failure == null) {
@@ -252,15 +280,7 @@ public final class OpenRouterClient implements ModelClient {
 
     private static ModelException errorFor(HttpReply reply) {
         String message = OpenRouterPayloads.readErrorMessage(reply.body(), reply.status());
-        ModelException.Kind kind = switch (reply.status()) {
-            case 401, 403 -> ModelException.Kind.AUTHENTICATION;
-            case 402 -> ModelException.Kind.AUTHENTICATION; // out of credit: try another key
-            case 429 -> ModelException.Kind.RATE_LIMIT;
-            default -> reply.status() >= 500
-                    ? ModelException.Kind.SERVER
-                    : ModelException.Kind.REQUEST;
-        };
-        return new ModelException(kind, message);
+        return new ModelException(ModelException.Kind.forStatus(reply.status()), message);
     }
 
     /** Exponential, with jitter so a wave of clients does not retry in lockstep. */
@@ -270,10 +290,45 @@ public final class OpenRouterClient implements ModelClient {
         return Duration.ofMillis(base + jitter);
     }
 
+    /**
+     * Reads a successful body, so that any failure to read it is malformed rather than a
+     * transport failure.
+     *
+     * <p>The distinction is money. A body of the wrong shape makes Gson throw an
+     * {@link IllegalStateException} or a {@link ClassCastException}; classed as a transport
+     * failure, that would be retried, and every retry of a request that already succeeded is
+     * billed again.
+     */
+    private static <T> T read(Function<String, T> reader, String body) {
+        try {
+            return reader.apply(body);
+        } catch (ModelException e) {
+            throw e;
+        } catch (RuntimeException e) {
+            throw new ModelException(ModelException.Kind.MALFORMED_RESPONSE,
+                    "The provider returned a response of an unexpected shape", e);
+        }
+    }
+
     private CompletableFuture<Void> delay(Duration duration) {
         CompletableFuture<Void> waited = new CompletableFuture<>();
-        scheduler.schedule(() -> waited.complete(null), duration.toMillis(), TimeUnit.MILLISECONDS);
+        pendingDelays.add(waited);
+        waited.whenComplete((ignored, failure) -> pendingDelays.remove(waited));
+        if (closed.get()) {
+            waited.completeExceptionally(closedException());
+            return waited;
+        }
+        try {
+            scheduler.schedule(() -> waited.complete(null), duration.toMillis(),
+                    TimeUnit.MILLISECONDS);
+        } catch (RejectedExecutionException e) {
+            waited.completeExceptionally(closedException());
+        }
         return waited;
+    }
+
+    private static ModelException closedException() {
+        return new ModelException(ModelException.Kind.CLOSED, "The model client is closed");
     }
 
     private static ModelException asModelException(Throwable failure) {
@@ -343,11 +398,23 @@ public final class OpenRouterClient implements ModelClient {
         }
     }
 
+    /**
+     * Closes the transport and the retry scheduler, and fails every request still waiting on
+     * a backoff with {@link ModelException.Kind#CLOSED}. Safe to call twice.
+     */
     @Override
     public void close() {
-        transport.close();
+        if (!closed.compareAndSet(false, true)) {
+            return;
+        }
+        // Waiters first: a request failed here never reaches the transport, so closing the
+        // transport afterwards cannot race a retry being sent through it.
         if (ownsScheduler) {
             scheduler.shutdownNow();
         }
+        for (CompletableFuture<Void> waiting : List.copyOf(pendingDelays)) {
+            waiting.completeExceptionally(closedException());
+        }
+        transport.close();
     }
 }
