@@ -45,5 +45,20 @@ processResources {
 }
 
 base {
-    archivesName = "${rootProject.name}-neoforge"
+    archivesName = 'MCAgentsCoreNeoforge'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            // The mod jar alone, with no dependency list: it already carries
+            // api, common and shared, and the loader supplies the rest.
+            artifact jar
+
+            pom {
+                name = 'MCAgentsCoreNeoforge'
+                description = "MCAgents Core for NeoForge"
+            }
+        }
+    }
 }

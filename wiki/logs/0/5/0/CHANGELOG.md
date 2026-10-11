@@ -12,8 +12,9 @@ Every consumer has something to change.
 
 - **Packages moved** from `io.github.mcagents.core` to
   `io.github.mcagentsmods.core`, and the Maven group to `io.github.mcagentsmods`.
-  The artifacts are `core-api` and `core-common`. Update every import and
-  dependency coordinate.
+  The artifacts are `mcagents-core-api` and `mcagents-core-common`, and every
+  module now publishes as `mcagents-core-{module}` with a jar named
+  `MCAgentsCore{Module}`. Update every import and dependency coordinate.
 - **Bukkit is gone.** There is no Spigot, Paper or Folia plugin and no universal
   jar. A server plugin built on 0.4.0 has nothing to run against; stay on 0.4.0.
 - **Depend on the mod id `mcagents_core`** and take the jar for your loader:
@@ -37,7 +38,7 @@ Every consumer has something to change.
   itself to OpenRouter.
 - **`api.http`**: `HttpTransport`, `HttpCall` and `HttpReply`, with
   `JdkHttpTransport` as the real transport, and `StubTransport` and
-  `StubKeySource` published as `core-common` test fixtures.
+  `StubKeySource` published as `mcagents-core-common` test fixtures.
 - **The web console**, moved from chat and opened to every mod: register a
   `WebModule` with `CoreWebRegistry.shared()` and its pages, assets and API
   appear under `/{id}/`, `/assets/{id}/` and `/api/{id}/` behind one token and

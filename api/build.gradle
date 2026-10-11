@@ -3,7 +3,7 @@ plugins {
 }
 
 base {
-    archivesName = "${rootProject.name}-api"
+    archivesName = 'MCAgentsCoreApi'
 }
 
 publishing {
@@ -12,7 +12,7 @@ publishing {
             from components.java
 
             pom {
-                name = "${rootProject.name}-${project.name}"
+                name = 'MCAgentsCoreApi'
                 description = "MCAgents Core API"
             }
         }

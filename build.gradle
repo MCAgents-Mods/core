@@ -51,12 +51,6 @@ subprojects {
         }
     }
 
-    // Only the two pure Java layers are published. The platform modules are
-    // distributed as mod artifacts, so they carry no publication.
-    if (project.name != 'api' && project.name != 'common') {
-        return
-    }
-
     apply plugin: 'maven-publish'
 
     publishing {
@@ -72,12 +66,15 @@ subprojects {
         }
 
         publications.withType(MavenPublication) {
-            // Qualify the coordinates with the root project name. Without this
-            // the artifactId defaults to the bare module name, so every project
-            // in this group would publish a colliding io.github.mcagentsmods:api —
-            // a consumer could not depend on core and another project at the
-            // same time. Matches the archivesName each module sets for its jar.
-            artifactId = "${rootProject.name}-${project.name}"
+            // Qualify the coordinates with the family and the root project
+            // name. Without this the artifactId defaults to the bare module
+            // name, so every project in this group would publish a colliding
+            // io.github.mcagentsmods:api — a consumer could not depend on core
+            // and another mod at the same time. Gives mcagents-core-api,
+            // mcagents-core-common, mcagents-core-shared, mcagents-core-fabric,
+            // mcagents-core-forge and mcagents-core-neoforge; the jar names are
+            // the archivesName each module sets, MCAgentsCore{Module}.
+            artifactId = "mcagents-${rootProject.name}-${project.name}"
 
             pom {
                 url = "https://github.com/${project.property('git-org-name')}/${project.property('git-repository')}"

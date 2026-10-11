@@ -37,3 +37,17 @@ one pattern, in this repository and in `chat`:
 | 2 | Rename base names and artifact ids | `refactor/artifact-names` | |
 
 `chat` merges after this repository, since it depends on the new coordinates.
+
+### Task 2 — refactor/artifact-names
+
+Each module sets its own `base.archivesName`; the root `build.gradle` sets every
+publication's `artifactId` to `mcagents-${rootProject.name}-${project.name}`, and no longer
+limits publishing to `api` and `common`. `shared` publishes `components.java`; each loader
+publishes `artifact jar`.
+
+The 0.5.0 changelog was corrected rather than left as history: 0.5.0 is neither tagged nor
+published, so the coordinates it ships under are the new ones. The modules, setup, API and
+provider pages and the state file name the new coordinates.
+
+`./gradlew build publishToMavenLocal` passes into a scratch repository: six POMs, the loader
+POMs with no dependencies, and `MCAgentsCore{Module}-0.5.0.jar` in each `build/libs/`.

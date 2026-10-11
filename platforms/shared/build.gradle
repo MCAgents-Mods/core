@@ -33,5 +33,18 @@ tasks.named('test', Test) {
 }
 
 base {
-    archivesName = "${rootProject.name}-shared"
+    archivesName = 'MCAgentsCoreShared'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            pom {
+                name = 'MCAgentsCoreShared'
+                description = "MCAgents Core Shared"
+            }
+        }
+    }
 }

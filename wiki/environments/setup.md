@@ -37,9 +37,9 @@ That compiles every module, runs the tests, and produces one jar per module unde
 
 | Loader | Jar |
 |---|---|
-| Forge | `platforms/forge/build/libs/core-forge-{version}.jar` |
-| NeoForge | `platforms/neoforge/build/libs/core-neoforge-{version}.jar` |
-| Fabric | `platforms/fabric/build/libs/core-fabric-{version}.jar` |
+| Forge | `platforms/forge/build/libs/MCAgentsCoreForge-{version}.jar` |
+| NeoForge | `platforms/neoforge/build/libs/MCAgentsCoreNeoforge-{version}.jar` |
+| Fabric | `platforms/fabric/build/libs/MCAgentsCoreFabric-{version}.jar` |
 
 Drop the one matching your loader into the game's `mods/` folder. Fabric also
 needs Fabric API.
@@ -94,10 +94,11 @@ and the machine-readable results to `{module}/build/test-results/test/`.
 There is no CI pipeline in this repository, so this command is the only thing
 that runs the tests. Run it before opening a pull request.
 
-## Publish the library modules
+## Publish the modules
 
-`api` and `common` are the two published modules. They go to GitHub Packages as
-`io.github.mcagentsmods:core-api` and `io.github.mcagentsmods:core-common`:
+Every module is published to GitHub Packages as
+`io.github.mcagentsmods:mcagents-core-{module}` — `api`, `common`, `shared`,
+`forge`, `neoforge` and `fabric`:
 
 ```sh
 ./gradlew publish

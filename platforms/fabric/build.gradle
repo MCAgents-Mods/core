@@ -47,5 +47,20 @@ processResources {
 }
 
 base {
-    archivesName = "${rootProject.name}-fabric"
+    archivesName = 'MCAgentsCoreFabric'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            // The mod jar alone, with no dependency list: it already carries
+            // api, common and shared, and the loader supplies the rest.
+            artifact jar
+
+            pom {
+                name = 'MCAgentsCoreFabric'
+                description = "MCAgents Core for Fabric"
+            }
+        }
+    }
 }
