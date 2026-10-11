@@ -1,8 +1,8 @@
 /*
  * Settings for the MCAgents core multi project build.
  *
- * The root project is named `mcagents`, which is what gives the published
- * modules their `mcagents-api` and `mcagents-common` artifact ids — see the
+ * The root project is named `core`, which is what gives the published
+ * modules their `core-api` and `core-common` artifact ids — see the
  * `artifactId` rule in the root `build.gradle`.
  */
 
@@ -11,7 +11,7 @@ plugins {
     id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
 }
 
-rootProject.name = 'mcagents'
+rootProject.name = 'core'
 
 // Pure Java layers. Everything else compiles against these two and never the
 // other way around.

@@ -1,6 +1,6 @@
 ---
 name: agents-entry-point
-description: Entry point for agents working in MCAgents/core — shared set resolution, the auto-activation contract, the trigger table, reading order, and routing.
+description: Entry point for agents working in MCAgents-Mods/core — shared set resolution, the auto-activation contract, the trigger table, reading order, and routing.
 ---
 
 # AGENTS

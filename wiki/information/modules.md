@@ -1,8 +1,8 @@
 # Modules
 
 The build is a Gradle multi project defined in `settings.gradle`, with
-`rootProject.name = mcagents`. It has seven modules, and every package under
-them is prefixed `io.github.mcagents.core`.
+`rootProject.name = core`. It has seven modules, and every package under
+them is prefixed `io.github.mcagentsmods.core`.
 
 ## The module graph
 
@@ -58,12 +58,12 @@ Only `api` and `common` carry a publication:
 
 | Module | Coordinates |
 |---|---|
-| `api` | `io.github.mcagents:mcagents-api` |
-| `common` | `io.github.mcagents:mcagents-common` |
+| `api` | `io.github.mcagentsmods:core-api` |
+| `common` | `io.github.mcagentsmods:core-common` |
 
 The `artifactId` is qualified with the root project name deliberately. Without
 it, every MCAgents project in this group would publish a colliding
-`io.github.mcagents:api`, and a consumer could not depend on `core` and another
+`io.github.mcagentsmods:api`, and a consumer could not depend on `core` and another
 project at the same time.
 
 The platform modules are distributed as mod artifacts rather than libraries, so

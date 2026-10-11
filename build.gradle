@@ -66,13 +66,13 @@ subprojects {
         publications.withType(MavenPublication) {
             // Qualify the coordinates with the root project name. Without this
             // the artifactId defaults to the bare module name, so every project
-            // in this group would publish a colliding io.github.mcagents:api —
+            // in this group would publish a colliding io.github.mcagentsmods:api —
             // a consumer could not depend on core and another project at the
             // same time. Matches the archivesName each module sets for its jar.
             artifactId = "${rootProject.name}-${project.name}"
 
             pom {
-                url = "https://mcagents.github.io/website"
+                url = "https://github.com/${project.property('git-org-name')}/${project.property('git-repository')}"
                 developers {
                     developer {
                         id = "jetsadawijit"

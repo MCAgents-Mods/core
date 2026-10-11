@@ -10,8 +10,8 @@ history, read `wiki/logs/`.
 
 ## 2026-10-11
 
-**Stack.** Gradle multi project build, Java 25, root project `mcagents`, group
-`io.github.mcagents`. Version `0.4.0`, carried by `project-version` in
+**Stack.** Gradle multi project build, Java 25, root project `core`, group
+`io.github.mcagentsmods`. Version `0.4.0`, carried by `project-version` in
 `gradle.properties`. Default branch `master`. License MIT,
 `Copyright (c) 2026 MCAgents`.
 

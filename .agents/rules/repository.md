@@ -18,7 +18,7 @@ are:
 * `settings.gradle`, `build.gradle`, `gradle.properties`, `gradlew`,
   `gradlew.bat`, `gradle/` — the build, the wrapper, and the version catalog
 * `api/`, `common/`, `platforms/` — the seven modules, all packaged under
-  `io.github.mcagents.core`
+  `io.github.mcagentsmods.core`
 * `.agents/` — this repository's own instructions (`rules/`, `knowledge/`), plus
   three reserved structural trees: `.agents/index/` (every index), `.agents/wiki/`
   (agent knowledge), and `.agents/memory/` (dynamic state)
@@ -56,7 +56,7 @@ Anything you would have to guess at is not a rule — it is a fabrication.
 `core` holds the shared agent and API code that MCAgents' Minecraft mods build
 on. Today that is one capability: driving language model agents —
 OpenRouter, OpenAI, DeepSeek, and Anthropic — through
-`io.github.mcagents.core.common.MCAgentsProvider`, the single public entry point.
+`io.github.mcagentsmods.core.common.MCAgentsProvider`, the single public entry point.
 
 Three constraints define the project, and a change that breaks one of them is
 wrong regardless of how well it works:

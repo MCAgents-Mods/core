@@ -17,7 +17,7 @@ checked into the repository.
 ## Get a working copy
 
 ```sh
-git clone https://github.com/MCAgents/core.git
+git clone https://github.com/MCAgents-Mods/core.git
 cd core
 ```
 
@@ -79,7 +79,7 @@ that runs the tests. Run it before opening a pull request.
 ## Publish the library modules
 
 `api` and `common` are the two published modules. They go to GitHub Packages as
-`io.github.mcagents:mcagents-api` and `io.github.mcagents:mcagents-common`:
+`io.github.mcagentsmods:core-api` and `io.github.mcagentsmods:core-common`:
 
 ```sh
 ./gradlew publish

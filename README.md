@@ -21,7 +21,7 @@ wants and replays it.
 ## What is here today
 
 - A Gradle multi project build on **Java 25**: `api`, `common`, and five
-  `platforms/mods/*` modules, all under `io.github.mcagents.core`. See
+  `platforms/mods/*` modules, all under `io.github.mcagentsmods.core`. See
   [`wiki/information/modules.md`](wiki/information/modules.md).
 - `MCAgentsProvider` — the single entry point, and the only class a consumer
   needs to read. See [`wiki/reference/api.md`](wiki/reference/api.md).
@@ -35,7 +35,7 @@ wants and replays it.
 ## Quick start
 
 ```sh
-git clone https://github.com/MCAgents/core.git
+git clone https://github.com/MCAgents-Mods/core.git
 cd core
 ./gradlew build
 ```
