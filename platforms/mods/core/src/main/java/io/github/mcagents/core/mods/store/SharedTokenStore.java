@@ -31,8 +31,7 @@ import java.util.logging.Logger;
  * and every MCAgents mod they install finds it, rather than each mod keeping its
  * own copy of the same key and each needing to be updated separately.</p>
  *
- * <p>The shape is the one the server plugin's {@code config.yml} uses, so the
- * two sides stay recognisable to each other:</p>
+ * <p>The shape is one list of tokens per vendor:</p>
  *
  * <pre>{@code
  * {
@@ -58,8 +57,7 @@ import java.util.logging.Logger;
 public final class SharedTokenStore implements TokenStore {
 
     /**
-     * The field holding a vendor's credential list, matching the plugin's
-     * {@code config.yml} key.
+     * The field holding a vendor's credential list.
      */
     private static final String TOKEN_FIELD = "token";
 

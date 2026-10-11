@@ -18,9 +18,8 @@ import java.util.concurrent.CompletableFuture;
  *
  * <p>Every method returns immediately with a {@link CompletableFuture} and
  * performs its work off the calling thread. That is not a convenience — a
- * Minecraft server tick must never block on a network call, and on Folia there
- * is no single main thread to block in the first place. Implementations are
- * safe to call from any thread or region.</p>
+ * Minecraft tick or the client's render thread must never block on a network
+ * call. Implementations are safe to call from any thread.</p>
  *
  * <p>Nothing guarantees which thread a returned future completes on, so a
  * callback that touches game state must hop back onto the right scheduler

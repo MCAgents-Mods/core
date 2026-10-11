@@ -1,17 +1,17 @@
 # core
 
-Shared foundation repository for **MCAgents**. It is intended to hold the agent
-and API code that MCAgents' Minecraft plugins and mods build on, so that behavior
-common to several projects lives in one place instead of being copied between
-them. Today that means one thing: driving language model agents — OpenRouter,
-OpenAI, DeepSeek, and Anthropic — from a plugin or a mod, through a single class.
+Shared foundation repository for **MCAgents-Mods**. It holds the agent and API
+code that MCAgents' Minecraft mods build on, so that behavior common to several
+mods lives in one place instead of being copied between them. Today that means
+one thing: driving language model agents — OpenRouter, OpenAI, DeepSeek, and
+Anthropic — from a mod, through a single class.
 
 ```java
 MCAgentsProvider agents = MCAgentsProvider.create();
 agents.registerAnthropic(key);
 
 agents.askAnthropic("claude-opus-4", "Name this village in three words.")
-      .thenAccept(name -> scheduler.run(() -> village.rename(name)));
+      .thenAccept(name -> minecraft.execute(() -> showName(name)));
 ```
 
 It is API only. No commands, no permissions, and no memory — the core stores no
@@ -20,8 +20,8 @@ wants and replays it.
 
 ## What is here today
 
-- A Gradle multi project build on **Java 25**: `api`, `common`, and ten
-  `platforms/*` modules, all under `io.github.mcagents.core`. See
+- A Gradle multi project build on **Java 25**: `api`, `common`, and five
+  `platforms/mods/*` modules, all under `io.github.mcagents.core`. See
   [`wiki/information/modules.md`](wiki/information/modules.md).
 - `MCAgentsProvider` — the single entry point, and the only class a consumer
   needs to read. See [`wiki/reference/api.md`](wiki/reference/api.md).

@@ -5,10 +5,10 @@ description: Entry point for agents working in MCAgents/core — shared set reso
 
 # AGENTS
 
-`MCAgents/core` holds the shared agent and API code that MCAgents' Minecraft plugins
-and mods build on: a Gradle multi project on Java 25, whose `api` and `common`
-modules carry the language model API and whose `platforms/*` modules cover the three
-Bukkit servers and the two mod loaders. See
+`MCAgents-Mods/core` holds the shared agent and API code that MCAgents' Minecraft
+mods build on: a Gradle multi project on Java 25, whose `api` and `common` modules
+carry the language model API and whose `platforms/*` modules cover the mod loaders.
+See
 [`wiki/information/overview.md`](wiki/information/overview.md).
 
 This file is an **entry point and an activation contract**. It contains no rules of

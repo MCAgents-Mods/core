@@ -1,23 +1,20 @@
 # Overview
 
-`core` is the shared foundation repository for **MCAgents**. It is intended to
-hold the agent and API code that MCAgents' Minecraft plugins and mods build on, so
-that behavior common to several projects lives in one place instead of being
-copied between them.
+`core` is the shared foundation repository for **MCAgents-Mods**. It holds the
+agent and API code that MCAgents' Minecraft mods build on, so that behavior
+common to several mods lives in one place instead of being copied between them.
 
 What that means today is one capability: driving language model agents —
-OpenRouter, OpenAI, DeepSeek, and Anthropic — from a plugin or a mod, through a
-single class. The core is API only. It has no commands, no permissions, and no
+OpenRouter, OpenAI, DeepSeek, and Anthropic — from a mod, through a single
+class. The core is API only. It has no commands, no permissions, and no
 memory: it stores no conversation and no per player state, so a consumer keeps
 whatever history it wants and replays it.
 
 ## Current state
 
 The `api` and `common` modules carry the agent API and its implementation. The
-`platforms/*` modules sit in two families — `platforms/bukkit/*` for the three
-server platforms and `platforms/mods/*` for the two mod loaders and the two
-physical sides — with `platforms/engine` bundling every one of them into the
-single universal jar. What exists today is:
+`platforms/mods/*` modules hold the mod side: what every loader shares, the two
+physical sides, and the two mod loaders. What exists today is:
 
 | Path | What it is |
 |---|---|
@@ -26,7 +23,7 @@ single universal jar. What exists today is:
 | `LICENSE` | MIT license, `Copyright (c) 2026 MCAgents`. |
 | `settings.gradle`, `build.gradle`, `gradle.properties` | The Gradle multi project build configuration. |
 | `gradlew`, `gradlew.bat`, `gradle/` | The Gradle wrapper and the version catalog. |
-| `api/`, `common/`, `platforms/` | The twelve build modules — see [`modules.md`](modules.md). |
+| `api/`, `common/`, `platforms/` | The seven build modules — see [`modules.md`](modules.md). |
 | `.agents/` | The agent instruction set — rules, git conventions, planning, platform knowledge, prompts, creators — plus the index, agent-wiki, and memory trees. |
 | `wiki/` | This documentation tree. |
 

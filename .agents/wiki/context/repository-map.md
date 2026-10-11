@@ -14,7 +14,7 @@ rather than restating them.
 
 A **Gradle multi project build on Java 25**, root project `mcagents`, group
 `io.github.mcagents`, version `0.4.0` in `gradle.properties`. It holds the shared
-agent and API code that MCAgents' Minecraft plugins and mods build on.
+agent and API code that MCAgents' Minecraft mods build on.
 
 Full description: [`../../../wiki/information/overview.md`](../../../wiki/information/overview.md).
 
@@ -24,12 +24,9 @@ Full description: [`../../../wiki/information/overview.md`](../../../wiki/inform
 |---|---|
 | `api/` | Pure Java API contracts — chat, llm, token packages. Depends on nothing in the repo. |
 | `common/` | The implementation: `MCAgentsProvider`, the vendor clients, credential pooling. |
-| `platforms/bukkit/core/` | What the three server entry points share. |
-| `platforms/bukkit/{spigotmc,papermc,foliamc}/` | One entry point per server platform. |
 | `platforms/mods/core/` | What every mod module shares, including the side-guard machinery. |
 | `platforms/mods/{client,server}/` | The two physical sides, which the loaders never mix. |
 | `platforms/mods/{neoforge,fabric}/` | Loader entry points. Plain Java modules today — no loader toolchain yet. |
-| `platforms/engine/` | The only module that implements every other one; produces the universal jar. |
 | `gradle/libs.versions.toml` | Every dependency coordinate. Never declare one inline in a module. |
 | `.agents/` | This repository's own instructions, plus the index, agent-wiki, and memory trees. The universal conventions are **not** here — they come from the connector. |
 | `wiki/` | Human documentation, including `wiki/logs/` release history. |
@@ -53,7 +50,6 @@ that page rather than inferring the layout from the directory listing.
 | Entry point | Where | Notes |
 |---|---|---|
 | `MCAgentsProvider` | `common/…/common/MCAgentsProvider.java` | The single public entry point, and the only class a consumer needs to read. |
-| `AbstractCorePlugin` | `platforms/bukkit/core/…/bukkit/` | Base for the three Bukkit plugins. |
 | `SideEntrypoint` / `ModBootstrap` | `platforms/mods/core/…/mods/environment/` | Mod-side bootstrap and the client/server split. |
 
 Public API surface, method by method:
@@ -66,7 +62,6 @@ Public API surface, method by method:
 ./gradlew test                           # tests only
 ./gradlew :common:test                   # one module
 ./gradlew test --tests '*TokenHandles*'  # one class
-./gradlew :platforms:engine:shadowJar    # the universal jar alone
 ./gradlew publishToMavenLocal            # a release dry run
 ./gradlew clean
 ```
@@ -78,8 +73,7 @@ here. Full setup, publishing, and environment variables:
 ## Generated paths — leave them alone
 
 * `build/` and `{module}/build/` — every artifact, report, and test result.
-* `{module}/build/libs/` — the per-module jars and the universal
-  `MCAgents-{version}.jar`.
+* `{module}/build/libs/` — the per-module jars.
 * `{module}/build/reports/tests/test/index.html` — the HTML test report.
 * `.gradle/` — Gradle's own state.
 
@@ -91,11 +85,9 @@ None of these are tracked. Do not commit them, and do not document a path under
 * **There is no CI pipeline.** `./gradlew test` is the only thing that runs the
   tests, so run it before opening a pull request. Do not write instructions or docs
   that assume a CI workflow exists.
-* **A green build proves nothing about Spigot compatibility.** Paper-only API fails
-  at *runtime* on Spigot, when the code path is first hit — never at compile time.
-* **Never assume a main thread.** On Folia there is no single main thread, and
-  `Bukkit.getScheduler()` is unsupported. Shared code that uses it makes every
-  downstream consumer Folia-incompatible. See
+* **Never block the game thread.** A future completes on whichever thread finished
+  the work, and a callback that touches game state must hop back onto the client or
+  server thread first. See
   [`../../knowledge/minecraft-platform.md`](../../knowledge/minecraft-platform.md) —
   that file is the authority, and it is a rule, not a note.
 * **`compileOnly` does not reach tests.** Modules declare `api` and `common` as

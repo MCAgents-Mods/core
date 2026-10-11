@@ -30,4 +30,4 @@ the standing prompts, the creators, and the universal rules are served by the
 
 | File | Purpose |
 |---|---|
-| [`../knowledge/minecraft-platform.md`](../knowledge/minecraft-platform.md) | Which server platforms and mod loaders are targeted, and the Folia threading constraints. |
+| [`../knowledge/minecraft-platform.md`](../knowledge/minecraft-platform.md) | Which mod loaders and Minecraft version are targeted, and the threading constraints shared code must honour. |

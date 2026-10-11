@@ -57,3 +57,21 @@ requests merge after this repository's.
 Created this record and its row in `memory-index.md`, and added `.agents/plans/` to
 `.gitignore` so the working plan can never be committed. Baseline before any change:
 `./gradlew build` passes on `master` at `f8f7eef`.
+
+### Task 2 — refactor/bukkit-removal
+
+Deleted `platforms/bukkit/{core,spigotmc,papermc,foliamc}` and `platforms/engine` —
+the Bukkit plugins, `YamlTokenStore`, `CoreCommand`, every `plugin.yml` and
+`config.yml`, and the shaded universal jar — along with the Spigot, Paper and Folia
+coordinates. The per-family group qualification in the root `build.gradle` went with
+them: it existed only because two families each had a module named `core`.
+
+Docs and instructions now describe a mods-only repository: `README.md`, `AGENTS.md`,
+the overview, modules, setup, mod-sides, provider-guide and API pages, the repository
+map, `rules/repository.md`, `knowledge/minecraft-platform.md` (Bukkit and Folia
+removed; threading restated for the client and server threads), and the state file.
+The request timeout section now names `LlmCredentials.DEFAULT_TIMEOUT`, the only
+timeout left — `request_timeout_seconds` was read by the deleted Bukkit config only.
+Released changelogs under `wiki/logs/` are history and were not touched.
+
+`./gradlew build` passes with seven modules.

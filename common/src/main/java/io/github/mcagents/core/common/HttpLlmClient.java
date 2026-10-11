@@ -334,7 +334,7 @@ abstract class HttpLlmClient extends AbstractLlmClient {
      *
      * <p>Shuts the underlying {@code HttpClient} down without waiting for
      * in-flight requests to finish. Deliberately not the blocking variant: this
-     * is normally called while a plugin or mod is being disabled, on a thread
+     * is normally called while a mod is shutting down, on a thread
      * that must not stall, and any request still running will fail on its own
      * once the client goes down.</p>
      */

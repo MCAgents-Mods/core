@@ -53,14 +53,13 @@ import java.util.concurrent.CompletionException;
  * its memory. A caller that wants a multi turn conversation keeps the history
  * itself and replays it, which is what {@link ChatResponse#asMessage()} is
  * for. This is deliberate: a shared core that quietly accumulated per player
- * history would leak memory in every plugin that used it.</p>
+ * history would leak memory in every mod that used it.</p>
  *
  * <p><strong>Nothing blocks.</strong> Every remote call returns a
  * {@link CompletableFuture} and does its work off the calling thread, so a call
  * is safe from a tick — but the completion is not. Nothing guarantees which
  * thread a future finishes on, so a callback that touches the world, an entity,
- * or an inventory must hop back onto the right scheduler first. On Folia that
- * means the scheduler owning the region, not a global one.</p>
+ * or an inventory must hop back onto the game thread first.</p>
  *
  * <h2>Failure</h2>
  *
@@ -74,15 +73,14 @@ public class MCAgentsProvider implements AgentProvider {
 
     /**
      * The provider installed by the most recent construction — the handle a
-     * plugin or mod hands to other code, and the one third party consumers look
+     * mod hands to other code, and the one third party consumers look
      * for.
      *
      * <p>Assigned by the constructor and never cleared, so it survives a
      * {@link #close()}; a closed provider left here fails every call with a
      * clear message rather than turning into a {@code null} dereference in the
-     * caller. Declared {@code volatile} because it is installed during plugin
-     * enable but read from asynchronous callbacks and, on Folia, from region
-     * threads.</p>
+     * caller. Declared {@code volatile} because it is installed during mod
+     * initialisation but read from asynchronous callbacks.</p>
      */
     public static volatile MCAgentsProvider instance;
 

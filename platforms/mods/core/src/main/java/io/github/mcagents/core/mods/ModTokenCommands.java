@@ -45,9 +45,8 @@ public final class ModTokenCommands {
     /**
      * How long one request may take before it is abandoned.
      *
-     * <p>Defined here rather than in any mod that consumes the API, for the
-     * same reason it is defined in the server plugin's configuration rather
-     * than a consumer's: a request either answers or fails within this window,
+     * <p>Defined here rather than in any mod that consumes the API: a request
+     * either answers or fails within this window,
      * which is what lets a consumer rely on its future always completing
      * without owning a timer of its own.</p>
      */

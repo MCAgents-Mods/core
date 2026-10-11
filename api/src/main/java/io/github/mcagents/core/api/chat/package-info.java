@@ -10,7 +10,6 @@
  * implementations, never by these types.</p>
  *
  * <p>Every type in this package is an immutable record or enum, so an instance
- * can be handed to another thread — or, on Folia, to another region — without
- * copying or locking.</p>
+ * can be handed to another thread without copying or locking.</p>
  */
 package io.github.mcagents.core.api.chat;

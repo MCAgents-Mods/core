@@ -5,19 +5,18 @@ plugins {
 dependencies {
     // The contracts this module implements. Declared compileOnly so the api
     // classes are never duplicated into a consumer's classpath by this jar —
-    // the engine is the single module that bundles them.
+    // the mod jar that ships them bundles exactly one copy.
     compileOnly project(':api')
 
-    // JSON codec for the vendor wire formats. compileOnly because every
-    // platform the core targets already provides Gson on the classpath: the
-    // Bukkit family bundles it in the server jar, and Minecraft itself pulls
-    // it in for the mod loaders. Shading a second copy would be waste.
+    // JSON codec for the vendor wire formats. compileOnly because Minecraft
+    // itself puts Gson on the classpath for every mod loader. Shading a second
+    // copy would be waste.
     compileOnly libs.gson
 }
 
 dependencies {
     // `compileOnly` does not reach the test compile classpath, so the contracts
-    // this module implements are declared again for the tests. The engine still
+    // this module implements are declared again for the tests. The mod jar still
     // bundles exactly one copy; nothing here changes what ships.
     testImplementation project(':api')
     testImplementation libs.gson

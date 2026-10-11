@@ -3,13 +3,14 @@ plugins {
 }
 
 dependencies {
-    // The shared layers are bundled once, by the engine. Every module below
-    // the engine declares them compileOnly so no jar carries a second copy.
+    // The shared layers are bundled once, by the mod jar that ships them.
+    // Every module below it declares them compileOnly so no jar carries a
+    // second copy.
     compileOnly project(':api')
     compileOnly project(':common')
 
-    // The mod family core, mirroring the role platforms:bukkit:core plays for the
-    // server side. This module adds only what NeoForge itself needs.
+    // The mod family core, which holds what every loader shares. This module
+    // adds only what NeoForge itself needs.
     compileOnly project(':platforms:mods:core')
 
     compileOnly libs.gson

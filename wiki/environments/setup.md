@@ -9,8 +9,7 @@
   [foojay resolver](https://github.com/gradle/foojay-toolchains) configured in
   `settings.gradle`.
 * **Network access** on the first build, to fetch Gradle 9.5.0, the Java 25
-  toolchain, and the platform APIs from Maven Central, the SpigotMC repository,
-  and the PaperMC repository.
+  toolchain, and the libraries from Maven Central.
 
 Gradle itself does not need to be installed — use the wrapper (`./gradlew`)
 checked into the repository.
@@ -31,57 +30,27 @@ The default branch is `master`.
 ```
 
 That compiles every module, runs the tests, and produces one jar per module under
-`{module}/build/libs/`, including the universal `MCAgents-{version}.jar` shaded by
-`platforms:engine`.
+`{module}/build/libs/`.
 
 Useful variants:
 
 ```sh
 ./gradlew :api:build                 # one module only
-./gradlew :platforms:engine:shadowJar  # the universal jar on its own
 ./gradlew clean                      # delete the root build directory
 ./gradlew javaToolchains             # show which JDK the build resolved
 ```
 
-## Install it on a server
+## The request timeout
 
-Drop `platforms/engine/build/libs/MCAgents-{version}.jar` into the server's
-`plugins/` folder. It loads as a plugin named `MCAgents`, which is the name
-consumer plugins declare in their `depend` list.
-
-Configure API tokens either by editing `plugins/MCAgents/config.yml`, or in
-game:
-
-```
-/agents                                   credential status for every platform
-/agents reload                            re-read the credential file
-/agents <platform> token add <token>      store a token
-/agents <platform> token remove <handle>  delete one, handle from tab completion
-```
-
-Tab completion offers a **masked handle** such as `#2:a3f9` for `remove` —
-position plus the last four characters — so choosing which key to delete never
-puts the key itself on screen. The full value is accepted too.
-
-Everything sits behind `mcagents.admin`, default op.
-
-### The request timeout
-
-```yaml
-request_timeout_seconds: 60
-```
-
-**This is the only place a timeout is defined.** Consumer plugins have no
-timeout setting, pass none, and cannot override it — which is the point: a
-request always either answers or fails within this window, so a consumer can rely
-on its future completing without owning a timer of its own.
+One request either answers or fails within 60 seconds —
+`LlmCredentials.DEFAULT_TIMEOUT`. **This is the only place a timeout is
+defined.** Consumer mods have no timeout setting, pass none, and cannot override
+it, so a consumer can rely on its future completing without owning a timer of its
+own.
 
 A timeout is not a credential failure. Nothing is evicted and nothing is retried:
 a model that has not answered in this long is unlikely to answer sooner on a
 second attempt, and retrying doubles the bill.
-
-Allowed range is 5–600 seconds; anything outside falls back to 60 with a warning.
-`/agents` shows the value in force.
 
 ## Test
 
