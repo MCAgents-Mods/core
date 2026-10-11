@@ -71,7 +71,7 @@ Two ways to register a vendor, and the difference matters.
 | `reloadTokens()` | `int` | Re-read every store; returns how many vendors were reloaded. |
 
 `TokenStore` itself is four methods: `load`, `add`, `evict`, `reload`, plus
-`describe`. `add` and `evict` are what the `/agents` command drives.
+`describe`. `add` and `evict` are what the mod's `/agents` client command drives.
 
 With a store registered, core handles the whole credential lifecycle so a
 consumer never sees a key again:
@@ -197,7 +197,7 @@ tokens can be billed differently.
 | `vendor()` | `LlmVendor` | Which service these reach. |
 | `apiKey()` | `String` | The secret. Never blank. |
 | `baseUrl()` | `String` | The endpoint. Trailing slashes are stripped. |
-| `timeout()` | `Duration` | Bounds one HTTP exchange, not a retry sequence — the core does not retry. Defaults to 60s, and on a server comes from `request_timeout_seconds` in the plugin's `config.yml`. Carried on the credential template, so it survives every rotation. |
+| `timeout()` | `Duration` | Bounds one HTTP exchange, not a retry sequence — the core does not retry. Defaults to 60s (`DEFAULT_TIMEOUT`). Carried on the credential template, so it survives every rotation. |
 | `headers()` | `Map<String,String>` | Extra headers on every request. Unmodifiable copy. |
 
 Build with `LlmCredentials.of(vendor, apiKey)` or

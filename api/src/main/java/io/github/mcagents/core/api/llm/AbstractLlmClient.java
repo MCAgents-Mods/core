@@ -32,7 +32,7 @@ public abstract class AbstractLlmClient implements LlmClient {
     /**
      * Whether {@link #close()} has run.
      *
-     * <p>Atomic because a client is shared across threads by design — a plugin
+     * <p>Atomic because a client is shared across threads by design — a mod
      * may well close it on the main thread while a request started from an
      * async task is still in flight.</p>
      */

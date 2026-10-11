@@ -31,8 +31,8 @@ import java.util.concurrent.CompletableFuture;
  *
  * <p>Every remote call returns a {@link CompletableFuture} and does its work off
  * the calling thread, so none of them may be assumed to complete on the thread
- * that started them. Registration and lookup are safe to call from any thread
- * or Folia region.</p>
+ * that started them. Registration and lookup are safe to call from any
+ * thread.</p>
  */
 public interface AgentProvider extends AutoCloseable {
 
@@ -169,7 +169,7 @@ public interface AgentProvider extends AutoCloseable {
     /**
      * Closes every registered client and clears the registry.
      *
-     * <p>Idempotent, and the natural thing to call when a plugin or mod is
+     * <p>Idempotent, and the natural thing to call when a mod is
      * disabled. A provider is not reusable afterwards: calls made after closing
      * fail with an {@link AgentException}.</p>
      */

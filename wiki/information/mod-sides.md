@@ -3,9 +3,6 @@
 How the mod half of `core` runs on a client and on a dedicated server from one
 jar, without either side loading the other's code.
 
-This page covers the mod family only. The Bukkit family has no equivalent
-problem: a plugin only ever runs on a server.
-
 ## The problem this solves
 
 A mod runs in two physically different processes:

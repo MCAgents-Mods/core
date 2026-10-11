@@ -3,8 +3,9 @@ plugins {
 }
 
 dependencies {
-    // The shared layers are bundled once, by the engine. Every module below
-    // the engine declares them compileOnly so no jar carries a second copy.
+    // The shared layers are bundled once, by the mod jar that ships them.
+    // Every module below it declares them compileOnly so no jar carries a
+    // second copy.
     compileOnly project(':api')
     compileOnly project(':common')
 

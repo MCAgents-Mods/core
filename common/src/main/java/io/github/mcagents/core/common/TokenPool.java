@@ -33,7 +33,7 @@ import java.util.Optional;
  * <h2>Threading</h2>
  *
  * <p>Every method is synchronized. Rotation happens on whichever thread a
- * failed request completed on, which on Folia can be any region thread, and the
+ * failed request completed on, which can be any thread, and the
  * operations are compound — read the current credential, drop it, advance —
  * so an atomic field would look safe without being so.</p>
  */

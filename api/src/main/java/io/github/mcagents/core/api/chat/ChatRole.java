@@ -21,7 +21,7 @@ public enum ChatRole {
     SYSTEM("system"),
 
     /**
-     * A turn authored by the caller — in practice, the plugin or mod driving
+     * A turn authored by the caller — in practice, the mod driving
      * the agent.
      */
     USER("user"),

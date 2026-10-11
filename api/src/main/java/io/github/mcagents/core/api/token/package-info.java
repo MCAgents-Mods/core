@@ -1,10 +1,9 @@
 /**
  * Credential storage contracts.
  *
- * <p>Where an API token lives is the consumer's business, not core's: a server
- * plugin keeps them in its own configuration file, a mod keeps them in a shared
- * file under the Minecraft directory, and a future consumer may keep them
- * somewhere else entirely. Core owns what is done <em>with</em> them —
+ * <p>Where an API token lives is the consumer's business, not core's: the mod
+ * side keeps them in a shared file under the Minecraft directory, and another
+ * consumer may keep them somewhere else entirely. Core owns what is done <em>with</em> them —
  * rotation, eviction, and the difference between "never configured" and
  * "every one was rejected" — and reads them through
  * {@link io.github.mcagents.core.api.token.TokenStore}.</p>

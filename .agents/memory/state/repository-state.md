@@ -1,6 +1,6 @@
 ---
 name: memory-state-repository-state
-description: Current known state of MCAgents/core — what exists, the stack, what is not built yet, and the next obvious step.
+description: Current known state of MCAgents-Mods/core — what exists, the stack, what is not built yet, and the next obvious step.
 ---
 
 # Repository State
@@ -8,7 +8,7 @@ description: Current known state of MCAgents/core — what exists, the stack, wh
 This file is **overwritten in place** and is always current. It is not a log — for
 history, read `wiki/logs/`.
 
-## 2026-08-12
+## 2026-10-11
 
 **Stack.** Gradle multi project build, Java 25, root project `mcagents`, group
 `io.github.mcagents`. Version `0.4.0`, carried by `project-version` in
@@ -20,14 +20,14 @@ history, read `wiki/logs/`.
 - `api` and `common` — the language model API and its implementation.
   `MCAgentsProvider` is the single public entry point, driving OpenRouter, OpenAI,
   DeepSeek, and Anthropic.
-- Credential pooling, rotation, and storage owned entirely by `core`: its own
-  `config.yml`, the shared `mcagents.json`, and the in-game `/agents` command with
-  masked handles in tab completion.
-- A configurable request timeout, `request_timeout_seconds`, default 60, range
-  5–600. It is the only timeout in MCAgents; consumers cannot override it.
-- Twelve build modules. `platforms/bukkit/*` covers SpigotMC, PaperMC, and Folia;
-  `platforms/mods/*` covers the two loaders plus the client and server physical
-  sides; `platforms/engine` shades the universal jar.
+- Credential pooling, rotation, and storage owned entirely by `core`: the shared
+  `mcagents.json` and the `/agents` client command logic with masked handles in tab
+  completion.
+- One request timeout, 60 seconds (`LlmCredentials.DEFAULT_TIMEOUT`). It is the only
+  timeout in MCAgents; consumers cannot override it.
+- Seven build modules. `platforms/mods/*` covers the two loaders plus the client and
+  server physical sides. The Bukkit family and the universal engine jar were removed
+  on 2026-10-11 — see [`../tasks/mods-foundation.md`](../tasks/mods-foundation.md).
 - A JUnit 5 test harness wired once in the root `build.gradle`. Tests exist for
   `common` token handling and for the mod-side environment, client, and server
   packages.

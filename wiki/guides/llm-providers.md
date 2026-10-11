@@ -22,12 +22,12 @@ dependencies {
 }
 ```
 
-`compileOnly` because the MCAgents engine jar already carries both on the
-server. Shading your own copy would put two of each class on the classpath.
+`compileOnly` because the core mod jar already carries both at runtime.
+Shading your own copy would put two of each class on the classpath.
 
 ## Register the vendors you have keys for
 
-Do this once, when your plugin or mod starts:
+Do this once, when your mod starts:
 
 ```java
 MCAgentsProvider agents = MCAgentsProvider.create();
@@ -86,7 +86,7 @@ agents.chatAnthropic(request).thenAccept(reply -> {
 ### Nothing is remembered
 
 The provider stores no conversation, no cache, and no per-player state. That is
-deliberate: `core` is shared by several plugins, and a core that quietly
+deliberate: `core` is shared by several mods, and a core that quietly
 accumulated history would leak memory in all of them.
 
 So a conversation is yours to keep and replay:
@@ -103,23 +103,22 @@ agents.chatOpenAi(request).thenAccept(reply -> {
 ```
 
 Bound that list yourself. An unbounded history grows until the model rejects it
-for length, and on a busy server one list per player adds up.
+for length, and one list per player adds up.
 
 ### Nothing blocks, and nothing promises you a thread
 
 Every call returns immediately and does its work off your thread, so calling one
 from a tick is safe. **The completion is not.** Nothing guarantees which thread
 a future finishes on, so a callback that touches the world, an entity, or an
-inventory has to hop back onto a scheduler first:
+inventory has to hop back onto the game thread first:
 
 ```java
 agents.askOpenAi(model, prompt).thenAccept(reply ->
-        scheduler.run(() -> villager.customName(Component.text(reply))));
+        minecraft.execute(() -> player.displayClientMessage(Component.literal(reply), false)));
 ```
 
-On Folia that means the scheduler owning the region the entity is in, not a
-global one. On Spigot and Paper it means the main thread. Getting this wrong
-produces an intermittent crash under load and nothing at all in testing.
+On a client that means the client thread; on a server, the server thread.
+Getting this wrong produces an intermittent crash under load and nothing at all in testing.
 
 ## Handling failure
 
@@ -145,7 +144,7 @@ The message carries the vendor's own error text, so an HTTP 400 tells you what
 was actually wrong.
 
 The core does not retry. `LlmCredentials.timeout()` bounds one exchange, and
-that is the whole of its patience — a retry policy belongs to the plugin that
+that is the whole of its patience — a retry policy belongs to the mod that
 knows whether the work is worth repeating.
 
 ## What differs per vendor
@@ -174,15 +173,12 @@ agents.register(LlmCredentials
 
 ## Shut down
 
-Close the provider when your plugin or mod disables:
+Close the provider when your mod shuts down:
 
 ```java
-@Override
-public void onDisable() {
-    agents.close();
-}
+agents.close();
 ```
 
 Closing shuts every client down without waiting for in-flight requests, so it
-will not stall the server thread. Requests still running fail; the provider is
+will not stall the game thread. Requests still running fail; the provider is
 not reusable afterwards.

@@ -1,9 +1,8 @@
 /**
  * Shared mod code — every loader, and both physical sides.
  *
- * <p>Everything the mod modules have in common lives here, mirroring the role
- * {@code io.github.mcagents.core.bukkit} plays for the server side. Two rules
- * decide what belongs:</p>
+ * <p>Everything the mod modules have in common lives here. Two rules decide
+ * what belongs:</p>
  *
  * <ul>
  *   <li><strong>Loader agnostic.</strong> Code needing a NeoForge or Fabric

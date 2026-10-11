@@ -5,10 +5,9 @@ import java.util.List;
 /**
  * Where credentials are read from and written back to.
  *
- * <p>Implemented once per side: the server plugin's configuration file, and the
- * shared file under the Minecraft directory that several MCAgents mods read.
- * The pooling logic depends only on this interface, so neither storage shape
- * leaks into it.</p>
+ * <p>Implemented by the shared file under the Minecraft directory that several
+ * MCAgents mods read. The pooling logic depends only on this interface, so no
+ * storage shape leaks into it.</p>
  *
  * <h2>Threading</h2>
  *

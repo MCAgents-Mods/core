@@ -1,6 +1,6 @@
 ---
 name: repository-rules
-description: Rules specific to the MCAgents/core repository — its current state, what exists, and what must not be assumed or introduced.
+description: Rules specific to the MCAgents-Mods/core repository — its current state, what exists, and what must not be assumed or introduced.
 ---
 
 # Repository Rules
@@ -10,14 +10,14 @@ the specialized rules rather than restating them.
 
 ## Current state — read this before assuming anything
 
-`MCAgents/core` is a **Gradle multi project build on Java 25**. The tracked files
+`MCAgents-Mods/core` is a **Gradle multi project build on Java 25**. The tracked files
 are:
 
 * `README.md` — project overview
 * `LICENSE` — MIT, `Copyright (c) 2026 MCAgents`
 * `settings.gradle`, `build.gradle`, `gradle.properties`, `gradlew`,
   `gradlew.bat`, `gradle/` — the build, the wrapper, and the version catalog
-* `api/`, `common/`, `platforms/` — the twelve modules, all packaged under
+* `api/`, `common/`, `platforms/` — the seven modules, all packaged under
   `io.github.mcagents.core`
 * `.agents/` — this repository's own instructions (`rules/`, `knowledge/`), plus
   three reserved structural trees: `.agents/index/` (every index), `.agents/wiki/`
@@ -53,8 +53,8 @@ Anything you would have to guess at is not a rule — it is a fabrication.
 
 ## What the project does
 
-`core` holds the shared agent and API code that MCAgents' Minecraft plugins and
-mods build on. Today that is one capability: driving language model agents —
+`core` holds the shared agent and API code that MCAgents' Minecraft mods build
+on. Today that is one capability: driving language model agents —
 OpenRouter, OpenAI, DeepSeek, and Anthropic — through
 `io.github.mcagents.core.common.MCAgentsProvider`, the single public entry point.
 
@@ -62,13 +62,13 @@ Three constraints define the project, and a change that breaks one of them is
 wrong regardless of how well it works:
 
 * **API only.** No commands, no permissions, no listeners, no gameplay. `core` is
-  consumed by plugins and mods; it is not one.
+  consumed by mods; it is not one.
 * **No memory.** Nothing stores a conversation, a cache, or per player state. A
   shared core that accumulated history would leak memory in every consumer at
   once.
 * **Nothing blocks.** Every remote call returns a `CompletableFuture` and works
-  off the calling thread. A tick must never wait on a network call, and on Folia
-  there is no single main thread to wait in.
+  off the calling thread. A tick or a rendered frame must never wait on a network
+  call.
 
 The `platforms/*` modules exist and compile but hold no code yet. That is scope
 guidance for *where* platform code will live — never a description of code that
