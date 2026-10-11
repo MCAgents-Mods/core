@@ -20,8 +20,8 @@ platforms/shared    loader-agnostic mod code, both physical sides
 
 | Module | Package | Purpose |
 |---|---|---|
-| `api` | `…core.api` | Pure Java contracts: interfaces, records, enums, abstract types. `chat` and `llm` describe the per-vendor client, `model` the routed model client, `http` its transport, and `token` the credential storage contract. No implementation, and no platform type anywhere. |
-| `common` | `…core.common` | Pure Java implementations of those contracts — `common.model` holds `OpenRouterClient`, `common.http` the JDK transport. Still no platform type. Its `testFixtures` source set holds `StubTransport` and `StubKeySource`. |
+| `api` | `…core.api` | Pure Java contracts: interfaces, records, enums, abstract types. `chat` and `llm` describe the per-vendor client, `model` the routed model client, `http` its transport, `web` the web console's registry, and `token` the credential storage contract. No implementation, and no platform type anywhere. |
+| `common` | `…core.common` | Pure Java implementations of those contracts — `common.model` holds `OpenRouterClient`, `common.http` the JDK transport, and `common.web` the loopback web console with the page shell it serves from `mcagents_core/web/`. Still no platform type. Its `testFixtures` source set holds `StubTransport` and `StubKeySource`. |
 | `platforms:shared` | `…core.shared` | The code every loader shares: `CoreRuntime` (start and stop), the machinery that decides which physical side is running, and the two sides as packages — `…shared.client` and `…shared.server`. Plain Java, no loader toolchain. |
 | `platforms:forge` | `…core.forge` | Only what Forge needs: the `@Mod` class and `META-INF/mods.toml`. |
 | `platforms:neoforge` | `…core.neoforge` | Only what NeoForge needs: the `@Mod` class and `META-INF/neoforge.mods.toml`. |

@@ -29,6 +29,9 @@ wants and replays it.
   and answer — and `OpenRouterClient`, the routed client with tool calling,
   embeddings, prompt caching, retries and key rotation. See
   [`wiki/reference/api.md`](wiki/reference/api.md).
+- A local web console that every mod registers its pages into, behind one
+  loopback server and one token. See
+  [`wiki/guides/web-pages.md`](wiki/guides/web-pages.md).
 - An agent instruction set under `.agents/` — placement rules, git conventions,
   task workflow, and the creator agents that maintain the trees.
 - A documentation tree under `wiki/` for people, and an agent-facing knowledge and

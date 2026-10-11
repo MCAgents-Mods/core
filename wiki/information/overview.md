@@ -7,7 +7,8 @@ common to several mods lives in one place instead of being copied between them.
 What that means today is one capability: driving language model agents —
 OpenRouter, OpenAI, DeepSeek, and Anthropic — from a mod, either through
 `MCAgentsProvider` or through `OpenRouterClient`, the routed client with tool
-calling, embeddings, prompt caching and retries. The core is API only. It has no commands, no permissions, and no
+calling, embeddings, prompt caching and retries. It also runs the local web
+console every mod registers its pages into. The core is API only. It has no commands, no permissions, and no
 memory: it stores no conversation and no per player state, so a consumer keeps
 whatever history it wants and replays it.
 
