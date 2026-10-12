@@ -34,9 +34,9 @@ hides it, because there the fixtures come from the project itself.
 
 | # | Title | Branch | PR |
 |---|---|---|---|
-| 1 | Task record | `chore/test-fixtures-capability-plan` | |
-| 2 | Name the test fixtures after the artifact | `fix/test-fixtures-capability` | |
-| 3 | Release 0.5.1 | `release/0.5.1` | |
+| 1 | Task record | `chore/test-fixtures-capability-plan` | #14 |
+| 2 | Name the test fixtures after the artifact | `fix/test-fixtures-capability` | #15 |
+| 3 | Release 0.5.1 | `release/0.5.1` | #16 |
 
 ### Task 1 — chore/test-fixtures-capability-plan
 
