@@ -5,7 +5,7 @@ description: Adding the Publish GitHub Actions workflow, which tests, publishes 
 
 # Task: Publish workflow
 
-**Status:** in progress
+**Status:** done once the pull requests below merge and the first Publish run tags `v0.5.0`
 
 ## The request
 
@@ -69,3 +69,10 @@ The pages that said there is no CI pipeline now describe the workflow:
 Packages never overwrites a version), `wiki/information/overview.md`,
 `.agents/wiki/context/repository-map.md`, `.agents/rules/repository.md`, and the state
 file. Nothing runs on a pull request yet, and the pages say so.
+
+### Task 3 — release/0.5.0
+
+No version change: `project-version` stays `0.5.0`, which has never been tagged or
+published, so the Publish run on the merge of task 2 ships it and tags `v0.5.0`. The 0.5.0
+changelog gains the workflow under Added, and the logs index summary says so. 0.5.0 is not
+yet released, so its log is still open to correction, as the artifact names task did.
