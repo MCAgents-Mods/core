@@ -5,7 +5,7 @@ description: Adding pack.mcmeta to core's Forge jar, without which Forge 26.2 re
 
 # Task: Forge pack metadata
 
-**Status:** in progress
+**Status:** done once the pull requests below merge and the Publish run tags `v0.5.2`
 
 ## The request
 
@@ -53,9 +53,9 @@ The owner was away and had asked for the recommended option to be taken on every
 
 | # | Title | Branch | PR |
 |---|---|---|---|
-| 1 | Task record | `chore/forge-pack-metadata-plan` | |
-| 2 | Add pack.mcmeta to the Forge jar | `fix/forge-pack-metadata` | |
-| 3 | Release 0.5.2 | `release/0.5.2` | |
+| 1 | Task record | `chore/forge-pack-metadata-plan` | #17 |
+| 2 | Add pack.mcmeta to the Forge jar | `fix/forge-pack-metadata` | #18 |
+| 3 | Release 0.5.2 | `release/0.5.2` | #19 |
 
 ### Task 1 — chore/forge-pack-metadata-plan
 
@@ -80,3 +80,7 @@ changelog and its logs-index row are new; the overview, the repository map, the 
 rule and the state file name 0.5.2, and the rule's `wiki/logs/` range runs to `0/5/2`.
 Merging this branch is the release: the Publish workflow finds no `v0.5.2` tag, builds and
 publishes the six modules, and tags the commit.
+
+The local build got through Maven Central's rate limit after task 2 merged:
+`./gradlew :platforms:forge:jar` on task 2's commit passes, and the jar holds `pack.mcmeta`
+at its root, unchanged, beside `META-INF/mods.toml`.
