@@ -46,6 +46,10 @@ Every consumer has something to change.
 - `ChatRole.TOOL`, and `ModelException.Kind.CLOSED` and `Kind.forStatus`.
 - `SharedTokenStore.atFile`, which opens exactly one file with no environment
   override.
+- **The Publish workflow**, `.github/workflows/publish.yml`. A push to `master`
+  whose `project-version` has no `v{version}` tag yet builds and tests, publishes
+  all six modules to GitHub Packages, and only then tags the commit. 0.5.0 is the
+  first version it ships; see `wiki/environments/setup.md`.
 
 ## Changed
 
