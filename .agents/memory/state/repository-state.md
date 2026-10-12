@@ -8,7 +8,7 @@ description: Current known state of MCAgents-Mods/core — what exists, the stac
 This file is **overwritten in place** and is always current. It is not a log — for
 history, read `wiki/logs/`.
 
-## 2026-10-11
+## 2026-10-12
 
 **Stack.** Gradle multi project build, Java 25, root project `core`, group
 `io.github.mcagentsmods`. Version `0.5.0`, carried by `project-version` in
@@ -48,7 +48,10 @@ history, read `wiki/logs/`.
 
 **What is not built yet.**
 
-- **No CI pipeline.** `./gradlew test` is the only thing that runs the tests.
+- **No pull request checks.** The one workflow, Publish (`.github/workflows/publish.yml`,
+  added 2026-10-12), builds, tests, publishes and tags only when a new `project-version`
+  reaches `master`. `./gradlew test` is still the only thing that runs the tests before a
+  merge. See [`../tasks/publish-workflow.md`](../tasks/publish-workflow.md).
 - **Never launched in a game.** The three jars build and their manifests agree with
   their entry points, but none has been loaded in a real client or server yet.
 - **Two request stacks remain**: `MCAgentsProvider` and `OpenRouterClient` each have their
@@ -73,7 +76,6 @@ in the repository. See
 and [`../tasks/agents-setup.md`](../tasks/agents-setup.md) for the generation that
 preceded it.
 
-**Next obvious step.** Either a CI workflow — which would make `./gradlew test` run
-on every pull request and let the "no CI" caveat come out of three separate files —
-or the first real loader code, which brings its toolchain with it. Neither is
-started; both are the user's call.
+**Next obvious step.** Either a pull request check — `./gradlew build` on every pull
+request, beside the Publish workflow — or loading the three jars in a real game. Neither
+is started; both are the user's call.

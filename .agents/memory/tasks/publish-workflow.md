@@ -48,3 +48,24 @@ against core's tags, so this repository goes first.
 ### Task 1 — chore/publish-workflow-plan
 
 This record, and its row in the memory index.
+
+### Task 2 — ci/publish
+
+`.github/workflows/publish.yml` is the owner's YAML with one change: its header names the
+six modules core publishes (`api`, `common`, `shared`, `fabric`, `forge`, `neoforge`)
+instead of the Bukkit layout it was written for. `project-version` is the version key,
+Java 25 is the toolchain, and the root `build.gradle` already publishes every module to
+`https://maven.pkg.github.com/MCAgents-Mods/core` with `GITHUB_ACTOR` and `GITHUB_TOKEN`,
+so nothing in the build changed.
+
+Checked before pushing: the version step, run locally against this checkout, prints
+`publish=true` and `tag=v0.5.0`, since the remote has no tags. `./gradlew build` passes
+(11m39s from cold, three loader toolchains included). `./gradlew publish --dry-run` with
+dummy credentials plans all six publications; Gradle turns the configuration cache off for
+the publish tasks rather than failing on the credentials.
+
+The pages that said there is no CI pipeline now describe the workflow:
+`wiki/environments/setup.md` (how a release is published, the retry, and that GitHub
+Packages never overwrites a version), `wiki/information/overview.md`,
+`.agents/wiki/context/repository-map.md`, `.agents/rules/repository.md`, and the state
+file. Nothing runs on a pull request yet, and the pages say so.

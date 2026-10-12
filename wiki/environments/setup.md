@@ -91,8 +91,8 @@ which does not reach tests, so a module with tests repeats those as
 A run writes an HTML report to `{module}/build/reports/tests/test/index.html`
 and the machine-readable results to `{module}/build/test-results/test/`.
 
-There is no CI pipeline in this repository, so this command is the only thing
-that runs the tests. Run it before opening a pull request.
+Nothing runs the tests on a pull request — the Publish workflow below builds only
+when a release reaches `master` — so run this command before opening one.
 
 ## Publish the modules
 
@@ -110,6 +110,23 @@ credentials. To try a release locally without publishing anywhere public:
 ```sh
 ./gradlew publishToMavenLocal
 ```
+
+### How a release is published
+
+Nobody runs `./gradlew publish` by hand for a release. The **Publish** workflow,
+`.github/workflows/publish.yml`, runs on every push to `master`:
+
+1. It reads `project-version` from `gradle.properties` and looks for the tag
+   `v{version}` on GitHub. If the tag exists, the run stops: a merge that leaves the
+   version alone publishes nothing.
+2. Otherwise it builds and tests every module, publishes all six to GitHub Packages,
+   and only then tags the commit `v{version}`.
+
+So a release is the merge that changes `project-version`. A failed run leaves no tag,
+and the next push to `master` — or **Run workflow** on the Publish workflow's page in
+the Actions tab — tries again. GitHub Packages refuses to overwrite a version, so if
+a run failed after some modules were already uploaded, delete those package versions
+before retrying.
 
 ## Start a piece of work
 
@@ -138,5 +155,6 @@ format, pull request title and body rules, and the merge procedure are defined i
 | `GITHUB_ACTOR` | `build.gradle` | Username for the GitHub Packages repository. |
 | `GITHUB_TOKEN` | `build.gradle` | Token for the GitHub Packages repository. |
 
-Both are only needed when running `./gradlew publish`. Nothing else in the
-repository reads the environment.
+Both are only needed when running `./gradlew publish`; the Publish workflow sets
+them from the run's own token. Nothing else in the repository reads the
+environment.
