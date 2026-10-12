@@ -5,7 +5,7 @@ description: Splitting core's one-page API reference into wiki/api/, one page pe
 
 # Task: API wiki
 
-**Status:** in progress
+**Status:** done once the pull requests below merge and the Publish run tags `v0.5.3`
 
 ## The request
 
@@ -66,3 +66,11 @@ repository map link to the new pages. `.agents/index/project-wiki-api-index.md` 
 folder, under `project-wiki-index.md` and in `root-index.md`; the state file counts seven
 indexes. `web-console.md` describes the console that task 2 of the owner's request removes in
 0.6.0, so that release deletes the page.
+
+### Task 3 — release/0.5.3
+
+`project-version` is `0.5.3`, a patch: documentation only, no code or jar changes. The 0.5.3
+changelog and its logs-index row are new; the overview, the repository map, the repository
+rule and the state file name 0.5.3, and the rule's `wiki/logs/` range runs to `0/5/3`.
+Merging this branch is the release: the Publish workflow finds no `v0.5.3` tag, builds and
+publishes the six modules, and tags the commit.
