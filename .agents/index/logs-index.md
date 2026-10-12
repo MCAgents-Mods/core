@@ -20,6 +20,7 @@ see `{shared}/rules/versioning.md`.
 
 | Version | Summary | Files |
 |---|---|---|
+| [`0/5/2/`](../../wiki/logs/0/5/2/CHANGELOG.md) | The Forge jar carries `pack.mcmeta`, so Forge 26.2 loads core's resources and creates worlds. | `CHANGELOG.md` |
 | [`0/5/1/`](../../wiki/logs/0/5/1/CHANGELOG.md) | `mcagents-core-common`'s test fixtures resolve from the published artifacts; nothing in the jars changes. | `CHANGELOG.md` |
 | [`0/5/0/`](../../wiki/logs/0/5/0/CHANGELOG.md) | Core becomes the mods foundation: Bukkit removed, one jar per loader, the shared model client and web console, and the Publish workflow that ships it. | `CHANGELOG.md` |
 | [`0/4/0/`](../../wiki/logs/0/4/0/CHANGELOG.md) | The request timeout becomes configurable, and stays the only timeout in MCAgents. | `CHANGELOG.md` |
