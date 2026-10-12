@@ -8,7 +8,8 @@
 # loader's own maven before moving it: Fabric (meta.fabricmc.net), NeoForge
 # (maven.neoforged.net) and Forge (maven.minecraftforge.net) must all publish a
 # build for it. Minecraft 26.x ships unobfuscated, so no module declares a
-# mappings coordinate.
+# mappings coordinate. The pack formats in the Forge module's pack.mcmeta move
+# with it: copy them from that Forge build's own pack.mcmeta.
 minecraft = "26.2"
 fabric-loader = "0.19.3"
 fabric-api = "0.157.0+26.2"

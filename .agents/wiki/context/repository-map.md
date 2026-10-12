@@ -102,6 +102,11 @@ None of these are tracked. Do not commit them, and do not document a path under
   its own build file.
 * **The first build is slow.** NeoForge and Forge decompile Minecraft on the first
   build of a machine; that is minutes, not a hang.
+* **The Forge jar needs `pack.mcmeta`.** Forge 26.2 refuses the resources of a mod jar
+  without one, shows a warning at start-up, and crashes when a world is created; NeoForge
+  and Fabric build the metadata themselves. Its `min_format` and `max_format` copy Forge's
+  own `pack.mcmeta` and change with the Minecraft version, so read them again from the new
+  Forge build whenever `minecraft` moves in `gradle/libs.versions.toml`.
 * **The client and server halves share a module.** Nothing outside
   `…shared.client` may import it, and the same for `…shared.server`;
   `SideSeparationTest` fails the build otherwise.
