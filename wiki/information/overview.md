@@ -29,9 +29,12 @@ Minecraft 26.2. What exists today is:
 | `api/`, `common/`, `platforms/` | The six build modules — see [`modules.md`](modules.md). |
 | `.agents/` | The agent instruction set — rules, git conventions, planning, platform knowledge, prompts, creators — plus the index, agent-wiki, and memory trees. |
 | `wiki/` | This documentation tree. |
+| `.github/workflows/publish.yml` | The Publish workflow, which ships each new version from `master`. |
 
-There is no CI pipeline in the repository at this point. Build, test, and publish
-commands are on [`../environments/setup.md`](../environments/setup.md).
+One GitHub Actions workflow, `.github/workflows/publish.yml`, publishes and tags a
+release when a new version reaches `master`. Nothing runs on a pull request. Build,
+test, and publish commands, and how a release is published, are on
+[`../environments/setup.md`](../environments/setup.md).
 
 ## How the repository is organized
 

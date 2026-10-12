@@ -30,6 +30,7 @@ Full description: [`../../../wiki/information/overview.md`](../../../wiki/inform
 | `gradle/libs.versions.toml` | Every dependency coordinate. Never declare one inline in a module. |
 | `.agents/` | This repository's own instructions, plus the index, agent-wiki, and memory trees. The universal conventions are **not** here — they come from the connector. |
 | `wiki/` | Human documentation, including `wiki/logs/` release history. |
+| `.github/workflows/publish.yml` | The Publish workflow: on a push to `master` whose `project-version` has no `v{version}` tag yet, build, test, publish every module, then tag. |
 
 ## Where the conventions come from
 
@@ -85,9 +86,12 @@ None of these are tracked. Do not commit them, and do not document a path under
 
 ## Gotchas
 
-* **There is no CI pipeline.** `./gradlew test` is the only thing that runs the
-  tests, so run it before opening a pull request. Do not write instructions or docs
-  that assume a CI workflow exists.
+* **Nothing checks a pull request.** The only workflow, Publish, runs on `master`
+  and builds only when a new version lands, so run `./gradlew test` before opening a
+  pull request. Do not describe a pull request check that does not exist.
+* **Merging a new `project-version` publishes it.** The Publish workflow tags and
+  ships the version the moment it reaches `master`, and a published version can never
+  be overwritten — the version bump belongs in the release task alone.
 * **Never block the game thread.** A future completes on whichever thread finished
   the work, and a callback that touches game state must hop back onto the client or
   server thread first. See

@@ -48,9 +48,11 @@ documented once, in
 [`../../wiki/information/modules.md`](../../wiki/information/modules.md). Do not
 restate them here; read that page rather than inferring the layout.
 
-There is **no CI pipeline in this repository yet**. Do not describe one, do not
-document commands for one, and do not write instructions that assume one.
-Anything you would have to guess at is not a rule — it is a fabrication.
+The only workflow is `.github/workflows/publish.yml`, which publishes and tags a
+release when a new `project-version` reaches `master`. **Nothing runs on a pull
+request.** Do not describe a check that does not exist, and do not write
+instructions that assume one. Anything you would have to guess at is not a rule —
+it is a fabrication.
 
 ## What the project does
 
