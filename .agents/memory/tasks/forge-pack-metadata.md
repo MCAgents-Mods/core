@@ -1,0 +1,62 @@
+---
+name: memory-tasks-forge-pack-metadata
+description: Adding pack.mcmeta to core's Forge jar, without which Forge 26.2 refuses the jar's resources and crashes on world creation, and releasing 0.5.2 with it.
+---
+
+# Task: Forge pack metadata
+
+**Status:** in progress
+
+## The request
+
+On 2026-10-12 the `agents` thread reported that Forge 26.2 refuses the resources of a mod jar
+that has no `pack.mcmeta`. The game shows a warning screen at start-up and crashes when a
+world is created ("Can not retrieve LootModifierManager until resources have loaded once").
+`MCAgentsCoreForge` up to 0.5.1 has no `pack.mcmeta`, so any Forge game with core installed
+crashes on a new world. A copy of core's jar with the file below added loaded a world
+cleanly:
+
+```json
+{"pack":{"description":"MCAgentsCore resources","max_format":107,"min_format":[107,1]}}
+```
+
+The template repository has the same gap and is fixed alongside, in its own pull requests.
+
+## What the loaders do
+
+Checked in the loader jars this build compiles against:
+
+- **Forge `26.2-65.1.3`.** `net.minecraftforge.resource.ResourcePackLoader` reads each mod
+  file's metadata with vanilla `Pack.readPackMetadata` and raises
+  `fml.modloading.brokenresources` when it finds none. Forge's own `pack.mcmeta` declares
+  `min_format` `[107, 1]` and `max_format` `107`.
+- **NeoForge `26.2.0.90`.** `ResourcePackLoader.readWithOptionalMeta` builds the metadata
+  when a mod has no `pack.mcmeta`.
+- **Fabric API `0.157.0+26.2`.** `ModPackResourcesUtil.getMetadataPack` does the same for
+  Fabric mods.
+
+So only the Forge jar needs the file.
+
+## Decisions
+
+The owner was away and had asked for the recommended option to be taken on every question.
+
+- **Release 0.5.2.** A patch: one resource file is added to one jar, and no API changes. The
+  alternative was 0.6.0.
+- **Forge only.** A `pack.mcmeta` in the NeoForge or Fabric jar would change nothing and
+  would be one more format number to keep in step with the game.
+- **The formats are Forge's own.** They change with the Minecraft version, so moving
+  `minecraft` in `gradle/libs.versions.toml` means reading them again from that Forge
+  build's `pack.mcmeta`.
+
+## Tasks
+
+| # | Title | Branch | PR |
+|---|---|---|---|
+| 1 | Task record | `chore/forge-pack-metadata-plan` | |
+| 2 | Add pack.mcmeta to the Forge jar | `fix/forge-pack-metadata` | |
+| 3 | Release 0.5.2 | `release/0.5.2` | |
+
+### Task 1 — chore/forge-pack-metadata-plan
+
+This record, and its row in the memory index.
