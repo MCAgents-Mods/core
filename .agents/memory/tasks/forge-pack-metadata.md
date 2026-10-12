@@ -60,3 +60,15 @@ The owner was away and had asked for the recommended option to be taken on every
 ### Task 1 — chore/forge-pack-metadata-plan
 
 This record, and its row in the memory index.
+
+### Task 2 — fix/forge-pack-metadata
+
+`platforms/forge/src/main/resources/pack.mcmeta` holds the content above, laid out like the
+`agents` repository's copy; `processResources` expands only `META-INF/mods.toml`, so the
+file reaches the jar root unchanged. `wiki/information/modules.md` lists it in the Forge
+module, and the repository map and the `minecraft` comment in `gradle/libs.versions.toml`
+say its formats follow Forge's own and move with the Minecraft version. NeoForge and Fabric
+are unchanged. The same content in a copy of the 0.5.1 Forge jar loaded a world in game (the
+`agents` thread's check). A local build of the jar was blocked: Maven Central answered 429
+while Gradle resolved Fabric API, so the Publish workflow's `./gradlew build` is the first
+full build of this change.
