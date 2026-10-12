@@ -29,7 +29,7 @@ Full description: [`../../../wiki/information/overview.md`](../../../wiki/inform
 | `platforms/{forge,neoforge,fabric}/` | One entry point and one manifest per loader, each with its own toolchain and its own mod jar. |
 | `gradle/libs.versions.toml` | Every dependency coordinate. Never declare one inline in a module. |
 | `.agents/` | This repository's own instructions, plus the index, agent-wiki, and memory trees. The universal conventions are **not** here — they come from the connector. |
-| `wiki/` | Human documentation, including `wiki/logs/` release history. |
+| `wiki/` | Human documentation, including `wiki/api/` (one page per public API scope) and `wiki/logs/` release history. |
 | `.github/workflows/publish.yml` | The Publish workflow: on a push to `master` whose `project-version` has no `v{version}` tag yet, build, test, publish every module, then tag. |
 
 ## Where the conventions come from
@@ -56,8 +56,8 @@ that page rather than inferring the layout from the directory listing.
 | `CoreRuntime` | `platforms/shared/…/shared/` | What each loader's entry point calls to start and stop core. |
 | `SideEntrypoint` / `ModBootstrap` | `platforms/shared/…/shared/environment/` | Mod-side bootstrap and the client/server split. |
 
-Public API surface, method by method:
-[`../../../wiki/reference/api.md`](../../../wiki/reference/api.md).
+Public API surface, one page per scope, method by method: `wiki/api/`, routed by
+[`../../index/project-wiki-api-index.md`](../../index/project-wiki-api-index.md).
 
 ## Commands that actually work here
 

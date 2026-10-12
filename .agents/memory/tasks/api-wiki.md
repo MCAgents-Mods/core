@@ -45,3 +45,24 @@ The owner was away and had asked for the recommended option to be taken on every
 ### Task 1 — chore/api-wiki-plan
 
 This record, and its row in the memory index.
+
+### Task 2 — docs/api-wiki
+
+`wiki/api/` holds fifteen pages, one scope each: `dependency`, `provider`, `chat-exchange`,
+`vendors`, `tokens`, `model-client`, `model-exchange`, `model-routing`, `http`, `failures`,
+`test-fixtures`, `web-console`, `mod-runtime`, `key-file` and `token-commands`. The plan's
+single `mod-runtime.md` became three (start-up and sides, the key file, the token commands),
+and the routed client's request types got their own `model-exchange.md`, because each would
+otherwise have carried a heading unrelated to its name.
+
+Every fact was read again from the source rather than copied. Two corrections came out of
+it: `MCAgentsProvider` is not the only public class in `common` (`TokenHandles` is public
+too), and no loader registers the `/agents` command, so `token-commands.md` says a mod wires
+`ModTokenCommands` itself. The examples on `test-fixtures.md` and `model-routing.md` were run
+against the compiled classes and print what the pages say.
+
+`wiki/reference/api.md` is deleted and `wiki/reference/` with it. README, both guides and the
+repository map link to the new pages. `.agents/index/project-wiki-api-index.md` routes the
+folder, under `project-wiki-index.md` and in `root-index.md`; the state file counts seven
+indexes. `web-console.md` describes the console that task 2 of the owner's request removes in
+0.6.0, so that release deletes the page.
