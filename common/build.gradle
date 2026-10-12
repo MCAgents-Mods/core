@@ -48,3 +48,14 @@ publishing {
         }
     }
 }
+
+// The test-fixtures variants carry the capability {group}:{project name}-test-fixtures,
+// which is common-test-fixtures here, not the published artifact id. A consumer that writes
+// testFixtures('io.github.mcagentsmods:mcagents-core-common') asks for
+// mcagents-core-common-test-fixtures, so the variants declare that capability too. The
+// old one stays, so a consumer that asked for it against 0.5.0 keeps resolving.
+['testFixturesApiElements', 'testFixturesRuntimeElements'].each { name ->
+    configurations.named(name) {
+        outgoing.capability("${project.group}:mcagents-${rootProject.name}-${project.name}-test-fixtures:${project.version}")
+    }
+}
