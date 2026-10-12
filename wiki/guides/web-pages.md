@@ -3,7 +3,7 @@
 Core runs one local web console for every MCAgents mod. A mod does not start a
 server of its own. It registers its pages, and core serves them next to every
 other mod's, under one header, behind one token. For every type named here, see
-[`../reference/api.md`](../reference/api.md#the-web-console).
+[`../api/web-console.md`](../api/web-console.md).
 
 ## Register a module
 

@@ -1,11 +1,11 @@
 ---
 name: project-wiki-index
-description: Index of the wiki/ documentation tree — project information, guides, reference, environment setup, and the versioned change logs.
+description: Index of the wiki/ documentation tree — project information, guides, the API pages, environment setup, and the versioned change logs.
 ---
 
 # Project Wiki Index
 
-**Scope:** `wiki/` (except `logs/`)
+**Scope:** `wiki/` (except `api/` and `logs/`)
 **Parent:** [root-index](root-index.md)
 
 This index owns `wiki/` and only `wiki/`. It never writes into `.agents/`. Any page
@@ -30,12 +30,6 @@ never seen the repository. Knowledge written for agents belongs to
 | [`../../wiki/guides/llm-providers.md`](../../wiki/guides/llm-providers.md) | Getting from an API key to a model's reply, and the threading and memory rules that come with it. |
 | [`../../wiki/guides/web-pages.md`](../../wiki/guides/web-pages.md) | Registering a mod's pages into the shared local web console, and the rules a page must follow. |
 
-## Reference
-
-| File | Purpose |
-|---|---|
-| [`../../wiki/reference/api.md`](../../wiki/reference/api.md) | Every public type in the api and common modules, method by method. |
-
 ## Environments
 
 | File | Purpose |
@@ -46,4 +40,5 @@ never seen the repository. Knowledge written for agents belongs to
 
 | Index | Scope | Load when |
 |---|---|---|
+| [`project-wiki-api-index.md`](project-wiki-api-index.md) | `wiki/api/` public API, one page per scope | You are about to call core, or must document a public type. |
 | [`logs-index.md`](logs-index.md) | `wiki/logs/` versioned change logs | You need release history, or must record a change against a version. |

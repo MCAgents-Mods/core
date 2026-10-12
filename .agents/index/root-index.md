@@ -13,6 +13,7 @@ description: Root router — the single entry point to every index this reposito
 | `agents://index/root-index.md` | The shared instruction set | You need a branching, commit, pull request, planning, directory, versioning, or creator convention. |
 | [`agent-wiki-index.md`](agent-wiki-index.md) | `.agents/wiki/` agent knowledge | You need an SOP, domain guideline, or operating context written for agents. |
 | [`project-wiki-index.md`](project-wiki-index.md) | `wiki/` human documentation | You need to read or write documentation a person will read. |
+| [`project-wiki-api-index.md`](project-wiki-api-index.md) | `wiki/api/` public API pages | You are about to call core, or must document a public type. |
 | [`memory-index.md`](memory-index.md) | `.agents/memory/` dynamic state | You need prior task state, session history, or must record progress. |
 | [`logs-index.md`](logs-index.md) | `wiki/logs/` versioned change logs | You need release history or must record a change. |
 

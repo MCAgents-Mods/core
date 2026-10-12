@@ -1,7 +1,9 @@
 # Using the Language Model Providers
 
 How to get from an API key to a model's reply, on any platform the core
-supports. For the full surface, see [`../reference/api.md`](../reference/api.md).
+supports. For the full surface, one page per scope, start at
+[`../api/provider.md`](../api/provider.md) and
+[`../api/model-client.md`](../api/model-client.md).
 
 ## Add the dependency
 

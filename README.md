@@ -28,7 +28,8 @@ wants and replays it.
 - `MCAgentsProvider` — one registered client per vendor, for a simple question
   and answer — and `OpenRouterClient`, the routed client with tool calling,
   embeddings, prompt caching, retries and key rotation. See
-  [`wiki/reference/api.md`](wiki/reference/api.md).
+  [`wiki/api/provider.md`](wiki/api/provider.md) and
+  [`wiki/api/model-client.md`](wiki/api/model-client.md).
 - A local web console that every mod registers its pages into, behind one
   loopback server and one token. See
   [`wiki/guides/web-pages.md`](wiki/guides/web-pages.md).
@@ -56,8 +57,8 @@ details: [`wiki/environments/setup.md`](wiki/environments/setup.md).
   repository is and how it is organized.
 - [`wiki/guides/llm-providers.md`](wiki/guides/llm-providers.md) — getting from
   an API key to a model's reply.
-- [`wiki/reference/api.md`](wiki/reference/api.md) — every public type, method
-  by method.
+- [`wiki/api/`](wiki/api/) — the public API, one page per scope, method by method;
+  start with [`dependency.md`](wiki/api/dependency.md).
 - [`wiki/information/modules.md`](wiki/information/modules.md) — the module
   graph, the dependency rules, and the published artifacts.
 - [`wiki/environments/setup.md`](wiki/environments/setup.md) — getting a working
