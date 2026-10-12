@@ -41,9 +41,9 @@ against core's tags, so this repository goes first.
 
 | # | Title | Branch | PR |
 |---|---|---|---|
-| 1 | Task record | `chore/publish-workflow-plan` | |
-| 2 | Publish workflow | `ci/publish` | |
-| 3 | Release 0.5.0 | `release/0.5.0` | |
+| 1 | Task record | `chore/publish-workflow-plan` | #11 |
+| 2 | Publish workflow | `ci/publish` | #12 |
+| 3 | Release 0.5.0 | `release/0.5.0` | #13 |
 
 ### Task 1 — chore/publish-workflow-plan
 
