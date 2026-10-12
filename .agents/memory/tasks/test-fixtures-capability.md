@@ -5,7 +5,7 @@ description: Fixing the capability name on mcagents-core-common's published test
 
 # Task: test-fixtures capability
 
-**Status:** in progress
+**Status:** done once the pull requests below merge and the Publish run tags `v0.5.1`
 
 ## The request
 
@@ -52,3 +52,11 @@ scratch consumer outside any composite build, depending on
 that `publishToMavenLocal` filled, compiles a class using `StubTransport` with the fix and
 fails to resolve `mcagents-core-common` without it. `wiki/information/modules.md` says the
 notation works from 0.5.1.
+
+### Task 3 — release/0.5.1
+
+`project-version` is `0.5.1`, approved as a patch: only published metadata changes. The
+0.5.1 changelog and its logs-index row are new; the overview, the repository map, the
+repository rule and the state file name 0.5.1, and the rule's `wiki/logs/` range now runs to
+`0/5/1` (it had stopped at `0/4/0`). Merging this branch is the release: the Publish workflow
+finds no `v0.5.1` tag, publishes the six modules and tags the commit.

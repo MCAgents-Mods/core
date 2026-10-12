@@ -13,7 +13,7 @@ rather than restating them.
 ## What this repository is
 
 A **Gradle multi project build on Java 25**, root project `core`, group
-`io.github.mcagentsmods`, version `0.5.0` in `gradle.properties`. It holds the shared
+`io.github.mcagentsmods`, version `0.5.1` in `gradle.properties`. It holds the shared
 agent and API code that MCAgents' Minecraft mods build on.
 
 Full description: [`../../../wiki/information/overview.md`](../../../wiki/information/overview.md).
