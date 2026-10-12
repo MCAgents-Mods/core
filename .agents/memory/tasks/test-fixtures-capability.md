@@ -41,3 +41,14 @@ hides it, because there the fixtures come from the project itself.
 ### Task 1 — chore/test-fixtures-capability-plan
 
 This record, and its row in the memory index.
+
+### Task 2 — fix/test-fixtures-capability
+
+`common/build.gradle` adds `mcagents-${rootProject.name}-${project.name}-test-fixtures` as an
+outgoing capability of both test-fixtures configurations, so the generated module metadata
+lists `common-test-fixtures` and `mcagents-core-common-test-fixtures` on each. Checked: a
+scratch consumer outside any composite build, depending on
+`testFixtures('io.github.mcagentsmods:mcagents-core-common:0.5.0')` from a local repository
+that `publishToMavenLocal` filled, compiles a class using `StubTransport` with the fix and
+fails to resolve `mcagents-core-common` without it. `wiki/information/modules.md` says the
+notation works from 0.5.1.

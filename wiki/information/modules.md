@@ -88,8 +88,10 @@ Every module carries a publication. The jar a module builds is named
 
 `mcagents-core-common` also publishes its test fixtures as a variant, so a consumer can
 test against `StubTransport` and `StubKeySource` with
-`testFixtures('io.github.mcagentsmods:mcagents-core-common:{version}')`. The fixtures
-are never bundled into a loader jar.
+`testFixtures('io.github.mcagentsmods:mcagents-core-common:{version}')`, from 0.5.1 on.
+0.5.0 published the fixtures under the capability `io.github.mcagentsmods:common-test-fixtures`
+only, which that notation does not ask for. The fixtures are never bundled into a loader
+jar.
 
 The `artifactId` is qualified with `mcagents-` and the root project name
 deliberately. Without it, every project in this group would publish a colliding
