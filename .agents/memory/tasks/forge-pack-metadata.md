@@ -72,3 +72,11 @@ are unchanged. The same content in a copy of the 0.5.1 Forge jar loaded a world 
 `agents` thread's check). A local build of the jar was blocked: Maven Central answered 429
 while Gradle resolved Fabric API, so the Publish workflow's `./gradlew build` is the first
 full build of this change.
+
+### Task 3 — release/0.5.2
+
+`project-version` is `0.5.2`, a patch: one resource file is added to the Forge jar. The 0.5.2
+changelog and its logs-index row are new; the overview, the repository map, the repository
+rule and the state file name 0.5.2, and the rule's `wiki/logs/` range runs to `0/5/2`.
+Merging this branch is the release: the Publish workflow finds no `v0.5.2` tag, builds and
+publishes the six modules, and tags the commit.
