@@ -53,6 +53,23 @@ Useful variants:
 ./gradlew javaToolchains             # show which JDK the build resolved
 ```
 
+## Run a development client
+
+Each loader module starts a development client with core loaded, in that module's own
+`run/` directory, which git ignores:
+
+```sh
+./gradlew :platforms:fabric:runClient
+./gradlew :platforms:neoforge:runClient
+./gradlew :platforms:forge:runClient
+```
+
+The client loads the mod the way its jar would: `api`, `common` and `shared` are part of
+`mcagents_core`, not separate pieces. NeoForge is told so through the mod's source sets;
+Forge treats the directory holding `mods.toml` as the whole mod, so its run task first
+copies every bundled module into `platforms/forge/build/devMod/` and starts the game from
+there. The first run of each loader downloads the game's assets.
+
 ## The request timeouts
 
 Through `MCAgentsProvider`, one request either answers or fails within 60 seconds —

@@ -86,3 +86,15 @@ hologram. The rule's update is proposed to the owner rather than edited here.
 ### Task 1 — chore/hologram-plan
 
 This record, and its row in the memory index.
+
+### Task 2 — build/dev-clients
+
+`./gradlew :platforms:{fabric,neoforge,forge}:runClient` each start a development client with
+core loaded. Fabric needed nothing: Loom gives every Fabric module a client run. NeoForge got
+a run and loads the bundled modules as part of `mcagents_core` through the mod's source sets.
+Forge got a run that starts from `build/devMod/`, one directory holding every bundled module,
+because Forge treats the directory holding `mods.toml` as the whole mod; its class path swap
+captures the object factory up front so the configuration cache keeps working, where calling
+`files(...)` inside the task action failed it. All three reached the title screen on
+2026-10-13 with `mcagents_core 0.5.3` loaded. `wiki/environments/setup.md` documents the
+commands.

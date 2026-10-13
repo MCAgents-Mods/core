@@ -24,6 +24,42 @@ dependencies {
 // self-contained.
 def bundledModules = [':api', ':common', ':platforms:shared']
 
+bundledModules.each { path -> evaluationDependsOn(path) }
+
+// Forge's dev client takes the directory holding mods.toml as the whole mod, so
+// it gets one directory holding what the jar holds.
+def devMod = tasks.register('devModDirectory', Sync) {
+    into layout.buildDirectory.dir('devMod')
+    from sourceSets.main.output
+    bundledModules.each { path -> from project(path).sourceSets.main.output }
+}
+
+minecraft {
+    runs {
+        // A development client: ./gradlew :platforms:forge:runClient, in run/.
+        client {
+            workingDir = project.file('run')
+        }
+    }
+}
+
+// ForgeGradle fills in the run's class path itself, so the separate pieces are
+// swapped for the one directory just before the game starts.
+tasks.withType(JavaExec).matching { it.name == 'runClient' }.configureEach {
+    dependsOn devMod
+    def merged = files(devMod)
+    def separate = files(sourceSets.main.output)
+    // Captured here rather than called from the action, which the configuration
+    // cache would refuse.
+    def fileCollections = objects
+    doFirst {
+        def rest = classpath.files.findAll { file ->
+            !separate.contains(file) && !file.name.startsWith('MCAgentsCore')
+        }
+        classpath = merged + fileCollections.fileCollection().from(rest)
+    }
+}
+
 tasks.named('jar', Jar) {
     bundledModules.each { path ->
         from project(path).sourceSets.main.output

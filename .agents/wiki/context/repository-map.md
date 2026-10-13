@@ -67,6 +67,7 @@ Public API surface, one page per scope, method by method: `wiki/api/`, routed by
 ./gradlew :common:test                   # one module
 ./gradlew test --tests '*TokenHandles*'  # one class
 ./gradlew publishToMavenLocal            # a release dry run
+./gradlew :platforms:fabric:runClient    # a dev client (also neoforge, forge)
 ./gradlew clean
 ```
 
