@@ -40,3 +40,4 @@ match on it before opening anything. Writing here needs no approval; see
 | [`../memory/tasks/forge-pack-metadata.md`](../memory/tasks/forge-pack-metadata.md) | `platforms/forge/`, Forge resources | Adding `pack.mcmeta` to the Forge jar, whose absence crashes Forge 26.2 on world creation, and releasing 0.5.2. |
 | [`../memory/tasks/api-wiki.md`](../memory/tasks/api-wiki.md) | `wiki/api/`, API documentation | Splitting the API reference into one page per scope under `wiki/api/`, and releasing 0.5.3. |
 | [`../memory/tasks/hologram.md`](../memory/tasks/hologram.md) | `platforms/client/`, the hologram, the web console | The in-game hologram framework that replaces the web console, and releasing 0.6.0. |
+| [`../memory/tasks/release-workflow.md`](../memory/tasks/release-workflow.md) | `.github/workflows/`, GitHub releases | The Release workflow that attaches the Forge, Fabric and NeoForge jars to each tag's GitHub release, and releasing 0.6.1. |
