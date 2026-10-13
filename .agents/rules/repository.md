@@ -98,8 +98,8 @@ start lives in `platforms/shared`, through `CoreRuntime`.
   copyright holder, or the year without explicit user instruction — that is a
   legal statement, not a code change.
 * **Never bump the version yourself** — see `{shared}/rules/versioning.md`. The
-  version carrier is `project-version` in `gradle.properties`, currently `0.5.3`.
-  `wiki/logs/` carries `0/1/0` through `0/5/3`; creating another version directory
+  version carrier is `project-version` in `gradle.properties`, currently `0.6.0`.
+  `wiki/logs/` carries `0/1/0` through `0/6/0`; creating another version directory
   requires user approval, exactly like editing that property.
 * **Never create an `INDEX.md`.** Every index is a file in `.agents/index/`, named
   `{scope}-index.md`. This is absolute — see `{shared}/rules/directories.md`.

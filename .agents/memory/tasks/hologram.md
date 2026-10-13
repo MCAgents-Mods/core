@@ -5,22 +5,22 @@ description: Adding the in-game hologram framework to core, removing the web con
 
 # Task: Hologram
 
-**Status:** in progress
+**Status:** done once the pull requests below merge and the Publish run tags `v0.6.0`
 
 ## The request
 
 On 2026-10-12 the owner asked, as task 2 of two: "Get rid of website, and in game interact
-only. Make it have in game hologram and we can interact in game only." The picture he gave
+only. Make it have in game hologram and we can interact in game only." The picture they gave
 shows one panel: `MCAGENTS` centred at the top, a grid of five buttons per row with three rows
 showing, a scrollbar on the right, and the footer "Hold Z to Move | Auto dismiss beyond 2
-Chunks". In his words: a new row when there are more than five buttons, scrolling when there
+Chunks". In their words: a new row when there are more than five buttons, scrolling when there
 are many rows; a button opens its hologram at a fixed place, which the player moves by aiming
 at it and holding Z and fixes by letting go; and it disappears once the player is more than
 two chunks from it — "player spawn it at chunk 1 then if player is at chunk 4 then make it
 disappear. We count chunk 2 and 3 to be in area". "Make this GUI hologram function to be in
 mod core."
 
-Later that day he added a second picture for chat: three panels side by side in the same
+Later that day they added a second picture for chat: three panels side by side in the same
 style — Sessions (a scrollable list, the chosen one highlighted), Conversation (a scrollable
 `<Player>` / `<Agent>` transcript) and User Prompt (a text box and a SEND button) — and asked
 for it to be planned and built too. Core supplies the panels; chat fills them in its own
@@ -180,3 +180,12 @@ Checked on 2026-10-13 with a stand-in `mcagents` 0.3.0 jar in each dev client's 
 Fabric stopped with "MCAgents Core is incompatible with any version before 0.4.0 of mod
 mcagents", NeoForge with the reason text, and NeoForge without the stand-in loaded a world.
 `wiki/api/dependency.md` says so under *In game*.
+
+### Task 6 — release/0.6.0
+
+`project-version` is `0.6.0`, a minor: the web console's public types are removed, which
+before 1.0 is a minor, and the hologram is added. The 0.6.0 changelog and its logs-index row
+are new; the overview, the repository map, the token commands page, the repository rule and
+the state file name 0.6.0, and the rule's `wiki/logs/` range runs to `0/6/0`. Merging this
+branch is the release: the Publish workflow finds no `v0.6.0` tag, builds and publishes the
+seven modules, and tags the commit.
