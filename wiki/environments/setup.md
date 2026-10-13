@@ -136,7 +136,7 @@ Nobody runs `./gradlew publish` by hand for a release. The **Publish** workflow,
 1. It reads `project-version` from `gradle.properties` and looks for the tag
    `v{version}` on GitHub. If the tag exists, the run stops: a merge that leaves the
    version alone publishes nothing.
-2. Otherwise it builds and tests every module, publishes all six to GitHub Packages,
+2. Otherwise it builds and tests every module, publishes all seven to GitHub Packages,
    and only then tags the commit `v{version}`.
 
 So a release is the merge that changes `project-version`. A failed run leaves no tag,

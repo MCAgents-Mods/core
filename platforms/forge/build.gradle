@@ -1,4 +1,4 @@
-// The Forge mod jar: core's api, common and shared code, plus the Forge entry
+// The Forge mod jar: core's api, common, shared and client code, plus the Forge entry
 // point. The only module that may reference Forge types.
 
 plugins {
@@ -17,12 +17,13 @@ dependencies {
     implementation project(':api')
     implementation project(':common')
     implementation project(':platforms:shared')
+    implementation project(':platforms:client')
 }
 
-// api, common and shared are plain Java, so their classes are merged into the
-// mod jar. Every loader jar does the same, which is what makes each one
-// self-contained.
-def bundledModules = [':api', ':common', ':platforms:shared']
+// api, common, shared and client are core's own modules, so their classes are
+// merged into the mod jar. Every loader jar does the same, which is what makes
+// each one self-contained.
+def bundledModules = [':api', ':common', ':platforms:shared', ':platforms:client']
 
 bundledModules.each { path -> evaluationDependsOn(path) }
 
@@ -39,6 +40,9 @@ minecraft {
         // A development client: ./gradlew :platforms:forge:runClient, in run/.
         client {
             workingDir = project.file('run')
+            // The jar names its mixins in its manifest; a run from a directory has no
+            // manifest, so it names them here.
+            args '--mixin.config', 'mcagents_core.mixins.json'
         }
     }
 }
@@ -61,6 +65,10 @@ tasks.withType(JavaExec).matching { it.name == 'runClient' }.configureEach {
 }
 
 tasks.named('jar', Jar) {
+    // Forge 26.2 has no event for drawing in the level, so a mixin draws the holograms.
+    manifest {
+        attributes('MixinConfigs': 'mcagents_core.mixins.json')
+    }
     bundledModules.each { path ->
         from project(path).sourceSets.main.output
     }
@@ -86,7 +94,7 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             // The mod jar alone, with no dependency list: it already carries
-            // api, common and shared, and the loader supplies the rest.
+            // api, common, shared and client, and the loader supplies the rest.
             artifact jar
 
             pom {

@@ -16,6 +16,11 @@ public final class CoreForgeMod {
 
     public CoreForgeMod() {
         PhysicalSide side = FMLEnvironment.dist.isClient() ? PhysicalSide.CLIENT : PhysicalSide.DEDICATED_SERVER;
+        if (side == PhysicalSide.CLIENT) {
+            // First, because Forge refuses a key once the game's options exist; and a
+            // class of its own, so a dedicated server never links the client types it names.
+            CoreForgeClient.start();
+        }
         CoreRuntime.start(side, FMLPaths.GAMEDIR.get());
         GameShuttingDownEvent.BUS.addListener(event -> CoreRuntime.stop());
     }

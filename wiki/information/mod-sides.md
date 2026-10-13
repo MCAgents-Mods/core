@@ -33,6 +33,7 @@ platforms/shared              io.github.mcagentsmods.core.shared
  ├── …shared.client               client only
  ├── …shared.server               server only
  └── everything else              both sides, no side-specific assumptions
+platforms/client              io.github.mcagentsmods.core.client     client only, as a whole
 platforms/forge               Forge entry point
 platforms/neoforge            NeoForge entry point
 platforms/fabric              Fabric entry points
@@ -83,6 +84,15 @@ it. `SideSeparationTest` is what stops that.
 Each loader's entry point does exactly this through `CoreRuntime.start(side,
 gameDirectory)`, with the side the loader itself reported, and calls
 `CoreRuntime.stop()` when the game shuts down.
+
+`platforms:client` is kept off the server the loader's way instead, because it
+is wired to the loader's own client events rather than started by name. Fabric
+loads `CoreFabricClient` only as a `client` entry point, NeoForge constructs
+`CoreNeoForgeClient` only for `Dist.CLIENT`, and `CoreForgeMod` calls
+`CoreForgeClient.start()` only when Forge reports the client. Forge's mixin,
+which draws the hologram, is listed under `client` in its configuration, so Mixin
+skips it on a server. Those four classes are the only ones that name
+`platforms:client`, so on a dedicated server nothing asks for it.
 
 ### 3. Failing legibly when the wiring is wrong
 

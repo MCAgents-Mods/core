@@ -98,3 +98,34 @@ captures the object factory up front so the configuration cache keeps working, w
 `files(...)` inside the task action failed it. All three reached the title screen on
 2026-10-13 with `mcagents_core 0.5.3` loaded. `wiki/environments/setup.md` documents the
 commands.
+
+### Task 3 — feat/hologram
+
+The new module `platforms/client` compiles against vanilla Minecraft through Loom, publishes
+`mcagents-core-client`, and is bundled into each loader jar beside `api`, `common` and
+`platforms/shared`. A mod describes a hologram with the records in `api.hologram`
+(`Hologram`, the sealed `HologramPanel`, `ButtonGrid`, `HologramButton`) and opens it with
+`Holograms`; each loader's client half connects its tick, drawing, attack and wheel events to
+`HologramClient`. The arithmetic that places a hologram, finds what the crosshair is on, lays
+out the grid and applies the two-chunk rule is in `common.hologram`, so it is tested without
+a game, the owner's chunk 1 to chunk 4 example among the tests.
+
+On Forge the hologram is drawn by a mixin on `LevelRenderer.submitFeatures`. The jar names
+the mixin configuration in its `MixinConfigs` manifest attribute; the dev client, which runs
+from a directory with no manifest, passes it as `--mixin.config`.
+
+Checked by hand on 2026-10-13 in each loader's dev client, with a scratch harness, never
+committed, that opened an 18-button demo hologram. On all three the panel matched the
+picture; a left click ran the button's action without hitting the block behind; the wheel
+scrolled rows without changing the hotbar slot; holding Z carried the hologram and letting
+go left it; the X closed it; and, placed in chunk -33, it stayed while the player stood in
+-32 and -31 and closed at -30. Forge's built jar was then run alone from `run/mods/`, without
+`--mixin.config` or the development classes, and drew the hologram, so the manifest
+attribute loads the mixin in a real install.
+
+`wiki/api/hologram.md` and `wiki/api/hologram-panels.md` are new and routed from the API
+index; `dependency.md`, `mod-runtime.md`, `modules.md`, `mod-sides.md`, the overview, the
+README, the setup page, the Publish workflow's header, the repository map and the state file
+name the seventh module. No dedicated server was started. `.agents/rules/repository.md` and
+`.agents/knowledge/minecraft-platform.md` still describe six modules and are proposed to the
+owner rather than edited.
