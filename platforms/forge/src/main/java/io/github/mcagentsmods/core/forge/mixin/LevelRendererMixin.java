@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
- * Draws the open hologram on Forge, which in 26.2 has no event for drawing in the level: at
+ * Draws the open hologram on Forge, which has no event for drawing in the level: at
  * the start of {@code submitFeatures}, where Fabric's and NeoForge's own events hand out the
  * same collector.
  */

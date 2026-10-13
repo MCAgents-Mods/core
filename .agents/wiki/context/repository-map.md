@@ -107,7 +107,7 @@ None of these are tracked. Do not commit them, and do not document a path under
   its own build file.
 * **The first build is slow.** NeoForge and Forge decompile Minecraft on the first
   build of a machine; that is minutes, not a hang.
-* **The Forge jar needs `pack.mcmeta`.** Forge 26.2 refuses the resources of a mod jar
+* **The Forge jar needs `pack.mcmeta`.** Forge refuses the resources of a mod jar
   without one, shows a warning at start-up, and crashes when a world is created; NeoForge
   and Fabric build the metadata themselves. Its `min_format` and `max_format` copy Forge's
   own `pack.mcmeta` and change with the Minecraft version, so each version keeps its own
@@ -123,12 +123,19 @@ None of these are tracked. Do not commit them, and do not document a path under
 * **`platforms/client` is reached only from a loader's client half.** Naming it from
   a loader's common entry point links Minecraft's client classes on a dedicated
   server. Its testable logic belongs in `common.hologram`, which needs no game.
-* **Forge has no level-render event in 26.2.** The hologram is drawn by a mixin on
+* **Forge has no level-render event, in 26.2 or 26.3.** The hologram is drawn by a mixin on
   `LevelRenderer.submitFeatures`, which the jar names in its `MixinConfigs` manifest
   attribute and the dev client passes as `--mixin.config`. Renaming the mixin
   configuration means changing both.
 * **A dev client is the only way to see a hologram.** `runClient` per loader and
   Minecraft version; nothing in the tests draws one.
+* **Minecraft 26.3 draws through Vulkan or OpenGL with an sRGB surface.** A virtual
+  display (Xvfb) offers no sRGB OpenGL surface, so a 26.3 dev client there needs a Vulkan
+  driver, such as Mesa's software one (lavapipe). NeoForge's early loading window is
+  OpenGL only: turn it off with `earlyWindowControl = false` in the run's
+  `config/fml.toml`.
+* **Gradle runs on Java 25.** Fabric Loom 1.18, the first for 26.3, refuses an older JVM,
+  and needs Gradle 9.7 or newer.
 * **Three constraints are load-bearing** and a change that breaks one is wrong
   however well it works: `core` is **API only** (no gameplay, even though it ships
   as a mod jar), holds **no memory** (no conversation or per-player state), and

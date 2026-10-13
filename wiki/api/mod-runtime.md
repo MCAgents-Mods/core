@@ -74,7 +74,7 @@ point connects its own events to these; a mod opens holograms through
 |---|---|---|
 | Fabric | `CoreFabricClient`, the `client` entry point | `LevelRenderEvents.COLLECT_SUBMITS` |
 | NeoForge | `CoreNeoForgeClient`, `@Mod(dist = Dist.CLIENT)` | `SubmitCustomGeometryEvent` |
-| Forge | `CoreForgeClient.start()`, called by `CoreForgeMod` on the client only | A mixin on `LevelRenderer.submitFeatures`, named in the jar's `MixinConfigs` manifest attribute, because Forge 26.2 has no event for drawing in the level |
+| Forge | `CoreForgeClient.start()`, called by `CoreForgeMod` on the client only | A mixin on `LevelRenderer.submitFeatures`, named in the jar's `MixinConfigs` manifest attribute, because Forge has no event for drawing in the level |
 
 Each loader reaches `mcagents-core-client-{minecraft}` only from that client half, so a dedicated server
 never links a client class.

@@ -156,9 +156,11 @@ final class OpenHologram {
             PanelPlacement placement = placements.get(i);
             PoseStack stack = new PoseStack();
             stack.translate(anchor.x() - camera.x, anchor.y() - camera.y, anchor.z() - camera.z);
-            stack.mulPose(Axis.YP.rotationDegrees((float) pose.turn()));
+            // rotateAround with the origin as its centre: mulPose before 26.3 and rotate
+            // from it are the same call under two names, and this one is in both.
+            stack.rotateAround(Axis.YP.rotationDegrees((float) pose.turn()), 0, 0, 0);
             stack.translate(placement.x(), 0, placement.z());
-            stack.mulPose(Axis.YP.rotationDegrees((float) placement.turn()));
+            stack.rotateAround(Axis.YP.rotationDegrees((float) placement.turn()), 0, 0, 0);
             float scale = (float) HologramSpace.BLOCKS_PER_PIXEL;
             stack.scale(scale, -scale, scale);
             stack.translate(-view.width() / 2f, -view.height() / 2f, 0);

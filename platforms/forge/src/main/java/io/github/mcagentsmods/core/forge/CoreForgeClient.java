@@ -9,7 +9,7 @@ import net.minecraftforge.event.TickEvent;
 
 /**
  * Forge's client half: the hologram's key, tick, click and wheel. Only {@link CoreForgeMod}
- * calls it, and only on the client. Forge 26.2 has no event for drawing in the level, so the
+ * calls it, and only on the client. Forge has no event for drawing in the level, so the
  * drawing comes from {@code mixin.LevelRendererMixin} instead.
  */
 final class CoreForgeClient {
@@ -26,15 +26,10 @@ final class CoreForgeClient {
         RegisterKeyMappingsEvent.BUS.addListener(event -> event.register(key));
         TickEvent.ClientTickEvent.Post.BUS.addListener(
                 event -> HologramClient.onEndTick(Minecraft.getInstance()));
-        // A listener that returns true cancels the event: the block behind a
-        // hologram is not hit, and the hotbar slot does not change.
-        InputEvent.InteractionKeyMappingTriggered.BUS.addListener(event -> {
-            if (event.isAttack() && HologramClient.onAttack()) {
-                event.setSwingHand(false);
-                return true;
-            }
-            return false;
-        });
+        // The attack key's event differs between Minecraft versions; AttackListener is
+        // that version's. A listener that returns true cancels the event: the block behind
+        // a hologram is not hit, and the hotbar slot does not change.
+        AttackListener.listen();
         InputEvent.MouseScrollingEvent.BUS.addListener(event -> {
             return HologramClient.onScroll(event.getDeltaY());
         });

@@ -58,8 +58,8 @@ public final class HologramClient {
      * @return the key, for the loader to register
      */
     public static KeyMapping createMoveKey(KeyMapping.Category category) {
-        moveKey = new KeyMapping("key.mcagents_core.move", InputConstants.Type.KEYSYM,
-                InputConstants.KEY_Z, category);
+        // A keyboard key: the type is left to KeyMapping, whose name for it changed in 26.3.
+        moveKey = new KeyMapping("key.mcagents_core.move", InputConstants.KEY_Z, category);
         return moveKey;
     }
 

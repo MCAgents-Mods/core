@@ -47,7 +47,7 @@ include 'platforms:shared'
 // differs for that version. The subproject is named {module}-{version}, as in
 // :platforms:fabric-26.2: two projects of one name would be one module to
 // Gradle. The catalog carries one block of coordinates per version.
-def minecraftVersions = ['26.2']
+def minecraftVersions = ['26.2', '26.3']
 
 // What core draws in the game and the input that drives it, on the client only.
 // Compiled against vanilla Minecraft, never a loader.

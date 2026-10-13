@@ -3,12 +3,12 @@
 ## Requirements
 
 * **git**
-* **A JDK** to run Gradle with. The build itself compiles on **Java 25**, but you
-  do not have to install it: the Gradle toolchain support downloads a Java 25 JDK
-  the first time you build, using the
+* **JDK 25** to run Gradle with: Fabric Loom 1.18, which builds for Minecraft 26.3,
+  refuses to run on an older one. The build compiles on Java 25 too, through a Gradle
+  toolchain, which the
   [foojay resolver](https://github.com/gradle/foojay-toolchains) configured in
-  `settings.gradle`.
-* **Network access** on the first build, to fetch Gradle 9.5.0, the Java 25
+  `settings.gradle` downloads when no installed JDK matches.
+* **Network access** on the first build, to fetch Gradle 9.7.1, the Java 25
   toolchain, the libraries from Maven Central, the three loader toolchains from
   the Fabric, NeoForged and MinecraftForge mavens, and Minecraft itself from
   Mojang. The first build decompiles Minecraft for NeoForge and Forge, which takes
@@ -43,7 +43,7 @@ that matter are the mod jars, one per loader and Minecraft version:
 | NeoForge | `platforms/neoforge/{minecraft}/build/libs/MCAgentsCoreNeoforge-{version}+{minecraft}.jar` |
 | Fabric | `platforms/fabric/{minecraft}/build/libs/MCAgentsCoreFabric-{version}+{minecraft}.jar` |
 
-`{minecraft}` is the Minecraft version, such as `26.2`. Drop the jar matching your
+`{minecraft}` is the Minecraft version, `26.2` or `26.3`. Drop the jar matching your
 loader and game version into the game's `mods/` folder. Fabric also needs Fabric API.
 
 Useful variants:
@@ -64,6 +64,7 @@ that version subproject's own `run/` directory, which git ignores:
 ./gradlew :platforms:fabric-26.2:runClient
 ./gradlew :platforms:neoforge-26.2:runClient
 ./gradlew :platforms:forge-26.2:runClient
+./gradlew :platforms:fabric-26.3:runClient    # and neoforge-26.3, forge-26.3
 ```
 
 The client loads the mod the way its jar would: `api`, `common` and `shared` are part of
