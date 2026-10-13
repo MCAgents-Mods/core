@@ -5,7 +5,7 @@ description: Building every loader jar for both Minecraft 26.2 and 26.3, one Gra
 
 # Task: Minecraft 26.3, keeping 26.2
 
-**Status:** in progress
+**Status:** done in core once the pull requests below merge and Release makes `v0.7.0` with six jars; agents, chat and the template follow in their own repositories
 
 ## The request
 
@@ -56,10 +56,10 @@ Fabric's and NeoForge's hooks and the Forge `LevelRenderer.submitFeatures` mixin
 
 | # | Title | Branch | PR |
 |---|---|---|---|
-| 1 | Task record | `chore/minecraft-26-3-plan` | |
-| 2 | Per-version layout, 26.2 only | `build/minecraft-versions` | |
-| 3 | Minecraft 26.3 | `feat/minecraft-26-3` | |
-| 4 | Release 0.7.0 | `release/0.7.0` | |
+| 1 | Task record | `chore/minecraft-26-3-plan` | #32 |
+| 2 | Per-version layout, 26.2 only | `build/minecraft-versions` | #33 |
+| 3 | Minecraft 26.3 | `feat/minecraft-26-3` | #34 |
+| 4 | Release 0.7.0 | `release/0.7.0` | #35 |
 
 ### Task 1 — chore/minecraft-26-3-plan
 
@@ -108,3 +108,11 @@ its buttons and text, and a solid back; 26.3 looks the same as 26.2. A click on 
 button ran its action and kept the hologram open on every loader and version. Minecraft 26.3
 draws through Vulkan or OpenGL; the virtual display offers no sRGB OpenGL surface, so 26.3 ran
 on Mesa's software Vulkan driver.
+
+### Task 4 — release/0.7.0
+
+`project-version` is `0.7.0`, a minor because the jar names and the Minecraft-facing artifact
+ids change. `wiki/logs/0/7/0/CHANGELOG.md` and its logs-index row are new, and the overview,
+repository map, repository rule and state file carry the version. Merging it makes Publish
+publish 0.7.0 and push `v0.7.0`, and Release attach six jars, one per loader and Minecraft
+version.
