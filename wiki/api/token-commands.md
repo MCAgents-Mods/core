@@ -3,7 +3,7 @@
 `ModTokenCommands` is the logic behind a `/agents` command that manages the [key file](key-file.md):
 list each vendor's state, add a key, remove one, and reload. It answers in plain strings that
 never contain a key, and it registers the file's keys with `MCAgentsProvider.instance` so they
-are used at once. The loader owns the Brigadier wiring, and as of 0.5.3 no core loader
+are used at once. The loader owns the Brigadier wiring, and as of 0.6.0 no core loader
 registers a command, so a mod that wants one wires these methods itself.
 
 ```java

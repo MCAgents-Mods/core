@@ -11,7 +11,7 @@ history, read `wiki/logs/`.
 ## 2026-10-13
 
 **Stack.** Gradle multi project build, Java 25, root project `core`, group
-`io.github.mcagentsmods`. Version `0.5.3`, carried by `project-version` in
+`io.github.mcagentsmods`. Version `0.6.0`, carried by `project-version` in
 `gradle.properties`. Default branch `master`. License MIT,
 `Copyright (c) 2026 MCAgents`.
 
@@ -90,4 +90,6 @@ in the repository. See
 and [`../tasks/agents-setup.md`](../tasks/agents-setup.md) for the generation that
 preceded it.
 
-**Next obvious step.** Releasing 0.6.0 — see [`../tasks/hologram.md`](../tasks/hologram.md).
+**Next obvious step.** None in core. The agents mod 0.2.0 opens the menu hologram on its G
+key, and chat 0.4.0 drops its website for a chat hologram built from the list, transcript
+and prompt panels — see [`../tasks/hologram.md`](../tasks/hologram.md).
