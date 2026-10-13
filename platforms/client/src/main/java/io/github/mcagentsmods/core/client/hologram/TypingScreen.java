@@ -1,0 +1,115 @@
+package io.github.mcagentsmods.core.client.hologram;
+
+import com.mojang.blaze3d.platform.InputConstants;
+import io.github.mcagentsmods.core.common.hologram.TextBuffer;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.network.chat.Component;
+
+/**
+ * Catches the keys while the player types into a hologram's prompt, and draws nothing over the
+ * world but one line saying how to send and stop. The text itself shows on the hologram.
+ *
+ * <p>Enter sends and stops typing, Shift+Enter starts a new line, and Escape or any click stops
+ * typing and keeps the text. The screen also closes on its own when the hologram does.
+ */
+final class TypingScreen extends Screen {
+
+    private static final String HINT = "hologram.mcagents_core.typing";
+
+    private final PromptPanelView prompt;
+
+    TypingScreen(PromptPanelView prompt) {
+        super(Component.translatable(HINT));
+        this.prompt = prompt;
+    }
+
+    @Override
+    protected void init() {
+        prompt.typing(true);
+    }
+
+    @Override
+    public void removed() {
+        prompt.typing(false);
+    }
+
+    @Override
+    public void tick() {
+        if (prompt.disposed()) {
+            onClose();
+        }
+    }
+
+    @Override
+    public boolean isPauseScreen() {
+        return false;
+    }
+
+    @Override
+    public boolean keyPressed(KeyEvent event) {
+        TextBuffer buffer = prompt.buffer();
+        int key = event.key();
+        if (key == InputConstants.KEY_RETURN || key == InputConstants.KEY_NUMPADENTER) {
+            if (event.hasShiftDown()) {
+                buffer.insert("\n");
+                prompt.caretMoved();
+            } else if (prompt.send()) {
+                onClose();
+            }
+            return true;
+        }
+        if (event.isPaste()) {
+            buffer.insert(minecraft.keyboardHandler.getClipboard());
+            prompt.caretMoved();
+            return true;
+        }
+        boolean handled = true;
+        switch (key) {
+            case InputConstants.KEY_BACKSPACE -> buffer.backspace();
+            case InputConstants.KEY_DELETE -> buffer.delete();
+            case InputConstants.KEY_LEFT -> buffer.left();
+            case InputConstants.KEY_RIGHT -> buffer.right();
+            case InputConstants.KEY_HOME -> buffer.home();
+            case InputConstants.KEY_END -> buffer.end();
+            default -> handled = false;
+        }
+        if (handled) {
+            prompt.caretMoved();
+            return true;
+        }
+        // Escape closes the screen; every other key is swallowed so it moves nothing in game.
+        super.keyPressed(event);
+        return true;
+    }
+
+    @Override
+    public boolean charTyped(CharacterEvent event) {
+        if (event.isAllowedChatCharacter()) {
+            prompt.buffer().insert(event.codepointAsString());
+            prompt.caretMoved();
+        }
+        return true;
+    }
+
+    @Override
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        onClose();
+        return true;
+    }
+
+    @Override
+    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        // Nothing: the world and the hologram stay in plain view.
+    }
+
+    @Override
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        // At the top, on a dark backdrop, clear of the hologram and the hotbar.
+        int textWidth = font.width(title);
+        graphics.textWithBackdrop(font, title, (width - textWidth) / 2, 12, textWidth, 0xFFFFFFFF);
+    }
+}

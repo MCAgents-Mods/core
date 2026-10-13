@@ -1,5 +1,8 @@
 {
   "key.category.mcagents_core.main": "MCAgents Core",
   "key.mcagents_core.move": "Move a hologram (hold)",
-  "hologram.mcagents_core.hint": "Hold %s to Move | Auto dismiss beyond 2 Chunks"
+  "hologram.mcagents_core.hint": "Hold %s to Move | Auto dismiss beyond 2 Chunks",
+  "hologram.mcagents_core.send": "Send",
+  "hologram.mcagents_core.prompt.hint": "Click here to type",
+  "hologram.mcagents_core.typing": "Enter to send | Shift+Enter for a new line | Esc to stop typing"
 }

@@ -1,5 +1,6 @@
 package io.github.mcagentsmods.core.client.hologram;
 
+import io.github.mcagentsmods.core.common.hologram.PanelArea;
 import net.minecraft.locale.Language;
 
 import java.util.Locale;
@@ -38,6 +39,10 @@ abstract class PanelView {
      */
     abstract void scroll(double u, double v, int rows);
 
+    /** Lets go of anything the panel holds once its hologram closes. */
+    void dispose() {
+    }
+
     /** Draws the frame, the face and the back every panel shares. */
     void drawFrame(HologramPainter painter) {
         int w = width();
@@ -70,8 +75,36 @@ abstract class PanelView {
                 hover ? HologramStyle.TITLE : HologramStyle.TEXT, 0);
     }
 
+    /**
+     * Draws a raised button with its label centred, the label shrunk to fit down to half size.
+     *
+     * @param enabled whether it can be pressed; a greyed button never lightens
+     */
+    static void drawButton(HologramPainter painter, PanelArea area, String label, boolean hover,
+                           boolean enabled) {
+        float left = (float) area.left();
+        float top = (float) area.top();
+        float right = (float) area.right();
+        float bottom = (float) area.bottom();
+        painter.rect(left, top, right, bottom, 3, HologramStyle.BUTTON_EDGE);
+        int face = !enabled ? HologramStyle.DISABLED : hover ? HologramStyle.BUTTON_HOVER : HologramStyle.BUTTON;
+        painter.rect(left + 1, top + 1, right - 1, bottom - 1, 4, face);
+        painter.bevel(left + 1, top + 1, right - 1, bottom - 1, 5, HologramStyle.FRAME_LIGHT,
+                HologramStyle.BUTTON_SHADE);
+        float room = right - left - 5;
+        float scale = Math.max(0.5f, Math.min(1, room / painter.width(label)));
+        float y = top + (bottom - top - 8 * scale) / 2 + 0.5f;
+        painter.centred(label, (left + right) / 2, y, 6, scale,
+                enabled ? HologramStyle.TEXT : HologramStyle.TEXT_SOFT, 0);
+    }
+
     /** A label as shown: its translation when there is one, in upper case. */
     static String label(String keyOrText) {
-        return Language.getInstance().getOrDefault(keyOrText).toUpperCase(Locale.ROOT);
+        return translate(keyOrText).toUpperCase(Locale.ROOT);
+    }
+
+    /** @return the translation of a key, or the key itself when there is none */
+    static String translate(String keyOrText) {
+        return Language.getInstance().getOrDefault(keyOrText);
     }
 }

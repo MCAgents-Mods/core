@@ -6,6 +6,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.LightCoordsUtil;
 
@@ -69,6 +70,42 @@ final class HologramPainter {
         return font.width(text);
     }
 
+    /** @return how wide a player's or a mod's own text is at scale 1, in panel pixels */
+    int plainWidth(String text) {
+        return font.width(plain(text));
+    }
+
+    /** @return how far one code point of plain text advances, at scale 1 */
+    int advance(int codePoint) {
+        return font.width(FormattedCharSequence.codepoint(codePoint, Style.EMPTY));
+    }
+
+    /**
+     * Shortens plain text to fit a width, ending it in three dots when it had to be cut.
+     *
+     * @param text  the text
+     * @param width the room, at scale 1
+     * @return the text, whole or cut
+     */
+    String fit(String text, float width) {
+        if (plainWidth(text) <= width) {
+            return text;
+        }
+        String dots = "...";
+        float room = width - plainWidth(dots);
+        int end = 0;
+        float used = 0;
+        while (end < text.length()) {
+            int codePoint = text.codePointAt(end);
+            used += advance(codePoint);
+            if (used > room) {
+                break;
+            }
+            end += Character.charCount(codePoint);
+        }
+        return text.substring(0, end) + dots;
+    }
+
     /**
      * Draws text with its top left corner at {@code (x, y)}.
      *
@@ -84,10 +121,26 @@ final class HologramPainter {
         pose.popPose();
     }
 
+    /**
+     * Draws a player's or a mod's own text as it is: a section sign in it is shown, not read as
+     * a formatting code.
+     */
+    void plainText(String text, float x, float y, int layer, int colour) {
+        pose.pushPose();
+        pose.translate(x, y, layer * LAYER);
+        collector.order(1).submitText(pose, 0, 0, plain(text), false,
+                Font.DisplayMode.POLYGON_OFFSET, LIGHT, colour, 0, 0);
+        pose.popPose();
+    }
+
     /** Draws text centred on {@code centreX}. */
     void centred(String text, float centreX, float y, int layer, float scale, int colour,
                  int outline) {
         text(text, centreX - width(text) * scale / 2, y, layer, scale, colour, outline);
+    }
+
+    private static FormattedCharSequence plain(String text) {
+        return FormattedCharSequence.forward(text, Style.EMPTY);
     }
 
     /** Sends the gathered rectangles to the game, in the pose they were drawn in. */

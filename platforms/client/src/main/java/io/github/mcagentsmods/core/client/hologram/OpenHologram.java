@@ -26,7 +26,7 @@ final class OpenHologram {
     private static final double MIN_RADIUS = 2.4;
 
     /** How far past its width a wider hologram opens, so its edges stay on screen. */
-    private static final double RADIUS_PER_WIDTH = 0.62;
+    private static final double RADIUS_PER_WIDTH = 0.75;
 
     /** The furthest the player can aim at a hologram from, in blocks. */
     static final double REACH = 12;
@@ -136,6 +136,11 @@ final class OpenHologram {
         if (grip != null) {
             pose = HologramSpace.carry(grip, gripDistance, eye, look, yaw);
         }
+    }
+
+    /** Tells every panel its hologram has closed. */
+    void dispose() {
+        views.forEach(PanelView::dispose);
     }
 
     /** Lets go: the hologram stays where it is now. */

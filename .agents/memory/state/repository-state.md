@@ -29,9 +29,11 @@ history, read `wiki/logs/`.
 - Holograms, in `platforms/client`: panels a mod opens in the level with
   `Holograms.open`, described by the records in `api.hologram`. The player aims and
   left-clicks, scrolls with the wheel, holds Z to carry one, and clicks its X to close
-  it; it also closes beyond two chunks or on a change of dimension. One panel kind so
-  far, the button grid. Checked by hand on 2026-10-13 in each loader's dev client, and
-  on Forge also from the built jar, where the mixin loads through the manifest.
+  it; it also closes beyond two chunks or on a change of dimension. Four panel kinds:
+  the button grid (a menu), and the list, transcript and prompt that a chat hologram
+  stands side by side; typing into a prompt goes through a screen that draws nothing
+  over the world. Checked by hand on 2026-10-13 in each loader's dev client, and on
+  Forge also from the built jar, where the mixin loads through the manifest.
 - Credential pooling, rotation, and storage owned entirely by `core`: the shared
   `mcagents.json` and the `/agents` client command logic with masked handles in tab
   completion. Reviewed for security on 2026-10-11 (task 7 in
@@ -52,7 +54,8 @@ history, read `wiki/logs/`.
   the `api.model` records, `common` token handling, the routed model client, and
   `platforms/shared`: the environment, client and
   server packages, `CoreRuntime`, and the side separation check; and `common.hologram`:
-  the grid, the two-chunk range and the placement arithmetic.
+  the grid, the two-chunk range, the placement arithmetic, the scroll window, text
+  wrapping and the typing buffer.
 
 **What is not built yet.**
 
@@ -88,5 +91,5 @@ in the repository. See
 and [`../tasks/agents-setup.md`](../tasks/agents-setup.md) for the generation that
 preceded it.
 
-**Next obvious step.** The rest of 0.6.0: the chat panels (a list, a transcript and a
-text box), then removing the web console — see [`../tasks/hologram.md`](../tasks/hologram.md).
+**Next obvious step.** The rest of 0.6.0: removing the web console, then the release —
+see [`../tasks/hologram.md`](../tasks/hologram.md).
