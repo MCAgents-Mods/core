@@ -5,6 +5,9 @@ import io.github.mcagentsmods.core.api.hologram.ButtonGrid;
 import io.github.mcagentsmods.core.api.hologram.Hologram;
 import io.github.mcagentsmods.core.api.hologram.HologramButton;
 import io.github.mcagentsmods.core.api.hologram.HologramPanel;
+import io.github.mcagentsmods.core.api.hologram.PromptInput;
+import io.github.mcagentsmods.core.api.hologram.SelectList;
+import io.github.mcagentsmods.core.api.hologram.Transcript;
 import io.github.mcagentsmods.core.common.hologram.HologramRange;
 import io.github.mcagentsmods.core.common.hologram.Vector3;
 import net.minecraft.client.KeyMapping;
@@ -179,12 +182,17 @@ public final class HologramClient {
         for (HologramPanel panel : spec.panels()) {
             views.add(view(panel));
         }
+        close();
         open = new OpenHologram(spec, minecraft.level, views, vector(player.getEyePosition()),
                 player.getYRot());
     }
 
     static void close() {
+        OpenHologram hologram = open;
         open = null;
+        if (hologram != null) {
+            hologram.dispose();
+        }
     }
 
     static String openId() {
@@ -195,6 +203,10 @@ public final class HologramClient {
     private static PanelView view(HologramPanel panel) {
         return switch (panel) {
             case ButtonGrid grid -> new GridPanelView(grid, HologramClient::hint, HologramClient::press);
+            case SelectList list -> new ListPanelView(list, HologramClient::run);
+            case Transcript transcript -> new TranscriptPanelView(transcript);
+            case PromptInput prompt -> new PromptPanelView(prompt, HologramClient::run,
+                    HologramClient::startTyping);
         };
     }
 
@@ -204,11 +216,21 @@ public final class HologramClient {
     }
 
     private static void press(HologramButton button) {
+        run("The hologram button " + button.label(), button.action());
+    }
+
+    private static boolean run(String what, Runnable action) {
         try {
-            button.action().run();
+            action.run();
+            return true;
         } catch (RuntimeException failure) {
-            LOGGER.log(Level.WARNING, "The hologram button " + button.label() + " failed", failure);
+            LOGGER.log(Level.WARNING, what + " failed", failure);
+            return false;
         }
+    }
+
+    private static void startTyping(PromptPanelView prompt) {
+        Minecraft.getInstance().setScreenAndShow(new TypingScreen(prompt));
     }
 
     private static double blockedAt(HitResult target, Vector3 eye) {

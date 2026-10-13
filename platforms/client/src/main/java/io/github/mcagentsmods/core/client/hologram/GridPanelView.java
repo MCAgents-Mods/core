@@ -3,6 +3,7 @@ package io.github.mcagentsmods.core.client.hologram;
 import io.github.mcagentsmods.core.api.hologram.ButtonGrid;
 import io.github.mcagentsmods.core.api.hologram.HologramButton;
 import io.github.mcagentsmods.core.common.hologram.HologramGrid;
+import io.github.mcagentsmods.core.common.hologram.PanelArea;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -16,7 +17,6 @@ final class GridPanelView extends PanelView {
     private static final int RULE_TOP = 29;
     private static final int HINT_TOP = 114;
     private static final float HINT_SCALE = 0.75f;
-    private static final float LABEL_MIN_SCALE = 0.5f;
 
     private final ButtonGrid spec;
     private final HologramGrid grid;
@@ -60,29 +60,16 @@ final class GridPanelView extends PanelView {
             for (int column = 0; column < ButtonGrid.COLUMNS; column++) {
                 int index = grid.indexAt(column, row);
                 if (index >= 0) {
-                    drawButton(painter, HologramGrid.buttonLeft(column), HologramGrid.buttonTop(row),
-                            label(buttons.get(index).label()), index == hovered);
+                    int left = HologramGrid.buttonLeft(column);
+                    int top = HologramGrid.buttonTop(row);
+                    PanelArea area = new PanelArea(left, top, left + HologramGrid.BUTTON_WIDTH,
+                            top + HologramGrid.BUTTON_HEIGHT);
+                    drawButton(painter, area, label(buttons.get(index).label()), index == hovered, true);
                 }
             }
         }
         drawScrollbar(painter, u, v);
         painter.centred(hint.get(), middle, HINT_TOP, 4, HINT_SCALE, HologramStyle.TEXT_SOFT, 0);
-    }
-
-    private static void drawButton(HologramPainter painter, int left, int top, String label,
-                                   boolean hover) {
-        int right = left + HologramGrid.BUTTON_WIDTH;
-        int bottom = top + HologramGrid.BUTTON_HEIGHT;
-        painter.rect(left, top, right, bottom, 3, HologramStyle.BUTTON_EDGE);
-        painter.rect(left + 1, top + 1, right - 1, bottom - 1, 4,
-                hover ? HologramStyle.BUTTON_HOVER : HologramStyle.BUTTON);
-        painter.bevel(left + 1, top + 1, right - 1, bottom - 1, 5, HologramStyle.FRAME_LIGHT,
-                HologramStyle.BUTTON_SHADE);
-        float room = HologramGrid.BUTTON_WIDTH - 5;
-        float scale = Math.max(LABEL_MIN_SCALE, Math.min(1, room / painter.width(label)));
-        float y = top + (HologramGrid.BUTTON_HEIGHT - 8 * scale) / 2 + 0.5f;
-        painter.centred(label, left + HologramGrid.BUTTON_WIDTH / 2f, y, 6, scale,
-                HologramStyle.TEXT, 0);
     }
 
     private void drawScrollbar(HologramPainter painter, double u, double v) {

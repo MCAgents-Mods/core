@@ -41,4 +41,4 @@ scope per page; a page that would need an unrelated heading is split.
 | [`../../wiki/api/token-commands.md`](../../wiki/api/token-commands.md) | `ModTokenCommands` and the server's permission checks. |
 | [`../../wiki/api/web-console.md`](../../wiki/api/web-console.md) | The loopback web console mods register pages into. |
 | [`../../wiki/api/hologram.md`](../../wiki/api/hologram.md) | `Hologram` and `Holograms`: opening and closing a hologram, and what the player does with it. |
-| [`../../wiki/api/hologram-panels.md`](../../wiki/api/hologram-panels.md) | The panel kinds a hologram is made of: `ButtonGrid` and `HologramButton`. |
+| [`../../wiki/api/hologram-panels.md`](../../wiki/api/hologram-panels.md) | The panel kinds a hologram is made of: `ButtonGrid`, `SelectList`, `Transcript` and `PromptInput`, and typing into a prompt. |

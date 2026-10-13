@@ -129,3 +129,35 @@ README, the setup page, the Publish workflow's header, the repository map and th
 name the seventh module. No dedicated server was started. `.agents/rules/repository.md` and
 `.agents/knowledge/minecraft-platform.md` still describe six modules and are proposed to the
 owner rather than edited.
+
+### Task 4 — feat/hologram-panels
+
+Three more panel kinds join the button grid in `api.hologram`: `SelectList` (rows to pick
+from, the chosen one highlighted, up to three buttons under it), `Transcript` (entries of
+`TranscriptEntry`, each a `<speaker>` line and its text wrapped under it) and `PromptInput` (a
+box to type into and a send button). They are tall panels, 160 by 230 pixels, drawn with a
+title band and a sunken box with its own scrollbar, so three stand side by side as the chat
+picture shows. Each reads the calling mod's suppliers every frame, so core holds none of the
+conversation; what it holds is the text being typed, in memory, until the hologram closes.
+
+Clicking a prompt's box opens `TypingScreen`, a screen that draws nothing over the world but
+one line at the top, and takes the keys: Enter sends and stops typing, Shift+Enter starts a
+new line, Escape or a click stops typing and keeps the text. Opening the chat hologram showed
+the arc too wide at arm's length, so a hologram now opens at least three quarters of its
+width away, where it was 0.62; the menu, 2.5 blocks wide, still opens 2.4 blocks away.
+
+The arithmetic is in `common.hologram`, tested: `ScrollWindow` (a window over rows or lines
+that can follow the end, and its scrollbar), `TextWrap` and `TextLine` (wrapping at spaces,
+cutting long words, keeping line breaks), `TextBuffer` (the caret, editing, cleaning pasted
+text and the length limit, never half a character) and `ColumnLayout` with `PanelArea` (where
+the box, rows, scrollbar and bottom buttons are, so a click lands where it is drawn).
+
+Checked by hand on 2026-10-13 with the scratch harness, which added a chat demo: on Fabric, the
+menu's Chat button replaced the menu with the chat hologram; a row click chose the row; the
+wheel scrolled the list; a long row ended in dots; typing, Shift+Enter, Enter and the send
+button sent the text and emptied the box; a send while not ready did nothing and Escape kept
+the text; the transcript followed new entries and stayed put once scrolled up; Z carried the
+three panels together; and the X closed them. On NeoForge and Forge the chat hologram drew
+and a typed prompt was sent.
+
+`wiki/api/hologram-panels.md` documents the four kinds and the typing keys.

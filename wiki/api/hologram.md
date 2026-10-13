@@ -73,6 +73,7 @@ survive leaving the world.
 |---|---|
 | Aims the crosshair at a panel, within 12 blocks and with nothing nearer in the way | The button under the crosshair lightens. |
 | Left-clicks a button | Its action runs. The block behind the hologram is not hit. |
+| Left-clicks a list's row, or a prompt's box | The mod is told which row was chosen, or typing starts; see [`hologram-panels.md`](hologram-panels.md). |
 | Turns the mouse wheel while aiming at a panel | The panel scrolls, and the hotbar slot does not change. |
 | Holds the move key while aiming at the hologram | The hologram follows the crosshair at the distance it was taken from, turned to face the player. |
 | Lets go of the move key | The hologram stays where it is. |
