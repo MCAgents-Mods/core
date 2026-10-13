@@ -38,9 +38,9 @@ The owner was away and had asked for the recommended option to be taken on every
 
 | # | Title | Branch | PR |
 |---|---|---|---|
-| 1 | Task record | `chore/api-wiki-plan` | |
-| 2 | API pages | `docs/api-wiki` | |
-| 3 | Release 0.5.3 | `release/0.5.3` | |
+| 1 | Task record | `chore/api-wiki-plan` | #20 |
+| 2 | API pages | `docs/api-wiki` | #21 |
+| 3 | Release 0.5.3 | `release/0.5.3` | #22 |
 
 ### Task 1 — chore/api-wiki-plan
 
