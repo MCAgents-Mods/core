@@ -2,7 +2,9 @@
 
 The build is a Gradle multi project defined in `settings.gradle`, with
 `rootProject.name = core`. It has seven modules, and every package under them is
-prefixed `io.github.mcagentsmods.core`.
+prefixed `io.github.mcagentsmods.core`. The four that compile against Minecraft
+are built once per Minecraft version; see
+[One build per Minecraft version](#one-build-per-minecraft-version).
 
 ## The module graph
 
@@ -12,9 +14,9 @@ api                 pure Java contracts
 
 platforms/shared    loader-agnostic mod code, both physical sides
 platforms/client    loader-agnostic client code against vanilla Minecraft
- ├── platforms/forge      Forge entry point     → MCAgentsCoreForge-{version}.jar
- ├── platforms/neoforge   NeoForge entry point  → MCAgentsCoreNeoforge-{version}.jar
- └── platforms/fabric     Fabric entry points   → MCAgentsCoreFabric-{version}.jar
+ ├── platforms/forge      Forge entry point     → MCAgentsCoreForge-{version}+{minecraft}.jar
+ ├── platforms/neoforge   NeoForge entry point  → MCAgentsCoreNeoforge-{version}+{minecraft}.jar
+ └── platforms/fabric     Fabric entry points   → MCAgentsCoreFabric-{version}+{minecraft}.jar
 ```
 
 Each loader module depends on both `platforms/shared` and `platforms/client`, and
@@ -28,9 +30,42 @@ Each loader module depends on both `platforms/shared` and `platforms/client`, an
 | `common` | `…core.common` | Pure Java implementations of those contracts — `common.model` holds `OpenRouterClient`, `common.http` the JDK transport, and `common.hologram` the arithmetic that places, aims at, lays out and scrolls a hologram, and wraps and edits its text. Still no platform type. Its `testFixtures` source set holds `StubTransport` and `StubKeySource`. |
 | `platforms:shared` | `…core.shared` | The code every loader shares: `CoreRuntime` (start and stop), the machinery that decides which physical side is running, and the two sides as packages — `…shared.client` and `…shared.server`. Plain Java, no loader toolchain. |
 | `platforms:client` | `…core.client` | What core draws in the game and the input that drives it: `…client.hologram` draws the open hologram, takes the player's clicks, wheel and move key, and closes it out of range, and `Holograms` is what a mod calls. Compiled against vanilla Minecraft through Loom; no loader type. Client only. |
-| `platforms:forge` | `…core.forge` | Only what Forge needs: the `@Mod` class, `META-INF/mods.toml`, and `pack.mcmeta`, without which Forge refuses the jar's resources and crashes when a world is created. NeoForge and Fabric build that metadata themselves. |
+| `platforms:forge` | `…core.forge` | Only what Forge needs: the `@Mod` class, `META-INF/mods.toml`, and `pack.mcmeta` (one per Minecraft version, in that version's folder), without which Forge refuses the jar's resources and crashes when a world is created. NeoForge and Fabric build that metadata themselves. |
 | `platforms:neoforge` | `…core.neoforge` | Only what NeoForge needs: the `@Mod` class and `META-INF/neoforge.mods.toml`. |
 | `platforms:fabric` | `…core.fabric` | Only what Fabric needs: the main and client entry points and `fabric.mod.json`. |
+
+## One build per Minecraft version
+
+`platforms/client` and the three loader modules compile against Minecraft, so each is
+built once for every Minecraft version core supports. The versions are listed once, in
+`settings.gradle`. Each of those modules is a folder of shared sources with one
+Gradle subproject per version:
+
+```
+platforms/fabric/
+├── fabric.gradle        the module's build, applied by every version
+├── src/                 the sources every version shares
+└── 26.2/                the subproject :platforms:fabric-26.2
+    ├── build.gradle     applies the loader plugin, then ../fabric.gradle
+    └── src/             only what differs for 26.2, often nothing
+```
+
+The subproject's folder is named for its version, and the subproject for its module
+and version: `:platforms:fabric-26.2`, since two projects of one name would be one module
+to Gradle. It compiles the shared `src/` together with its own, and
+`platforms/minecraft.gradle`, which every version subproject applies, takes the version
+from the folder's name, finds its coordinates in
+the catalog (each entry carries the version as a suffix, such as `fabric-api-26-2`),
+and names the jar `MCAgentsCoreFabric-{version}+{minecraft}.jar`. The loader metadata
+(`fabric.mod.json`, `mods.toml`, `neoforge.mods.toml`) is expanded per version, so
+each jar declares its own Minecraft version and no other.
+
+When a Minecraft version changes an API core uses, the shared code calls a small
+class that each version folder carries under the same name, and never checks the
+version itself. Forge's `pack.mcmeta`, whose formats move with Minecraft, lives in
+each version folder too.
+
+`api`, `common` and `platforms:shared` name no Minecraft type, so they are built once.
 
 ## One jar per loader
 
@@ -76,9 +111,9 @@ How the right half is started without linking the other is on
 | `platforms:client` | Fabric Loom (`net.fabricmc.fabric-loom`) | None: vanilla Minecraft only |
 
 The three plugins are declared once in the root `build.gradle` with
-`apply false`, so they share one build classloader. Every loader targets
-**Minecraft 26.2**. Minecraft 26.x ships unobfuscated, so no module declares a
-mappings coordinate.
+`apply false`, so they share one build classloader, and each version subproject
+applies its own. Core builds for **Minecraft 26.2**. Minecraft 26.x ships
+unobfuscated, so no module declares a mappings coordinate.
 
 `api`, `common` and `platforms:shared` use none of these toolchains. That is
 what keeps them testable without a game running. `platforms:client` uses Loom
@@ -87,18 +122,22 @@ only to compile against the game; the hologram's arithmetic lives in
 
 ## Published artifacts
 
-Every module carries a publication. The jar a module builds is named
-`MCAgentsCore{Module}-{version}.jar`; its Maven coordinates are:
+Every module carries a publication, a Minecraft-facing module one per Minecraft
+version. The jar a module builds is named `MCAgentsCore{Module}-{version}.jar`, with
+`+{minecraft}` before `.jar` for a Minecraft-facing one; its Maven coordinates are:
 
 | Module | Jar base name | Coordinates |
 |---|---|---|
 | `api` | `MCAgentsCoreApi` | `io.github.mcagentsmods:mcagents-core-api` |
 | `common` | `MCAgentsCoreCommon` | `io.github.mcagentsmods:mcagents-core-common` |
 | `platforms/shared` | `MCAgentsCoreShared` | `io.github.mcagentsmods:mcagents-core-shared` |
-| `platforms/client` | `MCAgentsCoreClient` | `io.github.mcagentsmods:mcagents-core-client` |
-| `platforms/forge` | `MCAgentsCoreForge` | `io.github.mcagentsmods:mcagents-core-forge` |
-| `platforms/neoforge` | `MCAgentsCoreNeoforge` | `io.github.mcagentsmods:mcagents-core-neoforge` |
-| `platforms/fabric` | `MCAgentsCoreFabric` | `io.github.mcagentsmods:mcagents-core-fabric` |
+| `platforms/client/{minecraft}` | `MCAgentsCoreClient` | `io.github.mcagentsmods:mcagents-core-client-{minecraft}` |
+| `platforms/forge/{minecraft}` | `MCAgentsCoreForge` | `io.github.mcagentsmods:mcagents-core-forge-{minecraft}` |
+| `platforms/neoforge/{minecraft}` | `MCAgentsCoreNeoforge` | `io.github.mcagentsmods:mcagents-core-neoforge-{minecraft}` |
+| `platforms/fabric/{minecraft}` | `MCAgentsCoreFabric` | `io.github.mcagentsmods:mcagents-core-fabric-{minecraft}` |
+
+`{minecraft}` is the Minecraft version, such as `26.2`. Before 0.7.0 these four had no
+version suffix and were built for Minecraft 26.2 only.
 
 `mcagents-core-common` also publishes its test fixtures as a variant, so a consumer can
 test against `StubTransport` and `StubKeySource` with
@@ -114,23 +153,26 @@ another mod at the same time.
 
 A loader module publishes its mod jar alone, with no dependency list: the jar
 already carries `api`, `common`, `shared` and `client`, and the loader supplies
-the rest. `mcagents-core-client` declares no dependency either: Minecraft comes
-from the consumer's own toolchain. A mod compiles against `mcagents-core-api`
-and `mcagents-core-common`, and `mcagents-core-client` to open holograms; the
-loader artifacts are for a development run that needs core loaded.
+the rest. `mcagents-core-client-{minecraft}` declares no dependency either:
+Minecraft comes from the consumer's own toolchain. A mod compiles against
+`mcagents-core-api` and `mcagents-core-common`, and the
+`mcagents-core-client-{minecraft}` of the Minecraft version it builds for to open
+holograms; the loader artifacts are for a development run that needs core loaded.
 
 ## Dependency versions
 
 Every coordinate lives in `gradle/libs.versions.toml`, so a version bump is one
-change in one file:
+change in one file. The entries that move with Minecraft come in one block per
+version, suffixed with it (`-26-2` for 26.2):
 
 | Catalog entry | Coordinate | Used by |
 |---|---|---|
 | `gson` | `com.google.code.gson:gson` | `common`, `platforms:shared` (compileOnly) |
-| `minecraft` | `com.mojang:minecraft` | `platforms:fabric`, `platforms:client` |
-| `fabric-loader`, `fabric-api` | Fabric | `platforms:fabric` |
-| `neoforge` (version only) | `net.neoforged:neoforge` | `platforms:neoforge` |
-| `forge` (version only) | `net.minecraftforge:forge` | `platforms:forge` |
+| `fabric-loader` | `net.fabricmc:fabric-loader` | `platforms:fabric` |
+| `minecraft-{v}` | `com.mojang:minecraft` | `platforms:fabric`, `platforms:client` |
+| `fabric-api-{v}` | `net.fabricmc.fabric-api:fabric-api` | `platforms:fabric` |
+| `neoforge-{v}` (version only) | `net.neoforged:neoforge` | `platforms:neoforge` |
+| `forge-{v}` (version only) | `net.minecraftforge:forge` | `platforms:forge` |
 
 ## Java version
 

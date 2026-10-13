@@ -33,42 +33,44 @@ The default branch is `master`.
 ```
 
 That compiles every module, runs the tests, and produces one jar per module under
-`{module}/build/libs/`. The three that matter are the mod jars:
+`{module}/build/libs/`, and one per Minecraft version for the modules built against
+Minecraft (see [`../information/modules.md`](../information/modules.md)). The ones
+that matter are the mod jars, one per loader and Minecraft version:
 
 | Loader | Jar |
 |---|---|
-| Forge | `platforms/forge/build/libs/MCAgentsCoreForge-{version}.jar` |
-| NeoForge | `platforms/neoforge/build/libs/MCAgentsCoreNeoforge-{version}.jar` |
-| Fabric | `platforms/fabric/build/libs/MCAgentsCoreFabric-{version}.jar` |
+| Forge | `platforms/forge/{minecraft}/build/libs/MCAgentsCoreForge-{version}+{minecraft}.jar` |
+| NeoForge | `platforms/neoforge/{minecraft}/build/libs/MCAgentsCoreNeoforge-{version}+{minecraft}.jar` |
+| Fabric | `platforms/fabric/{minecraft}/build/libs/MCAgentsCoreFabric-{version}+{minecraft}.jar` |
 
-Drop the one matching your loader into the game's `mods/` folder. Fabric also
-needs Fabric API.
+`{minecraft}` is the Minecraft version, such as `26.2`. Drop the jar matching your
+loader and game version into the game's `mods/` folder. Fabric also needs Fabric API.
 
 Useful variants:
 
 ```sh
-./gradlew :api:build                 # one module only
-./gradlew :platforms:fabric:build    # one loader's jar
+./gradlew :api:build                     # one module only
+./gradlew :platforms:fabric-26.2:build    # one loader's jar, for one Minecraft version
 ./gradlew clean                      # delete the root build directory
 ./gradlew javaToolchains             # show which JDK the build resolved
 ```
 
 ## Run a development client
 
-Each loader module starts a development client with core loaded, in that module's own
-`run/` directory, which git ignores:
+Each loader starts a development client with core loaded, one per Minecraft version, in
+that version subproject's own `run/` directory, which git ignores:
 
 ```sh
-./gradlew :platforms:fabric:runClient
-./gradlew :platforms:neoforge:runClient
-./gradlew :platforms:forge:runClient
+./gradlew :platforms:fabric-26.2:runClient
+./gradlew :platforms:neoforge-26.2:runClient
+./gradlew :platforms:forge-26.2:runClient
 ```
 
 The client loads the mod the way its jar would: `api`, `common` and `shared` are part of
 `mcagents_core`, not separate pieces. NeoForge is told so through the mod's source sets;
 Forge treats the directory holding `mods.toml` as the whole mod, so its run task first
-copies every bundled module into `platforms/forge/build/devMod/` and starts the game from
-there. The first run of each loader downloads the game's assets.
+copies every bundled module into `platforms/forge/{minecraft}/build/devMod/` and starts the
+game from there. The first run of each loader downloads the game's assets.
 
 ## The request timeouts
 
@@ -114,8 +116,9 @@ when a release reaches `master` — so run this command before opening one.
 ## Publish the modules
 
 Every module is published to GitHub Packages as
-`io.github.mcagentsmods:mcagents-core-{module}` — `api`, `common`, `shared`,
-`forge`, `neoforge` and `fabric`:
+`io.github.mcagentsmods:mcagents-core-{module}` — `api`, `common` and `shared` once,
+and `client`, `forge`, `neoforge` and `fabric` once per Minecraft version, as
+`mcagents-core-{module}-{minecraft}`:
 
 ```sh
 ./gradlew publish
@@ -136,7 +139,7 @@ Nobody runs `./gradlew publish` by hand for a release. The **Publish** workflow,
 1. It reads `project-version` from `gradle.properties` and looks for the tag
    `v{version}` on GitHub. If the tag exists, the run stops: a merge that leaves the
    version alone publishes nothing.
-2. Otherwise it builds and tests every module, publishes all seven to GitHub Packages,
+2. Otherwise it builds and tests every module, publishes every module to GitHub Packages,
    and only then tags the commit `v{version}`.
 
 So a release is the merge that changes `project-version`. A failed run leaves no tag,
@@ -154,11 +157,12 @@ runs each time a Publish run on `master` finishes:
 1. It reads `project-version` and looks for the tag `v{version}`. If the tag does not
    exist, or already has a GitHub release, the run stops: a merge that leaves the version
    alone releases nothing.
-2. Otherwise it checks out the tag, runs `./gradlew assemble`, and takes one jar each from
-   `platforms/forge`, `platforms/fabric` and `platforms/neoforge` —
-   `MCAgentsCoreForge-{version}.jar`, `MCAgentsCoreFabric-{version}.jar` and
-   `MCAgentsCoreNeoforge-{version}.jar`.
-3. It creates the `v{version}` release with the three jars attached and that version's
+2. Otherwise it checks out the tag, runs `./gradlew assemble`, and takes one jar from each
+   Minecraft version subproject of `platforms/forge`, `platforms/fabric` and
+   `platforms/neoforge` — `MCAgentsCoreForge-{version}+{minecraft}.jar`,
+   `MCAgentsCoreFabric-{version}+{minecraft}.jar` and
+   `MCAgentsCoreNeoforge-{version}+{minecraft}.jar`.
+3. It creates the `v{version}` release with those jars attached and that version's
    `wiki/logs/{Major}/{Minor}/{Patch}/CHANGELOG.md` as its notes, then deletes the copy of
    the jars the run kept in Actions.
 

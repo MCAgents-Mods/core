@@ -71,10 +71,11 @@ subprojects {
             // name, so every project in this group would publish a colliding
             // io.github.mcagentsmods:api — a consumer could not depend on core
             // and another mod at the same time. Gives mcagents-core-api,
-            // mcagents-core-common, mcagents-core-shared, mcagents-core-client,
-            // mcagents-core-fabric, mcagents-core-forge and mcagents-core-neoforge;
-            // the jar names are the archivesName each module sets,
-            // MCAgentsCore{Module}.
+            // mcagents-core-common and mcagents-core-shared, and, for the
+            // modules built once per Minecraft version, whose subprojects are
+            // named {module}-{version}, mcagents-core-client-26.2,
+            // mcagents-core-fabric-26.2 and so on. The jar names are the
+            // archivesName each module sets, MCAgentsCore{Module}.
             artifactId = "mcagents-${rootProject.name}-${project.name}"
 
             pom {
