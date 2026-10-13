@@ -145,6 +145,27 @@ the Actions tab — tries again. GitHub Packages refuses to overwrite a version,
 a run failed after some modules were already uploaded, delete those package versions
 before retrying.
 
+### How the jars reach the Releases page
+
+The mod jars a player installs are attached to the repository's **Releases** page, one
+GitHub release per version. The **Release** workflow, `.github/workflows/release.yml`,
+runs each time a Publish run on `master` finishes:
+
+1. It reads `project-version` and looks for the tag `v{version}`. If the tag does not
+   exist, or already has a GitHub release, the run stops: a merge that leaves the version
+   alone releases nothing.
+2. Otherwise it checks out the tag, runs `./gradlew assemble`, and takes one jar each from
+   `platforms/forge`, `platforms/fabric` and `platforms/neoforge` —
+   `MCAgentsCoreForge-{version}.jar`, `MCAgentsCoreFabric-{version}.jar` and
+   `MCAgentsCoreNeoforge-{version}.jar`.
+3. It creates the `v{version}` release with the three jars attached and that version's
+   `wiki/logs/{Major}/{Minor}/{Patch}/CHANGELOG.md` as its notes, then deletes the copy of
+   the jars the run kept in Actions.
+
+A release that failed is made by the next merge to `master`. **Run workflow** on the
+Release workflow's page does the same by hand; its `tag` input releases an earlier tag that
+has none.
+
 ## Start a piece of work
 
 Never commit to `master`. Branch from it, named `{type}/{primary-noun}`:

@@ -32,6 +32,7 @@ Full description: [`../../../wiki/information/overview.md`](../../../wiki/inform
 | `.agents/` | This repository's own instructions, plus the index, agent-wiki, and memory trees. The universal conventions are **not** here — they come from the connector. |
 | `wiki/` | Human documentation, including `wiki/api/` (one page per public API scope) and `wiki/logs/` release history. |
 | `.github/workflows/publish.yml` | The Publish workflow: on a push to `master` whose `project-version` has no `v{version}` tag yet, build, test, publish every module, then tag. |
+| `.github/workflows/release.yml` | The Release workflow: after each Publish run on `master`, if `v{version}` has no GitHub release yet, build the Forge, Fabric and NeoForge jars from the tag and attach them to a new release, then delete the run's copy of the jars. |
 
 ## Where the conventions come from
 
@@ -89,9 +90,8 @@ None of these are tracked. Do not commit them, and do not document a path under
 
 ## Gotchas
 
-* **Nothing checks a pull request.** The only workflow, Publish, runs on `master`
-  and builds only when a new version lands, so run `./gradlew test` before opening a
-  pull request. Do not describe a pull request check that does not exist.
+* **Nothing checks a pull request.** Both workflows, Publish and Release, run only on
+  `master`, after a merge, so run `./gradlew test` before opening a pull request. Do not describe a pull request check that does not exist.
 * **Merging a new `project-version` publishes it.** The Publish workflow tags and
   ships the version the moment it reaches `master`, and a published version can never
   be overwritten — the version bump belongs in the release task alone.
