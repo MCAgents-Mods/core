@@ -23,9 +23,6 @@ history, read `wiki/logs/`.
   `MCAgents-Mods/chat` with tool calling, embeddings, prompt-cache hints, retries,
   key rotation and direct provider routes. `mcagents-core-common` publishes `StubTransport`
   and `StubKeySource` as test fixtures.
-- The local web console, in `common.web`: one loopback server, started on demand, that
-  every mod registers its pages into through `CoreWebRegistry.shared()`, and the shared
-  page shell under `mcagents_core/web/`.
 - Holograms, in `platforms/client`: panels a mod opens in the level with
   `Holograms.open`, described by the records in `api.hologram`. The player aims and
   left-clicks, scrolls with the wheel, holds Z to carry one, and clicks its X to close
@@ -33,7 +30,9 @@ history, read `wiki/logs/`.
   the button grid (a menu), and the list, transcript and prompt that a chat hologram
   stands side by side; typing into a prompt goes through a screen that draws nothing
   over the world. Checked by hand on 2026-10-13 in each loader's dev client, and on
-  Forge also from the built jar, where the mixin loads through the manifest.
+  Forge also from the built jar, where the mixin loads through the manifest. They
+  replace the web console, removed for 0.6.0 with `api.web` and `common.web`: nothing
+  in core listens on a port.
 - Credential pooling, rotation, and storage owned entirely by `core`: the shared
   `mcagents.json` and the `/agents` client command logic with masked handles in tab
   completion. Reviewed for security on 2026-10-11 (task 7 in
@@ -91,5 +90,4 @@ in the repository. See
 and [`../tasks/agents-setup.md`](../tasks/agents-setup.md) for the generation that
 preceded it.
 
-**Next obvious step.** The rest of 0.6.0: removing the web console, then the release —
-see [`../tasks/hologram.md`](../tasks/hologram.md).
+**Next obvious step.** Releasing 0.6.0 — see [`../tasks/hologram.md`](../tasks/hologram.md).

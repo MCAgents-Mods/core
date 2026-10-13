@@ -160,4 +160,23 @@ the text; the transcript followed new entries and stayed put once scrolled up; Z
 three panels together; and the X closed them. On NeoForge and Forge the chat hologram drew
 and a typed prompt was sent.
 
-`wiki/api/hologram-panels.md` documents the four kinds and the typing keys.
+`wiki/api/hologram-panels.md` documents the four kinds and the typing keys. The plan's task 3
+listed a guide page too; none was written, because the two API pages open with the examples a
+guide would carry.
+
+### Task 5 — refactor/web-console-removal
+
+The web console is gone: `api.web`, `common.web`, the page shell under
+`mcagents_core/web/`, their tests, `CoreRuntime.stop()` closing the console, and the pages
+`wiki/api/web-console.md` and `wiki/guides/web-pages.md`. Nothing in core listens on a port.
+The loader manifests describe core as the model client and the holograms, and the docs that
+named the console no longer do; the 0.5.0 change log and earlier records keep it as history.
+
+MCAgents chat 0.3.0, already published, declares `mcagents_core >= 0.5.1` and opens the
+console from its console button, so with core 0.6.0 it would fail at that button. Core 0.6.0
+therefore declares chat (mod id `mcagents`) below 0.4.0 incompatible: `breaks` on Fabric and
+an `incompatible` dependency with a reason on NeoForge, the two loaders chat ships for.
+Checked on 2026-10-13 with a stand-in `mcagents` 0.3.0 jar in each dev client's `run/mods/`:
+Fabric stopped with "MCAgents Core is incompatible with any version before 0.4.0 of mod
+mcagents", NeoForge with the reason text, and NeoForge without the stand-in loaded a world.
+`wiki/api/dependency.md` says so under *In game*.

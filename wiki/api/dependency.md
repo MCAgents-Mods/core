@@ -42,8 +42,8 @@ coordinates as `testImplementation`.
 
 | Artifact | Packages | Holds | Page |
 |---|---|---|---|
-| `mcagents-core-api` | `…core.api`, `.chat`, `.llm`, `.token`, `.model`, `.http`, `.web`, `.hologram` | Contracts only: interfaces, records, enums. No implementation. | Every page below |
-| `mcagents-core-common` | `…core.common`, `.model`, `.http`, `.web`, `.hologram` | The implementations: `MCAgentsProvider`, `OpenRouterClient`, `JdkHttpTransport`, `CoreWebRegistry`, and the hologram's placement, layout, scrolling and text arithmetic, which `mcagents-core-client` uses. | [`provider.md`](provider.md), [`model-client.md`](model-client.md), [`http.md`](http.md), [`web-console.md`](web-console.md) |
+| `mcagents-core-api` | `…core.api`, `.chat`, `.llm`, `.token`, `.model`, `.http`, `.hologram` | Contracts only: interfaces, records, enums. No implementation. | Every page below |
+| `mcagents-core-common` | `…core.common`, `.model`, `.http`, `.hologram` | The implementations: `MCAgentsProvider`, `OpenRouterClient`, `JdkHttpTransport`, and the hologram's placement, layout, scrolling and text arithmetic, which `mcagents-core-client` uses. | [`provider.md`](provider.md), [`model-client.md`](model-client.md), [`http.md`](http.md) |
 | `mcagents-core-common`, test fixtures | `…core.common.testing` | `StubTransport` and `StubKeySource`, for a consumer's tests. | [`test-fixtures.md`](test-fixtures.md) |
 | `mcagents-core-shared` | `…core.shared` and below | What the loader entry points start: sides, the shared key file, the token commands. | [`mod-runtime.md`](mod-runtime.md), [`key-file.md`](key-file.md), [`token-commands.md`](token-commands.md) |
 | `mcagents-core-client` | `…core.client.hologram` | `Holograms`, which opens and closes holograms, and the drawing and input behind it. Client only; compiled against Minecraft 26.2. | [`hologram.md`](hologram.md), [`hologram-panels.md`](hologram-panels.md) |
@@ -58,6 +58,10 @@ group `io.github.mcagentsmods` with the same version; `project-version` in core'
 The player installs the core jar for their loader (`MCAgentsCoreFabric`,
 `MCAgentsCoreNeoforge` or `MCAgentsCoreForge`), mod id `mcagents_core`. A mod built on core
 declares that mod id as a dependency in its own manifest.
+
+From 0.6.0 core refuses to load beside MCAgents chat (mod id `mcagents`) older than 0.4.0,
+on Fabric and NeoForge, the loaders chat ships for: those versions open the web console,
+which core no longer has. The loader names the mod to update instead of starting the game.
 
 ## Related
 

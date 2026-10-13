@@ -9,7 +9,7 @@ version = "${version}"
 displayName = "MCAgents Core"
 authors = "MCAgents"
 description = '''
-The shared foundation MCAgents mods build on: the language model client and the local web console that other mods register their pages into.
+The shared foundation MCAgents mods build on: the language model client and the in-game holograms other mods open.
 '''
 
 [[dependencies.mcagents_core]]
