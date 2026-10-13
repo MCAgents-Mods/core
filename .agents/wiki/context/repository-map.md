@@ -22,8 +22,8 @@ Full description: [`../../../wiki/information/overview.md`](../../../wiki/inform
 
 | Path | What it is |
 |---|---|
-| `api/` | Pure Java API contracts — chat, llm, token, model, http, web and hologram packages. Depends on nothing in the repo. |
-| `common/` | The implementation: `MCAgentsProvider`, the vendor clients, credential pooling, the routed `OpenRouterClient` (`common.model`), `JdkHttpTransport` (`common.http`), the web console (`common.web`, its shell under `common/src/main/resources/mcagents_core/web/`), and the hologram's placement and layout arithmetic (`common.hologram`). |
+| `api/` | Pure Java API contracts — chat, llm, token, model, http and hologram packages. Depends on nothing in the repo. |
+| `common/` | The implementation: `MCAgentsProvider`, the vendor clients, credential pooling, the routed `OpenRouterClient` (`common.model`), `JdkHttpTransport` (`common.http`), and the hologram's placement, layout, scrolling and text arithmetic (`common.hologram`). |
 | `common/src/testFixtures/` | `StubTransport` and `StubKeySource`, published for consumers' tests. |
 | `platforms/shared/` | What every loader shares: `CoreRuntime`, the side-guard machinery, and the client and server halves as packages. Plain Java. |
 | `platforms/client/` | The holograms: drawing, aiming, clicks, the wheel, the Z key and the two-chunk range, against vanilla Minecraft through Loom, and the `en_us` lang file for the key and the footer. Client only; no loader type. |
@@ -53,7 +53,6 @@ that page rather than inferring the layout from the directory listing.
 |---|---|---|
 | `MCAgentsProvider` | `common/…/common/MCAgentsProvider.java` | One registered client per vendor. |
 | `OpenRouterClient` | `common/…/common/model/OpenRouterClient.java` | The routed client: tools, embeddings, caching, retries, key rotation. What `MCAgents-Mods/chat` calls. |
-| `CoreWebRegistry` | `common/…/common/web/CoreWebRegistry.java` | Where mods register web pages; `shared()` is the game's one instance, `open()` starts the console. |
 | `CoreRuntime` | `platforms/shared/…/shared/` | What each loader's entry point calls to start and stop core. |
 | `SideEntrypoint` / `ModBootstrap` | `platforms/shared/…/shared/environment/` | Mod-side bootstrap and the client/server split. |
 | `Holograms` | `platforms/client/…/client/hologram/` | What a mod calls to open and close a hologram. |

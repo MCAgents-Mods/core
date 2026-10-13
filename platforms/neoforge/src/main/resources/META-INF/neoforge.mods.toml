@@ -9,7 +9,7 @@ version = "${version}"
 displayName = "MCAgents Core"
 authors = "MCAgents"
 description = '''
-The shared foundation MCAgents mods build on: the language model client and the local web console that other mods register their pages into.
+The shared foundation MCAgents mods build on: the language model client and the in-game holograms other mods open.
 '''
 
 [[dependencies.mcagents_core]]
@@ -23,5 +23,14 @@ side = "BOTH"
 modId = "minecraft"
 type = "required"
 versionRange = "[26.2,26.3)"
+ordering = "NONE"
+side = "BOTH"
+
+# MCAgents chat before 0.4.0 opens the web console, which core 0.6.0 removed.
+[[dependencies.mcagents_core]]
+modId = "mcagents"
+type = "incompatible"
+reason = "MCAgents chat before 0.4.0 needs the web console, which MCAgents Core 0.6.0 removed. Update MCAgents chat."
+versionRange = "(,0.4.0)"
 ordering = "NONE"
 side = "BOTH"

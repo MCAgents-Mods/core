@@ -23,7 +23,7 @@ Why the two halves exist, and how one is started without linking the other:
 |---|---|
 | `MOD_ID` | `mcagents_core`, the id every loader manifest declares. |
 | `start(PhysicalSide, Path gameDirectory)` | Installs the side, then starts the matching half. Idempotent: a second call returns the half already running. |
-| `stop()` | Stops the running half and closes the [web console](web-console.md), keeping its registrations. Safe to call more than once. |
+| `stop()` | Stops the running half. Safe to call more than once. |
 | `running()` | The running half, or `null` before `start` and after `stop`. |
 
 Both are synchronized, and called from a loader's start-up and shutdown threads, never from a

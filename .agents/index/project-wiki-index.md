@@ -28,7 +28,6 @@ never seen the repository. Knowledge written for agents belongs to
 | File | Purpose |
 |---|---|
 | [`../../wiki/guides/llm-providers.md`](../../wiki/guides/llm-providers.md) | Getting from an API key to a model's reply, and the threading and memory rules that come with it. |
-| [`../../wiki/guides/web-pages.md`](../../wiki/guides/web-pages.md) | Registering a mod's pages into the shared local web console, and the rules a page must follow. |
 
 ## Environments
 

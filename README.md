@@ -30,9 +30,6 @@ wants and replays it.
   embeddings, prompt caching, retries and key rotation. See
   [`wiki/api/provider.md`](wiki/api/provider.md) and
   [`wiki/api/model-client.md`](wiki/api/model-client.md).
-- A local web console that every mod registers its pages into, behind one
-  loopback server and one token. See
-  [`wiki/guides/web-pages.md`](wiki/guides/web-pages.md).
 - Holograms: panels a mod opens in the world in front of the player, who aims and
   clicks, holds Z to move them, and leaves them behind beyond two chunks. See
   [`wiki/api/hologram.md`](wiki/api/hologram.md).
