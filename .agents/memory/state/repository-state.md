@@ -58,10 +58,13 @@ history, read `wiki/logs/`.
 
 **What is not built yet.**
 
-- **No pull request checks.** The one workflow, Publish (`.github/workflows/publish.yml`,
-  added 2026-10-12), builds, tests, publishes and tags only when a new `project-version`
-  reaches `master`. `./gradlew test` is still the only thing that runs the tests before a
-  merge. See [`../tasks/publish-workflow.md`](../tasks/publish-workflow.md).
+- **No pull request checks.** Both workflows run only on `master`. Publish
+  (`.github/workflows/publish.yml`, added 2026-10-12) builds, tests, publishes and tags
+  only when a new `project-version` reaches `master`; Release
+  (`.github/workflows/release.yml`, added 2026-10-13) then attaches the Forge, Fabric and
+  NeoForge jars to that tag's GitHub release. `./gradlew test` is still the only thing that
+  runs the tests before a merge. See [`../tasks/publish-workflow.md`](../tasks/publish-workflow.md)
+  and [`../tasks/release-workflow.md`](../tasks/release-workflow.md).
 - **Never played by a person.** On 2026-10-13 each loader's development client
   (`runClient`) started with core loaded and a demo hologram was driven by hand, but no
   published jar has been loaded in a player's game, and no dedicated server has been

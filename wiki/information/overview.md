@@ -31,11 +31,13 @@ sides, `platforms/client` the holograms, drawn through vanilla Minecraft, and
 | `.agents/` | The agent instruction set — rules, git conventions, planning, platform knowledge, prompts, creators — plus the index, agent-wiki, and memory trees. |
 | `wiki/` | This documentation tree. |
 | `.github/workflows/publish.yml` | The Publish workflow, which ships each new version from `master`. |
+| `.github/workflows/release.yml` | The Release workflow, which attaches the Forge, Fabric and NeoForge jars to each version's GitHub release. |
 
-One GitHub Actions workflow, `.github/workflows/publish.yml`, publishes and tags a
-release when a new version reaches `master`. Nothing runs on a pull request. Build,
-test, and publish commands, and how a release is published, are on
-[`../environments/setup.md`](../environments/setup.md).
+Two GitHub Actions workflows run on `master`. `.github/workflows/publish.yml` publishes
+and tags a release when a new version reaches `master`; `.github/workflows/release.yml`
+then builds the three loader jars from that tag and attaches them to its GitHub release.
+Nothing runs on a pull request. Build, test, and publish commands, and how a release is
+published, are on [`../environments/setup.md`](../environments/setup.md).
 
 ## How the repository is organized
 

@@ -54,3 +54,29 @@ same workflow in their own pull requests, after core.
 ### Task 1 — chore/release-workflow-plan
 
 This record, and its row in the memory index.
+
+### Task 2 — ci/release
+
+`.github/workflows/release.yml`, as described above: job `build` (contents read) finds the
+tag and its release, checks out the tag, checks its `project-version`, runs
+`./gradlew assemble`, takes `MCAgentsCore{Forge,Fabric,Neoforge}-{version}.jar` from
+`platforms/{forge,fabric,neoforge}/build/libs/` and uploads them as `mod-jars`; job `release`
+(contents and actions write) writes the notes, creates the release with
+`gh release create --verify-tag`, marks it latest only when it is the version on `master`, and
+deletes the artifact. Its concurrency group, `github-release`, is not Publish's `release`, so
+a queued Release run never cancels a queued Publish run. `publish.yml` is unchanged.
+
+The setup page gains "How the jars reach the Releases page"; the overview, the repository map,
+the repository rule and the state file now name two workflows. The rule's sentence "The only
+workflow is `.github/workflows/publish.yml`" had become false. It is corrected here, as was
+done when Publish landed, and listed as a finding for the owner to keep or revert.
+
+Checked locally: `actionlint` 1.7.12 with shellcheck passes on both workflows. Each step's
+script was run from the workflow file: the tag check against the real remote gives
+`v0.6.0`, `latest=true`, `release=true` with no input, `latest=false` for `v0.5.2`, a notice
+for a missing tag, and an error for `0.6.0`; the notes step turns the 0.6.0 changelog's
+`../../../../api/…` links into `https://github.com/MCAgents-Mods/core/blob/v0.6.0/wiki/api/…`
+and falls back to generated notes when a version has no changelog; the jar step takes one
+jar per loader, skips the sources jars, and fails on a missing jar, two jars, or a tag whose
+`project-version` differs. The first real run is the Release run after this branch merges,
+which should make the `v0.6.0` release.

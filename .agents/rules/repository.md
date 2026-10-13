@@ -48,11 +48,12 @@ documented once, in
 [`../../wiki/information/modules.md`](../../wiki/information/modules.md). Do not
 restate them here; read that page rather than inferring the layout.
 
-The only workflow is `.github/workflows/publish.yml`, which publishes and tags a
-release when a new `project-version` reaches `master`. **Nothing runs on a pull
-request.** Do not describe a check that does not exist, and do not write
-instructions that assume one. Anything you would have to guess at is not a rule —
-it is a fabrication.
+The two workflows are `.github/workflows/publish.yml`, which publishes and tags a
+release when a new `project-version` reaches `master`, and
+`.github/workflows/release.yml`, which then attaches the Forge, Fabric and NeoForge
+jars to that tag's GitHub release. **Nothing runs on a pull request.** Do not describe
+a check that does not exist, and do not write instructions that assume one. Anything
+you would have to guess at is not a rule — it is a fabrication.
 
 ## What the project does
 
