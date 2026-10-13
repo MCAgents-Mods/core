@@ -41,13 +41,23 @@ include 'common'
 // one is running. Plain Java, compiled without any loader toolchain.
 include 'platforms:shared'
 
+// Every Minecraft version core builds for. Each module below compiles against
+// Minecraft, so it is a folder of shared sources, platforms/{module}/src, with
+// one subproject per version in platforms/{module}/{version}, holding only what
+// differs for that version. The subproject is named {module}-{version}, as in
+// :platforms:fabric-26.2: two projects of one name would be one module to
+// Gradle. The catalog carries one block of coordinates per version.
+def minecraftVersions = ['26.2']
+
 // What core draws in the game and the input that drives it, on the client only.
 // Compiled against vanilla Minecraft, never a loader.
-include 'platforms:client'
-
-// One module per mod loader. Each brings its own toolchain and builds its own
-// jar carrying api, common, shared and client — a loader never loads another
+//
+// Then one module per mod loader. Each brings its own toolchain and builds its
+// own jar carrying api, common, shared and client — a loader never loads another
 // loader's classes, so the jars are never merged.
-include 'platforms:forge'
-include 'platforms:neoforge'
-include 'platforms:fabric'
+['client', 'forge', 'neoforge', 'fabric'].each { module ->
+    minecraftVersions.each { minecraft ->
+        include "platforms:${module}-${minecraft}"
+        project(":platforms:${module}-${minecraft}").projectDir = file("platforms/${module}/${minecraft}")
+    }
+}

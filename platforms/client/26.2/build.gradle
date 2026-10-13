@@ -1,0 +1,7 @@
+// core's client module for Minecraft 26.2. Everything but the version is in ../client.gradle.
+
+plugins {
+    id 'net.fabricmc.fabric-loom'
+}
+
+apply from: '../client.gradle'

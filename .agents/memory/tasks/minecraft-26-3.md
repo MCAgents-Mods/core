@@ -64,3 +64,20 @@ Fabric's and NeoForge's hooks and the Forge `LevelRenderer.submitFeatures` mixin
 ### Task 1 — chore/minecraft-26-3-plan
 
 This record, and its row in the memory index.
+
+### Task 2 — build/minecraft-versions
+
+`platforms/client`, `fabric`, `neoforge` and `forge` each became a folder of shared sources with
+one subproject per Minecraft version, `platforms/{module}/{minecraft}`, named
+`:platforms:{module}-{minecraft}` (two projects both named `26.2` were one module to Gradle and
+made a circular dependency). The versions are listed once, in `settings.gradle`, and only 26.2
+is in it yet. `platforms/minecraft.gradle` takes the version from the folder name, looks up the
+catalog entries suffixed with it (`fabric-api-26-2`), adds the folder's own `src/`, and names the
+jar `{Name}-{version}+{minecraft}.jar`. The loader metadata is expanded per version. Forge's
+`pack.mcmeta` moved into `platforms/forge/26.2/`. `release.yml` attaches one jar per loader and
+Minecraft version.
+
+Checked: `./gradlew build` passes; each loader's 26.2 jar holds the same files, byte for byte, as
+the v0.6.1 release's jar; the published artifact ids are `mcagents-core-{api,common,shared}` and
+`mcagents-core-{client,fabric,neoforge,forge}-26.2`; actionlint is clean on both workflows; the
+release step's jar collection, run locally, finds three jars for v0.6.1 and fails for v0.6.0.

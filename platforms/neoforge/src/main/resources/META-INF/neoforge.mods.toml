@@ -15,14 +15,14 @@ The shared foundation MCAgents mods build on: the language model client and the 
 [[dependencies.mcagents_core]]
 modId = "neoforge"
 type = "required"
-versionRange = "[26.2,)"
+versionRange = "[${minecraft},)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.mcagents_core]]
 modId = "minecraft"
 type = "required"
-versionRange = "[26.2,26.3)"
+versionRange = "[${minecraft},${minecraftNext})"
 ordering = "NONE"
 side = "BOTH"
 

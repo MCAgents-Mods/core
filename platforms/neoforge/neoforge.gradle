@@ -1,23 +1,26 @@
 // The NeoForge mod jar: core's api, common, shared and client code, plus the NeoForge
 // entry point. The only module that may reference NeoForge types.
+//
+// Applied by each Minecraft version subproject, platforms/neoforge/{version}, after it
+// applies ModDevGradle; that subproject builds the jar for its version.
 
-plugins {
-    id 'net.neoforged.moddev'
-}
+apply from: '../../minecraft.gradle'
+
+def clientModule = ":platforms:client-${minecraftVersion}"
 
 // api, common, shared and client are core's own modules, so their classes are
 // merged into the mod jar. Every loader jar does the same, which is what makes
 // each one self-contained.
-def bundledModules = [':api', ':common', ':platforms:shared', ':platforms:client']
+def bundledModules = [':api', ':common', ':platforms:shared', clientModule]
 
 // The dev client loads the bundled modules as part of this mod, as the jar
 // does; loaded apart, NeoForge would give them a class loader of their own.
 bundledModules.each { path -> evaluationDependsOn(path) }
 
 neoForge {
-    version = libs.versions.neoforge.get()
+    version = versionFor('neoforge')
 
-    // A development client: ./gradlew :platforms:neoforge:runClient, in run/.
+    // A development client: ./gradlew :platforms:neoforge-{version}:runClient, in run/.
     runs {
         client {
             client()
@@ -37,7 +40,7 @@ dependencies {
     implementation project(':api')
     implementation project(':common')
     implementation project(':platforms:shared')
-    implementation project(':platforms:client')
+    implementation project(clientModule)
 }
 
 tasks.named('jar', Jar) {
@@ -50,11 +53,13 @@ tasks.named('jar', Jar) {
 }
 
 processResources {
-    def modVersion = project.version
-    inputs.property 'version', modVersion
+    // The jar declares its own Minecraft version, and NeoForge for it.
+    def properties = [version: project.version, minecraft: minecraftVersion,
+                      minecraftNext: minecraftNext]
+    inputs.properties properties
 
     filesMatching('META-INF/neoforge.mods.toml') {
-        expand version: modVersion
+        expand properties
     }
 }
 
@@ -71,7 +76,7 @@ publishing {
 
             pom {
                 name = 'MCAgentsCoreNeoforge'
-                description = "MCAgents Core for NeoForge"
+                description = "MCAgents Core for NeoForge, Minecraft ${minecraftVersion}"
             }
         }
     }
