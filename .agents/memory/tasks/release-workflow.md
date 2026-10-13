@@ -5,7 +5,7 @@ description: Adding the Release workflow, which attaches the Forge, Fabric and N
 
 # Task: Release workflow
 
-**Status:** in progress
+**Status:** done once the pull requests below merge and the Release run makes `v0.6.1`
 
 ## The request
 
@@ -47,9 +47,9 @@ same workflow in their own pull requests, after core.
 
 | # | Title | Branch | PR |
 |---|---|---|---|
-| 1 | Task record | `chore/release-workflow-plan` | |
-| 2 | Release workflow | `ci/release` | |
-| 3 | Release 0.6.1 | `release/0.6.1` | |
+| 1 | Task record | `chore/release-workflow-plan` | #29 |
+| 2 | Release workflow | `ci/release` | #30 |
+| 3 | Release 0.6.1 | `release/0.6.1` | #31 |
 
 ### Task 1 — chore/release-workflow-plan
 
@@ -80,3 +80,17 @@ and falls back to generated notes when a version has no changelog; the jar step 
 jar per loader, skips the sources jars, and fails on a missing jar, two jars, or a tag whose
 `project-version` differs. The first real run is the Release run after this branch merges,
 which should make the `v0.6.0` release.
+
+### Task 3 — release/0.6.1
+
+`project-version` is `0.6.1`, a patch: the workflow changes no jar. The 0.6.1 changelog and its
+logs-index row are new; the overview, the repository map, the repository rule and the state
+file name 0.6.1, and the rule's `wiki/logs/` range runs to `0/6/1`. Merging this branch is the
+release: Publish finds no `v0.6.1` tag, builds, publishes and tags the commit, and Release then
+makes the `v0.6.1` release with the three jars.
+
+The first real run came from merging #30: Publish found `v0.6.0` and stopped, and Release
+(run 38405107504) built the tagged commit and created the `v0.6.0` release, marked latest,
+with `MCAgentsCoreForge-0.6.0.jar`, `MCAgentsCoreFabric-0.6.0.jar` and
+`MCAgentsCoreNeoforge-0.6.0.jar` attached and the 0.6.0 changelog as its notes, its links
+pointing at the tagged files. The run's `mod-jars` artifact was deleted; the run lists none.
