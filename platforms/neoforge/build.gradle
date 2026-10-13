@@ -5,12 +5,30 @@ plugins {
     id 'net.neoforged.moddev'
 }
 
+// api, common and shared are plain Java, so their classes are merged into the
+// mod jar. Every loader jar does the same, which is what makes each one
+// self-contained.
+def bundledModules = [':api', ':common', ':platforms:shared']
+
+// The dev client loads the bundled modules as part of this mod, as the jar
+// does; loaded apart, NeoForge would give them a class loader of their own.
+bundledModules.each { path -> evaluationDependsOn(path) }
+
 neoForge {
     version = libs.versions.neoforge.get()
+
+    // A development client: ./gradlew :platforms:neoforge:runClient, in run/.
+    runs {
+        client {
+            client()
+            gameDirectory = project.file('run')
+        }
+    }
 
     mods {
         'mcagents_core' {
             sourceSet sourceSets.main
+            bundledModules.each { path -> sourceSet project(path).sourceSets.main }
         }
     }
 }
@@ -20,11 +38,6 @@ dependencies {
     implementation project(':common')
     implementation project(':platforms:shared')
 }
-
-// api, common and shared are plain Java, so their classes are merged into the
-// mod jar. Every loader jar does the same, which is what makes each one
-// self-contained.
-def bundledModules = [':api', ':common', ':platforms:shared']
 
 tasks.named('jar', Jar) {
     bundledModules.each { path ->

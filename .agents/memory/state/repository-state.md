@@ -52,8 +52,9 @@ history, read `wiki/logs/`.
   added 2026-10-12), builds, tests, publishes and tags only when a new `project-version`
   reaches `master`. `./gradlew test` is still the only thing that runs the tests before a
   merge. See [`../tasks/publish-workflow.md`](../tasks/publish-workflow.md).
-- **Never launched in a game.** The three jars build and their manifests agree with
-  their entry points, but none has been loaded in a real client or server yet.
+- **Never played by a person.** On 2026-10-13 each loader's development client
+  (`runClient`) started with core loaded, but no published jar has been loaded in a
+  player's game, and no dedicated server has been started.
 - **Two request stacks remain**: `MCAgentsProvider` and `OpenRouterClient` each have their
   own records, JSON and transport. Folding them together is deferred to a later minor.
 - **The `/agents` client commands are not wired** into any loader's command tree;
@@ -76,6 +77,5 @@ in the repository. See
 and [`../tasks/agents-setup.md`](../tasks/agents-setup.md) for the generation that
 preceded it.
 
-**Next obvious step.** Either a pull request check — `./gradlew build` on every pull
-request, beside the Publish workflow — or loading the three jars in a real game. Neither
-is started; both are the user's call.
+**Next obvious step.** The in-game hologram that replaces the web console, in progress
+for 0.6.0 — see [`../tasks/hologram.md`](../tasks/hologram.md).
