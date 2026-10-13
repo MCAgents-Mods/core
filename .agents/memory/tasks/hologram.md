@@ -76,12 +76,12 @@ hologram. The rule's update is proposed to the owner rather than edited here.
 
 | # | Title | Branch | PR |
 |---|---|---|---|
-| 1 | Task record | `chore/hologram-plan` | |
-| 2 | Dev clients | `build/dev-clients` | |
-| 3 | Hologram | `feat/hologram` | |
-| 4 | Hologram panels | `feat/hologram-panels` | |
-| 5 | Web console removal | `refactor/web-console-removal` | |
-| 6 | Release 0.6.0 | `release/0.6.0` | |
+| 1 | Task record | `chore/hologram-plan` | #23 |
+| 2 | Dev clients | `build/dev-clients` | #24 |
+| 3 | Hologram | `feat/hologram` | #25 |
+| 4 | Hologram panels | `feat/hologram-panels` | #26 |
+| 5 | Web console removal | `refactor/web-console-removal` | #27 |
+| 6 | Release 0.6.0 | `release/0.6.0` | #28 |
 
 ### Task 1 — chore/hologram-plan
 
