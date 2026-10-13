@@ -81,3 +81,30 @@ Checked: `./gradlew build` passes; each loader's 26.2 jar holds the same files, 
 the v0.6.1 release's jar; the published artifact ids are `mcagents-core-{api,common,shared}` and
 `mcagents-core-{client,fabric,neoforge,forge}-26.2`; actionlint is clean on both workflows; the
 release step's jar collection, run locally, finds three jars for v0.6.1 and fails for v0.6.0.
+
+### Task 3 — feat/minecraft-26-3
+
+`settings.gradle` lists 26.3 beside 26.2, the catalog has a 26.3 block (Fabric API
+0.162.0+26.3, NeoForge 26.3.0.76, Forge 26.3-66.0.11), and each Minecraft-facing module has a
+`26.3/` subproject. Fabric Loom moved to 1.18.4 and Fabric Loader to 0.19.5 for both versions;
+Loom 1.18 needs Gradle 9.7 or newer, so the wrapper is 9.7.1, and it refuses to run Gradle on
+anything older than Java 25. Forge 26.3's `pack.mcmeta` is 121 and 121.
+
+Two of the four breaks needed no version class. The move key uses `KeyMapping`'s constructor
+without an input type, which means the keyboard in both versions, and panels turn with
+`PoseStack.rotateAround` about the origin, which both versions have. The other two did:
+
+- `client/{26.2,26.3}/…/hologram/RectangleSubmitter` sends a panel's rectangles. 26.2 keeps
+  the custom geometry in `RenderTypes.textBackground()`. 26.3 has no such render type, so each
+  rectangle is a `submitTextBackground`, drawn from its own centre so the game sorts them, and
+  one seen from behind is mirrored.
+- `forge/{26.2,26.3}/…/forge/AttackListener` listens for the attack key: 26.2's one
+  interaction event with `isAttack()`, 26.3's `InteractionKeyMappingTriggered.Attack`.
+
+Checked on 2026-10-13 in all six dev clients (three loaders, two versions) under a virtual
+display, with a scratch harness, never committed, that made a flat world, opened an
+18-button hologram, clicked the attack key and walked behind it. Every client drew the panel,
+its buttons and text, and a solid back; 26.3 looks the same as 26.2. A click on the aimed-at
+button ran its action and kept the hologram open on every loader and version. Minecraft 26.3
+draws through Vulkan or OpenGL; the virtual display offers no sRGB OpenGL surface, so 26.3 ran
+on Mesa's software Vulkan driver.

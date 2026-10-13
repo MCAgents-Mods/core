@@ -1,10 +1,8 @@
 package io.github.mcagentsmods.core.client.hologram;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
@@ -15,8 +13,8 @@ import java.util.List;
 
 /**
  * Draws one panel in panel pixels: x to the right and y down from the panel's top left
- * corner, with z towards the player. Rectangles are gathered and sent to the game in one
- * piece by {@link #flush()}; text goes straight away.
+ * corner, with z towards the player. Rectangles are gathered and sent to the game together
+ * by {@link #flush()}; text goes straight away.
  *
  * <p>Depth is a layer number rather than a distance: each layer lifts what it draws a little
  * further off the panel, so a button sits on the face and its label on the button.
@@ -26,12 +24,13 @@ final class HologramPainter {
     /** How far one layer lifts, in panel pixels. */
     private static final float LAYER = 0.12f;
 
-    private static final int LIGHT = LightCoordsUtil.FULL_BRIGHT;
+    /** Full brightness: a hologram glows the same by day, by night and underground. */
+    static final int LIGHT = LightCoordsUtil.FULL_BRIGHT;
 
     private final SubmitNodeCollector collector;
     private final PoseStack pose;
     private final Font font;
-    private final List<float[]> quads = new ArrayList<>();
+    private final List<Rect> rects = new ArrayList<>();
 
     HologramPainter(SubmitNodeCollector collector, PoseStack pose, Font font) {
         this.collector = collector;
@@ -41,12 +40,12 @@ final class HologramPainter {
 
     /** Fills a rectangle on {@code layer}, seen from the front. */
     void rect(float left, float top, float right, float bottom, int layer, int colour) {
-        quads.add(new float[] {left, top, right, bottom, layer * LAYER, colour, 0});
+        rects.add(new Rect(left, top, right, bottom, layer * LAYER, colour, false));
     }
 
     /** Fills a rectangle seen from behind, so the panel is solid from both sides. */
     void back(float left, float top, float right, float bottom, int colour) {
-        quads.add(new float[] {left, top, right, bottom, -LAYER, colour, 1});
+        rects.add(new Rect(left, top, right, bottom, -LAYER, colour, true));
     }
 
     /** Draws a one-pixel outline just inside a rectangle. */
@@ -145,31 +144,20 @@ final class HologramPainter {
 
     /** Sends the gathered rectangles to the game, in the pose they were drawn in. */
     void flush() {
-        if (quads.isEmpty()) {
+        if (rects.isEmpty()) {
             return;
         }
-        List<float[]> batch = List.copyOf(quads);
-        quads.clear();
-        collector.submitCustomGeometry(pose, RenderTypes.textBackground(), (last, buffer) -> {
-            for (float[] q : batch) {
-                quad(buffer, last, q[0], q[1], q[2], q[3], q[4], (int) q[5], q[6] != 0);
-            }
-        });
+        List<Rect> batch = List.copyOf(rects);
+        rects.clear();
+        RectangleSubmitter.submit(collector, pose, batch);
     }
 
-    private static void quad(VertexConsumer buffer, PoseStack.Pose last, float left, float top,
-                             float right, float bottom, float z, int colour, boolean back) {
-        // Counter-clockwise as seen from the side that should show it.
-        if (back) {
-            buffer.addVertex(last, left, top, z).setColor(colour).setLight(LIGHT);
-            buffer.addVertex(last, right, top, z).setColor(colour).setLight(LIGHT);
-            buffer.addVertex(last, right, bottom, z).setColor(colour).setLight(LIGHT);
-            buffer.addVertex(last, left, bottom, z).setColor(colour).setLight(LIGHT);
-        } else {
-            buffer.addVertex(last, left, top, z).setColor(colour).setLight(LIGHT);
-            buffer.addVertex(last, left, bottom, z).setColor(colour).setLight(LIGHT);
-            buffer.addVertex(last, right, bottom, z).setColor(colour).setLight(LIGHT);
-            buffer.addVertex(last, right, top, z).setColor(colour).setLight(LIGHT);
-        }
+    /**
+     * One filled rectangle in panel pixels, {@code z} off the panel's face.
+     *
+     * @param back whether it is seen from behind the panel rather than from in front
+     */
+    record Rect(float left, float top, float right, float bottom, float z, int colour,
+                boolean back) {
     }
 }

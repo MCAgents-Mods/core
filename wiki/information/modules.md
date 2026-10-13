@@ -112,7 +112,7 @@ How the right half is started without linking the other is on
 
 The three plugins are declared once in the root `build.gradle` with
 `apply false`, so they share one build classloader, and each version subproject
-applies its own. Core builds for **Minecraft 26.2**. Minecraft 26.x ships
+applies its own. Core builds for **Minecraft 26.2 and 26.3**. Minecraft 26.x ships
 unobfuscated, so no module declares a mappings coordinate.
 
 `api`, `common` and `platforms:shared` use none of these toolchains. That is
@@ -136,7 +136,7 @@ version. The jar a module builds is named `MCAgentsCore{Module}-{version}.jar`, 
 | `platforms/neoforge/{minecraft}` | `MCAgentsCoreNeoforge` | `io.github.mcagentsmods:mcagents-core-neoforge-{minecraft}` |
 | `platforms/fabric/{minecraft}` | `MCAgentsCoreFabric` | `io.github.mcagentsmods:mcagents-core-fabric-{minecraft}` |
 
-`{minecraft}` is the Minecraft version, such as `26.2`. Before 0.7.0 these four had no
+`{minecraft}` is the Minecraft version, `26.2` or `26.3`. Before 0.7.0 these four had no
 version suffix and were built for Minecraft 26.2 only.
 
 `mcagents-core-common` also publishes its test fixtures as a variant, so a consumer can

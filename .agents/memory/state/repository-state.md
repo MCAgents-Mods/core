@@ -47,7 +47,8 @@ history, read `wiki/logs/`.
   code, with the client and server halves as packages), `platforms/client` (the
   holograms, against vanilla Minecraft) and one module per loader —
   `platforms/forge`, `platforms/neoforge`, `platforms/fabric` — each building its own
-  mod jar, id `mcagents_core`, for Minecraft 26.2. The Bukkit family and the
+  mod jar, id `mcagents_core`, once per Minecraft version (26.2 and 26.3), each version a
+  subproject `platforms/{module}/{minecraft}`. The Bukkit family and the
   universal engine jar were removed on 2026-10-11 — see [`../tasks/mods-foundation.md`](../tasks/mods-foundation.md).
 - A JUnit 5 test harness wired once in the root `build.gradle`. Tests exist for
   the `api.model` records, `common` token handling, the routed model client, and
