@@ -22,11 +22,12 @@ Full description: [`../../../wiki/information/overview.md`](../../../wiki/inform
 
 | Path | What it is |
 |---|---|
-| `api/` | Pure Java API contracts — chat, llm, token, model and http packages. Depends on nothing in the repo. |
-| `common/` | The implementation: `MCAgentsProvider`, the vendor clients, credential pooling, the routed `OpenRouterClient` (`common.model`), `JdkHttpTransport` (`common.http`), and the web console (`common.web`, its shell under `common/src/main/resources/mcagents_core/web/`). |
+| `api/` | Pure Java API contracts — chat, llm, token, model, http, web and hologram packages. Depends on nothing in the repo. |
+| `common/` | The implementation: `MCAgentsProvider`, the vendor clients, credential pooling, the routed `OpenRouterClient` (`common.model`), `JdkHttpTransport` (`common.http`), the web console (`common.web`, its shell under `common/src/main/resources/mcagents_core/web/`), and the hologram's placement and layout arithmetic (`common.hologram`). |
 | `common/src/testFixtures/` | `StubTransport` and `StubKeySource`, published for consumers' tests. |
 | `platforms/shared/` | What every loader shares: `CoreRuntime`, the side-guard machinery, and the client and server halves as packages. Plain Java. |
-| `platforms/{forge,neoforge,fabric}/` | One entry point and one manifest per loader, each with its own toolchain and its own mod jar. |
+| `platforms/client/` | The holograms: drawing, aiming, clicks, the wheel, the Z key and the two-chunk range, against vanilla Minecraft through Loom, and the `en_us` lang file for the key and the footer. Client only; no loader type. |
+| `platforms/{forge,neoforge,fabric}/` | One entry point and one manifest per loader, a client half that wires the hologram to the loader's events, and Forge's drawing mixin; each with its own toolchain and its own mod jar. |
 | `gradle/libs.versions.toml` | Every dependency coordinate. Never declare one inline in a module. |
 | `.agents/` | This repository's own instructions, plus the index, agent-wiki, and memory trees. The universal conventions are **not** here — they come from the connector. |
 | `wiki/` | Human documentation, including `wiki/api/` (one page per public API scope) and `wiki/logs/` release history. |
@@ -55,6 +56,8 @@ that page rather than inferring the layout from the directory listing.
 | `CoreWebRegistry` | `common/…/common/web/CoreWebRegistry.java` | Where mods register web pages; `shared()` is the game's one instance, `open()` starts the console. |
 | `CoreRuntime` | `platforms/shared/…/shared/` | What each loader's entry point calls to start and stop core. |
 | `SideEntrypoint` / `ModBootstrap` | `platforms/shared/…/shared/environment/` | Mod-side bootstrap and the client/server split. |
+| `Holograms` | `platforms/client/…/client/hologram/` | What a mod calls to open and close a hologram. |
+| `HologramClient` | `platforms/client/…/client/hologram/` | What each loader's client half connects its tick, render, attack and scroll events to. |
 
 Public API surface, one page per scope, method by method: `wiki/api/`, routed by
 [`../../index/project-wiki-api-index.md`](../../index/project-wiki-api-index.md).
@@ -111,6 +114,15 @@ None of these are tracked. Do not commit them, and do not document a path under
 * **The client and server halves share a module.** Nothing outside
   `…shared.client` may import it, and the same for `…shared.server`;
   `SideSeparationTest` fails the build otherwise.
+* **`platforms/client` is reached only from a loader's client half.** Naming it from
+  a loader's common entry point links Minecraft's client classes on a dedicated
+  server. Its testable logic belongs in `common.hologram`, which needs no game.
+* **Forge has no level-render event in 26.2.** The hologram is drawn by a mixin on
+  `LevelRenderer.submitFeatures`, which the jar names in its `MixinConfigs` manifest
+  attribute and the dev client passes as `--mixin.config`. Renaming the mixin
+  configuration means changing both.
+* **A dev client is the only way to see a hologram.** `runClient` per loader; nothing
+  in the tests draws one.
 * **Three constraints are load-bearing** and a change that breaks one is wrong
   however well it works: `core` is **API only** (no gameplay, even though it ships
   as a mod jar), holds **no memory** (no conversation or per-player state), and

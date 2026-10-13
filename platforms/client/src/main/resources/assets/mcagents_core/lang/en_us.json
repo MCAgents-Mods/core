@@ -1,0 +1,5 @@
+{
+  "key.category.mcagents_core.main": "MCAgents Core",
+  "key.mcagents_core.move": "Move a hologram (hold)",
+  "hologram.mcagents_core.hint": "Hold %s to Move | Auto dismiss beyond 2 Chunks"
+}

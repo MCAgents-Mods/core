@@ -1,0 +1,43 @@
+// What core draws in the game and the input that drives it: the holograms. Client side only.
+//
+// Compiled against vanilla Minecraft and nothing else; no Fabric, NeoForge or Forge type may
+// appear here. Minecraft 26.x ships unobfuscated, so the same classes link against every
+// loader's game. Each loader module bundles this one into its jar and wires its events to it.
+
+plugins {
+    // Loom is used for the vanilla game alone: no loader, no mod metadata, no run configs.
+    id 'net.fabricmc.fabric-loom'
+}
+
+dependencies {
+    minecraft libs.minecraft
+
+    // The shared layers are bundled once, by each loader's jar. This module
+    // declares them compileOnly so its own jar never carries a second copy.
+    compileOnly project(':api')
+    compileOnly project(':common')
+}
+
+tasks.withType(JavaCompile).configureEach {
+    // Loom's game jar carries Fabric's @Environment annotation, whose enum is deliberately not
+    // on this module's classpath, and javac warns once per class that reads it with no lint
+    // switch to turn that off. Errors still fail the build.
+    options.warnings = false
+}
+
+base {
+    archivesName = 'MCAgentsCoreClient'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            pom {
+                name = 'MCAgentsCoreClient'
+                description = "MCAgents Core Client"
+            }
+        }
+    }
+}

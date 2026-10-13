@@ -5,7 +5,8 @@ gameDirectory)` once and `CoreRuntime.stop()` at shutdown; core then starts the 
 the dedicated-server half, and never links the other. A mod built on core does not call any
 of this, because the core mod does it. Read this page to write a loader entry point, or to
 check which side code is running on. Everything here is in `mcagents-core-shared`, under
-`io.github.mcagentsmods.core.shared`.
+`io.github.mcagentsmods.core.shared`, except the hologram's hooks, which are in
+`mcagents-core-client`.
 
 ```java
 // A loader's client entry point, as core's Fabric one does it
@@ -53,3 +54,27 @@ render or tick loop.
 The `client` and `server` packages never import each other, and nothing else in the module
 imports either; `SideSeparationTest` fails the build otherwise. Where each half keeps its key
 file: [`key-file.md`](key-file.md).
+
+## The hologram's hooks
+
+`…core.client.hologram.HologramClient`, in `mcagents-core-client`. A loader's client entry
+point connects its own events to these; a mod opens holograms through
+[`Holograms`](hologram.md) instead. Every method runs on the client thread.
+
+| Member | When the loader calls it |
+|---|---|
+| `KEY_CATEGORY` | The id of the *MCAgents Core* category in *Controls*, `mcagents_core:main`. The loader registers the category its own way. |
+| `createMoveKey(KeyMapping.Category)` | First thing in client start-up, before `CoreRuntime.start`: every loader refuses a key once the game's options exist. Returns the move key, Z, for the loader to register. |
+| `onEndTick(Minecraft)` | At the end of every client tick. Carries, lets go of or closes the open hologram. |
+| `submit(LevelRenderState, SubmitNodeCollector)` | Once a frame, while the level's features are gathered. Draws the open hologram. |
+| `onAttack()` | When the attack key fires. `true` means the hologram took the click, and the loader cancels the attack and the arm swing. |
+| `onScroll(double)` | When the mouse wheel would change the hotbar slot, with the wheel's vertical movement. `true` means the hologram took it, and the loader leaves the slot alone. |
+
+| Loader | Where its client half starts | Drawing hook |
+|---|---|---|
+| Fabric | `CoreFabricClient`, the `client` entry point | `LevelRenderEvents.COLLECT_SUBMITS` |
+| NeoForge | `CoreNeoForgeClient`, `@Mod(dist = Dist.CLIENT)` | `SubmitCustomGeometryEvent` |
+| Forge | `CoreForgeClient.start()`, called by `CoreForgeMod` on the client only | A mixin on `LevelRenderer.submitFeatures`, named in the jar's `MixinConfigs` manifest attribute, because Forge 26.2 has no event for drawing in the level |
+
+Each loader reaches `mcagents-core-client` only from that client half, so a dedicated server
+never links a client class.

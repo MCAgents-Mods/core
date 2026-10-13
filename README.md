@@ -21,9 +21,9 @@ wants and replays it.
 ## What is here today
 
 - A Gradle multi project build on **Java 25**: `api`, `common`,
-  `platforms/shared`, and one module per mod loader — `platforms/forge`,
-  `platforms/neoforge` and `platforms/fabric` — each building its own jar for
-  Minecraft 26.2, all under `io.github.mcagentsmods.core`. See
+  `platforms/shared`, `platforms/client`, and one module per mod loader —
+  `platforms/forge`, `platforms/neoforge` and `platforms/fabric` — each building
+  its own jar for Minecraft 26.2, all under `io.github.mcagentsmods.core`. See
   [`wiki/information/modules.md`](wiki/information/modules.md).
 - `MCAgentsProvider` — one registered client per vendor, for a simple question
   and answer — and `OpenRouterClient`, the routed client with tool calling,
@@ -33,6 +33,9 @@ wants and replays it.
 - A local web console that every mod registers its pages into, behind one
   loopback server and one token. See
   [`wiki/guides/web-pages.md`](wiki/guides/web-pages.md).
+- Holograms: panels a mod opens in the world in front of the player, who aims and
+  clicks, holds Z to move them, and leaves them behind beyond two chunks. See
+  [`wiki/api/hologram.md`](wiki/api/hologram.md).
 - An agent instruction set under `.agents/` — placement rules, git conventions,
   task workflow, and the creator agents that maintain the trees.
 - A documentation tree under `wiki/` for people, and an agent-facing knowledge and

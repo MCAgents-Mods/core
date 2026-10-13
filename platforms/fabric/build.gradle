@@ -1,4 +1,4 @@
-// The Fabric mod jar: core's api, common and shared code, plus the two Fabric
+// The Fabric mod jar: core's api, common, shared and client code, plus the two Fabric
 // entry points. The only module that may reference Fabric types.
 
 plugins {
@@ -9,6 +9,10 @@ loom {
     mods {
         'mcagents_core' {
             sourceSet sourceSets.main
+            // The dev client loads the client module as part of this mod, as the jar
+            // merges it, so it finds the module's strings. Only a Loom module can be
+            // named here; api, common and shared carry no assets.
+            sourceSet 'main', ':platforms:client'
         }
     }
 }
@@ -21,12 +25,13 @@ dependencies {
     implementation project(':api')
     implementation project(':common')
     implementation project(':platforms:shared')
+    implementation project(':platforms:client')
 }
 
-// api, common and shared are plain Java, so their classes are merged into the
-// mod jar rather than nested as separate Fabric mods. Every other loader jar
-// does the same, which is what makes each one self-contained.
-def bundledModules = [':api', ':common', ':platforms:shared']
+// api, common, shared and client are core's own modules, so their classes are
+// merged into the mod jar rather than nested as separate Fabric mods. Every
+// other loader jar does the same, which is what makes each one self-contained.
+def bundledModules = [':api', ':common', ':platforms:shared', ':platforms:client']
 
 tasks.named('jar', Jar) {
     bundledModules.each { path ->
@@ -54,7 +59,7 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             // The mod jar alone, with no dependency list: it already carries
-            // api, common and shared, and the loader supplies the rest.
+            // api, common, shared and client, and the loader supplies the rest.
             artifact jar
 
             pom {

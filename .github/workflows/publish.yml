@@ -1,7 +1,7 @@
 name: Publish
 
-# Publishes the api, common, shared, fabric, forge and neoforge jars to GitHub
-# Packages and tags the commit when a release lands on master.
+# Publishes the api, common, shared, client, fabric, forge and neoforge jars to
+# GitHub Packages and tags the commit when a release lands on master.
 #
 # The version is project-version in gradle.properties. The first step looks for
 # the v{version} tag on the remote: when it exists the run stops there, so an

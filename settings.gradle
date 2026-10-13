@@ -41,9 +41,13 @@ include 'common'
 // one is running. Plain Java, compiled without any loader toolchain.
 include 'platforms:shared'
 
+// What core draws in the game and the input that drives it, on the client only.
+// Compiled against vanilla Minecraft, never a loader.
+include 'platforms:client'
+
 // One module per mod loader. Each brings its own toolchain and builds its own
-// jar carrying api, common and shared — a loader never loads another loader's
-// classes, so the jars are never merged.
+// jar carrying api, common, shared and client — a loader never loads another
+// loader's classes, so the jars are never merged.
 include 'platforms:forge'
 include 'platforms:neoforge'
 include 'platforms:fabric'
