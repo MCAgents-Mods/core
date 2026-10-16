@@ -1,7 +1,7 @@
 # Modules
 
 The build is a Gradle multi project defined in `settings.gradle`, with
-`rootProject.name = core`. It has seven modules, and every package under them is
+`rootProject.name = core`. It has eight modules, and every package under them is
 prefixed `io.github.mcagentsmods.core`. The four that compile against Minecraft
 are built for the one Minecraft version core supports, the latest release; see
 [The Minecraft version](#the-minecraft-version).
@@ -9,8 +9,9 @@ are built for the one Minecraft version core supports, the latest release; see
 ## The module graph
 
 ```
-api                 pure Java contracts
- └── common         pure Java implementations
+tool                pure Java tools: the registry, the worker pool, the executor
+ └── api            pure Java contracts
+      └── common    pure Java implementations
 
 platforms/shared    loader-agnostic mod code, both physical sides
 platforms/client    loader-agnostic client code against vanilla Minecraft
@@ -26,6 +27,7 @@ Each loader module depends on both `platforms/shared` and `platforms/client`, an
 
 | Module | Package | Purpose |
 |---|---|---|
+| `tool` | `…core.tool` | Tools in pure Java: what a tool is (`ToolSpec`, `ToolSchema`, `ToolArguments`, `ToolResult`), the registry every mod adds tools to, the worker pool that runs them, and the executor that runs one turn's calls. It compiles against the JDK alone, so plain Java can use it without the rest of core. See [`tools.md`](tools.md). |
 | `api` | `…core.api` | Pure Java contracts: interfaces, records, enums, abstract types. `chat` and `llm` describe the per-vendor client, `model` the routed model client, `http` its transport, `token` the credential storage contract, and `hologram` what a hologram shows. No implementation, and no platform type anywhere. |
 | `common` | `…core.common` | Pure Java implementations of those contracts — `common.model` holds `OpenRouterClient`, `common.http` the JDK transport, and `common.hologram` the arithmetic that places, aims at, lays out and scrolls a hologram, and wraps and edits its text. Still no platform type. Its `testFixtures` source set holds `StubTransport` and `StubKeySource`. |
 | `platforms:shared` | `…core.shared` | The code every loader shares: `CoreRuntime` (start and stop), the machinery that decides which physical side is running, and the two sides as packages — `…shared.client` and `…shared.server`. Plain Java, no loader toolchain. |
@@ -69,7 +71,7 @@ the catalog block, and each module's version folder are renamed and updated, and
 version is not kept. Core 0.7.0 built for 26.2 and 26.3 side by side; from 0.8.0 core
 builds for 26.3 alone.
 
-`api`, `common` and `platforms:shared` name no Minecraft type, so they are built once.
+`tool`, `api`, `common` and `platforms:shared` name no Minecraft type, so they are built once.
 
 ## One jar per loader
 
@@ -78,9 +80,9 @@ loader never loads another loader's classes, and a merged jar would carry two
 loaders' worth of dead code into every game. All three declare the mod id
 `mcagents_core`.
 
-Each jar carries the classes of `api`, `common`, `platforms:shared` and
+Each jar carries the classes of `tool`, `api`, `common`, `platforms:shared` and
 `platforms:client` merged in beside its own entry point, so it is self-contained.
-None of those four names a loader type, so they are merged rather than nested as
+None of those five names a loader type, so they are merged rather than nested as
 separate mods. Gson is not bundled: Minecraft puts it on the classpath for every
 loader. The Forge jar also names its mixin configuration in its manifest, as
 `MixinConfigs`.
@@ -119,20 +121,21 @@ The three plugins are declared once in the root `build.gradle` with
 applies its own. Core builds for **Minecraft 26.3**, the latest release. Minecraft 26.x ships
 unobfuscated, so no module declares a mappings coordinate.
 
-`api`, `common` and `platforms:shared` use none of these toolchains. That is
+`tool`, `api`, `common` and `platforms:shared` use none of these toolchains. That is
 what keeps them testable without a game running. `platforms:client` uses Loom
 only to compile against the game; the hologram's arithmetic lives in
 `common.hologram` so that it is tested without one.
 
 ## Published artifacts
 
-Only the library modules carry a publication: `api`, `common`, `shared` and `client`. The
+Only the library modules carry a publication: `tool`, `api`, `common`, `shared` and `client`. The
 three loader modules build their mod jars but publish nothing to GitHub Packages; the Release
 workflow attaches those jars to each version's GitHub release instead. The jar a module builds is named `MCAgentsCore{Module}-{version}.jar`, with
 `+{minecraft}` before `.jar` for a Minecraft-facing one; its Maven coordinates are:
 
 | Module | Jar base name | Coordinates |
 |---|---|---|
+| `tool` | `MCAgentsCoreTool` | `io.github.mcagentsmods:core-tool` |
 | `api` | `MCAgentsCoreApi` | `io.github.mcagentsmods:core-api` |
 | `common` | `MCAgentsCoreCommon` | `io.github.mcagentsmods:core-common` |
 | `platforms/shared` | `MCAgentsCoreShared` | `io.github.mcagentsmods:core-shared` |

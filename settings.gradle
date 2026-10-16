@@ -32,8 +32,9 @@ plugins {
 
 rootProject.name = 'core'
 
-// Pure Java layers. Everything else compiles against these two and never the
-// other way around.
+// Pure Java layers. Everything else compiles against these three and never the
+// other way around. tool needs nothing but the JDK; api builds on it.
+include 'tool'
 include 'api'
 include 'common'
 
@@ -56,7 +57,7 @@ def minecraftVersion = '26.3'
 // Compiled against vanilla Minecraft, never a loader.
 //
 // Then one module per mod loader. Each brings its own toolchain and builds its
-// own jar carrying api, common, shared and client — a loader never loads another
+// own jar carrying tool, api, common, shared and client — a loader never loads another
 // loader's classes, so the jars are never merged.
 ['client', 'forge', 'neoforge', 'fabric'].each { module ->
     include "platforms:${module}"

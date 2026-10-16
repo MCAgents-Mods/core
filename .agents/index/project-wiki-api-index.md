@@ -32,6 +32,15 @@ scope per page; a page that would need an unrelated heading is split.
 | [`../../wiki/api/failures.md`](../../wiki/api/failures.md) | `AgentException` and `ModelException`: what a failed future means and what to do. |
 | [`../../wiki/api/test-fixtures.md`](../../wiki/api/test-fixtures.md) | `StubTransport` and `StubKeySource`, for a consumer's tests. |
 
+## Tools
+
+| File | Purpose |
+|---|---|
+| [`../../wiki/api/tool-registry.md`](../../wiki/api/tool-registry.md) | `ToolRegistry`: registering a tool, its categories, and the handle that removes it. |
+| [`../../wiki/api/tool-spec.md`](../../wiki/api/tool-spec.md) | `ToolSpec` and `ToolSchema`: what the model is told about a tool and its arguments. |
+| [`../../wiki/api/tool-arguments.md`](../../wiki/api/tool-arguments.md) | `ToolArguments` and `ToolResult`: reading what the model sent and answering it. |
+| [`../../wiki/api/tool-execution.md`](../../wiki/api/tool-execution.md) | `Tool`, `AsyncTool`, `ToolExecutor` and `WorkerPool`: how calls run, in what order, and on how many workers. |
+
 ## In the game
 
 | File | Purpose |

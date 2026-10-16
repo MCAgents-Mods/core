@@ -66,7 +66,7 @@ Each loader starts a development client with core loaded, in its version subproj
 ./gradlew :platforms:forge:runClient
 ```
 
-The client loads the mod the way its jar would: `api`, `common` and `shared` are part of
+The client loads the mod the way its jar would: `tool`, `api`, `common` and `shared` are part of
 `mcagents_core`, not separate pieces. NeoForge is told so through the mod's source sets;
 Forge treats the directory holding `mods.toml` as the whole mod, so its run task first
 copies every bundled module into `platforms/forge/{minecraft}/build/devMod/` and starts the
@@ -116,7 +116,7 @@ when a release reaches `master` — so run this command before opening one.
 ## Publish the modules
 
 The library modules are published to GitHub Packages as
-`io.github.mcagentsmods:core-{module}` — `api`, `common`, `shared` and `client`,
+`io.github.mcagentsmods:core-{module}` — `tool`, `api`, `common`, `shared` and `client`,
 with no Minecraft version in their id. The `forge`, `neoforge` and `fabric` mod jars are not
 published there; the Release workflow below attaches them to the version's GitHub release:
 

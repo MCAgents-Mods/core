@@ -15,7 +15,9 @@ per player state, so a consumer keeps whatever history it wants and replays it.
 
 ## Current state
 
-The `api` and `common` modules carry the agent API and its implementation.
+The `tool` module holds tools in pure Java: the registry every mod adds tools to and the
+worker pool that runs them. The `api` and `common` modules carry the agent API and its
+implementation.
 `platforms/shared` holds what every loader shares, including the two physical
 sides, `platforms/client` the holograms, drawn through vanilla Minecraft, and
 `platforms/{forge,neoforge,fabric}` each build one mod jar for the latest Minecraft
@@ -28,7 +30,7 @@ release, today 26.3, the only version core supports. What exists today is:
 | `LICENSE` | MIT license, `Copyright (c) 2026 MCAgents`. |
 | `settings.gradle`, `build.gradle`, `gradle.properties` | The Gradle multi project build configuration. |
 | `gradlew`, `gradlew.bat`, `gradle/` | The Gradle wrapper and the version catalog. |
-| `api/`, `common/`, `platforms/` | The seven build modules — see [`modules.md`](modules.md). |
+| `tool/`, `api/`, `common/`, `platforms/` | The eight build modules — see [`modules.md`](modules.md). |
 | `.agents/` | The agent instruction set — rules, git conventions, planning, platform knowledge, prompts, creators — plus the index, agent-wiki, and memory trees. |
 | `wiki/` | This documentation tree. |
 | `.github/workflows/publish.yml` | The Publish workflow, which ships each new version from `master`. |
