@@ -5,7 +5,7 @@ description: Dropping Minecraft 26.2 so core supports only the latest release (2
 
 # Task: only the latest Minecraft version
 
-**Status:** in progress
+**Status:** done in core once the pull requests below merge and Release makes `v0.8.0` with three jars; agents, chat and the template follow in their own repositories
 
 ## The request
 
@@ -35,10 +35,10 @@ project's shared files.
 
 | # | Title | Branch | PR |
 |---|---|---|---|
-| 1 | Task record | `chore/latest-minecraft-plan` | |
-| 2 | Only Minecraft 26.3 | `build/latest-minecraft` | |
-| 3 | Unversioned project and artifact ids | `build/unversioned-ids` | |
-| 4 | Release 0.8.0 | `release/0.8.0` | |
+| 1 | Task record | `chore/latest-minecraft-plan` | #36 |
+| 2 | Only Minecraft 26.3 | `build/latest-minecraft` | #37 |
+| 3 | Unversioned project and artifact ids | `build/unversioned-ids` | #38 |
+| 4 | Release 0.8.0 | `release/0.8.0` | #39 |
 
 ### Task 1 — chore/latest-minecraft-plan
 
@@ -70,3 +70,11 @@ folder `platforms/{module}/26.3`. So the published ids are `mcagents-core-client
 `wiki/information/modules.md`, the repository map, and the `build.gradle` comment.
 agents and chat substitute these project paths for the published ids in their composite
 builds, so they move to the new names in their own `build/unversioned-ids`.
+
+### Task 4 — release/0.8.0
+
+`project-version` is `0.8.0`, a minor because a supported Minecraft version and the published
+ids change. `wiki/logs/0/8/0/CHANGELOG.md` and its logs-index row are new, and the overview,
+repository map, repository rule and state file carry the version. Merging it makes Publish
+publish 0.8.0 (`mcagents-core-{api,common,shared,client,fabric,neoforge,forge}`) and push
+`v0.8.0`, and Release attach three jars, one per loader, all `+26.3`.
