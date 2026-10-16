@@ -3,7 +3,7 @@
 `OpenRouterClient` is the client for a mod that needs tool calling, embeddings, prompt
 caching, retries or per-request routing. Give it a transport, a key source and, optionally,
 routes; it then rotates keys, retries what is worth retrying, and sends each request to
-OpenRouter or straight to the platform. It is what `MCAgents-Mods/agents` and
+OpenRouter or straight to the platform. It is what core's own [agent](agent.md) and
 `MCAgents-Mods/chat` call. For one fixed key per vendor and plain chat,
 [`MCAgentsProvider`](provider.md) is simpler.
 

@@ -21,6 +21,7 @@ never seen the repository. Knowledge written for agents belongs to
 |---|---|
 | [`../../wiki/information/overview.md`](../../wiki/information/overview.md) | What this repository is, what it is for, and what it contains today. |
 | [`../../wiki/information/modules.md`](../../wiki/information/modules.md) | The build modules, how they depend on each other, and what is published. |
+| [`../../wiki/information/agent.md`](../../wiki/information/agent.md) | How core's agent answers a prompt: the three model steps and tool rounds. |
 | [`../../wiki/information/tools.md`](../../wiki/information/tools.md) | What a tool is: its spec, categories, failures as results, the two kinds of work, and the worker limit. |
 | [`../../wiki/information/mod-sides.md`](../../wiki/information/mod-sides.md) | How the mod half runs on a client and a dedicated server from one jar, without either side loading the other's code. |
 

@@ -39,6 +39,8 @@ scope per page; a page that would need an unrelated heading is split.
 | [`../../wiki/api/tool-registry.md`](../../wiki/api/tool-registry.md) | `ToolRegistry`: registering a tool, its categories, and the handle that removes it. |
 | [`../../wiki/api/tool-spec.md`](../../wiki/api/tool-spec.md) | `ToolSpec` and `ToolSchema`: what the model is told about a tool and its arguments. |
 | [`../../wiki/api/tool-arguments.md`](../../wiki/api/tool-arguments.md) | `ToolArguments` and `ToolResult`: reading what the model sent and answering it. |
+| [`../../wiki/api/agent.md`](../../wiki/api/agent.md) | `Agents.agent`, `Agent`, `AgentRequest`, `AgentAnswer` and `ToolAgent`: asking the agent a question it answers with the tools it needs. |
+| [`../../wiki/api/settings.md`](../../wiki/api/settings.md) | `AgentSettings` and `Agents.update`: the worker limit and tool rounds the player sets, and their file. |
 | [`../../wiki/api/tool-execution.md`](../../wiki/api/tool-execution.md) | `Tool`, `AsyncTool`, `ToolExecutor` and `WorkerPool`: how calls run, in what order, and on how many workers. |
 
 ## In the game

@@ -72,3 +72,17 @@ API pages and `wiki/information/tools.md` moved from agents, without the parts a
 its settings and `ClientThreadTools`, which arrive with that code in tasks 3 and 4. The module,
 dependency, setup and overview pages, the README, the repository map, the state file, the
 Publish header and both wiki indexes name the new module.
+
+### Task 3 — feat/tool-agent
+
+Agents' pure-Java contracts and their implementations are in core: `Agent`, `AgentRequest`
+and `AgentAnswer` in `core.api.agent`, `AgentButton` in `core.api.button`, and `Agents`,
+`AgentButtons`, `AgentSettings`, `AgentsPaths`, `ToolAgent` and `Selection` in
+`core.common.agent`, with their four test classes. `MCAgentsAgents` is gone: `AgentsPaths`
+carries the two folder names itself, `MCAgents` and `agents`, so the settings file stays at
+`MCAgents/agents/settings.properties`. Each new package has a `package-info`. The agent and
+settings API pages and `wiki/information/agent.md` moved from agents, without the agents menu
+and the start-up, which arrive in task 4; the tool pages regained `Agents.tools()`,
+`Agents.workers()` and the settings paragraph. The dependency, module, model-client pages,
+the repository map and both wiki indexes name the new packages. Nothing calls `Agents.start`
+yet, so until task 4 the settings apply in memory only.

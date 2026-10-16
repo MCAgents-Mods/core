@@ -23,8 +23,8 @@ Full description: [`../../../wiki/information/overview.md`](../../../wiki/inform
 | Path | What it is |
 |---|---|
 | `tool/` | Tools in pure Java: `ToolSpec`, `ToolSchema`, `ToolArguments`, `ToolResult`, the shared `ToolRegistry`, `WorkerPool` and `ToolExecutor`. Depends on the JDK alone. |
-| `api/` | Pure Java API contracts — chat, llm, token, model, http and hologram packages. Depends on `tool/` alone. |
-| `common/` | The implementation: `MCAgentsProvider`, the vendor clients, credential pooling, the routed `OpenRouterClient` (`common.model`), `JdkHttpTransport` (`common.http`), and the hologram's placement, layout, scrolling and text arithmetic (`common.hologram`). |
+| `api/` | Pure Java API contracts — chat, llm, token, model, http, hologram, agent and button packages. Depends on `tool/` alone. |
+| `common/` | The implementation: `MCAgentsProvider`, the vendor clients, credential pooling, the routed `OpenRouterClient` (`common.model`), `JdkHttpTransport` (`common.http`), the hologram's placement, layout, scrolling and text arithmetic (`common.hologram`), and the agent layer (`common.agent`): `Agents`, `ToolAgent` and the player's `AgentSettings`. |
 | `common/src/testFixtures/` | `StubTransport` and `StubKeySource`, published for consumers' tests. |
 | `platforms/shared/` | What every loader shares: `CoreRuntime`, the side-guard machinery, and the client and server halves as packages. Plain Java. |
 | `platforms/client/` | The holograms: drawing, aiming, clicks, the wheel, the Z key and the two-chunk range, against vanilla Minecraft through Loom, and the `en_us` lang file for the key and the footer. Client only; no loader type. |
