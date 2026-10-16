@@ -133,10 +133,10 @@ workflow attaches those jars to each version's GitHub release instead. The jar a
 
 | Module | Jar base name | Coordinates |
 |---|---|---|
-| `api` | `MCAgentsCoreApi` | `io.github.mcagentsmods:mcagents-core-api` |
-| `common` | `MCAgentsCoreCommon` | `io.github.mcagentsmods:mcagents-core-common` |
-| `platforms/shared` | `MCAgentsCoreShared` | `io.github.mcagentsmods:mcagents-core-shared` |
-| `platforms/client/{minecraft}` | `MCAgentsCoreClient` | `io.github.mcagentsmods:mcagents-core-client` |
+| `api` | `MCAgentsCoreApi` | `io.github.mcagentsmods:core-api` |
+| `common` | `MCAgentsCoreCommon` | `io.github.mcagentsmods:core-common` |
+| `platforms/shared` | `MCAgentsCoreShared` | `io.github.mcagentsmods:core-shared` |
+| `platforms/client/{minecraft}` | `MCAgentsCoreClient` | `io.github.mcagentsmods:core-client` |
 | `platforms/forge/{minecraft}` | `MCAgentsCoreForge` | Not published: attached to the GitHub release |
 | `platforms/neoforge/{minecraft}` | `MCAgentsCoreNeoforge` | Not published: attached to the GitHub release |
 | `platforms/fabric/{minecraft}` | `MCAgentsCoreFabric` | Not published: attached to the GitHub release |
@@ -145,24 +145,26 @@ workflow attaches those jars to each version's GitHub release instead. The jar a
 artifact id. Before 0.7.0 these four ids had no version suffix either and were built for
 Minecraft 26.2 only; 0.7.0 published a `-26.2` and a `-26.3` id for each, side by side, and
 from 0.8.0 the ids are those above again, built for 26.3. Up to 0.8.0 the loader modules were
-published too, as `mcagents-core-{loader}`.
+published too, as `mcagents-core-{loader}`, and every artifact id started with `mcagents-`, as
+in `mcagents-core-api`; from 0.9.0 on the ids are those above.
 
-`mcagents-core-common` also publishes its test fixtures as a variant, so a consumer can
+`core-common` also publishes its test fixtures as a variant, so a consumer can
 test against `StubTransport` and `StubKeySource` with
-`testFixtures('io.github.mcagentsmods:mcagents-core-common:{version}')`, from 0.5.1 on.
+`testFixtures('io.github.mcagentsmods:core-common:{version}')`, from 0.9.0 on (0.5.1 to
+0.8.0 answer the same notation as `mcagents-core-common`).
 0.5.0 published the fixtures under the capability `io.github.mcagentsmods:common-test-fixtures`
 only, which that notation does not ask for. The fixtures are never bundled into a loader
 jar.
 
-The `artifactId` is qualified with `mcagents-` and the root project name
-deliberately. Without it, every project in this group would publish a colliding
-`io.github.mcagentsmods:api`, and a consumer could not depend on `core` and
-another mod at the same time.
+The `artifactId` is qualified with the root project name deliberately. Without it,
+every project in this group would publish a colliding `io.github.mcagentsmods:api`,
+and a consumer could not depend on `core` and another mod at the same time. The group
+already says MCAgents, so the id does not repeat it.
 
-`mcagents-core-client` declares no dependency:
+`core-client` declares no dependency:
 Minecraft comes from the consumer's own toolchain. A mod compiles against
-`mcagents-core-api` and `mcagents-core-common`, and the
-`mcagents-core-client`, built for the Minecraft version core supports, to open
+`core-api` and `core-common`, and the
+`core-client`, built for the Minecraft version core supports, to open
 holograms. A development run that needs core loaded takes the loader jar from core's GitHub
 release, or builds it from a core checkout.
 

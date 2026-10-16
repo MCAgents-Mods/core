@@ -2,8 +2,8 @@
  * Settings for the MCAgents core multi project build.
  *
  * The root project is named `core`, which is what gives the published
- * modules their `mcagents-core-{module}` artifact ids — see the
- * `artifactId` rule in the root `build.gradle`.
+ * modules their `core-{module}` artifact ids — see the `artifactId` rule in
+ * the root `build.gradle`.
  */
 
 pluginManagement {

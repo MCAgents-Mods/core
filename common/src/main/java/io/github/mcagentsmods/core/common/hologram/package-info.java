@@ -4,7 +4,7 @@
  * hologram follows the player, the two-chunk rule, where each panel's parts are, scrolling,
  * and wrapping and editing text.
  *
- * <p>Core's client module ({@code mcagents-core-client}) is the caller; a mod opens a hologram
+ * <p>Core's client module ({@code core-client}) is the caller; a mod opens a hologram
  * through that module and never needs these classes. Lengths are in blocks unless a method
  * says panel pixels, and angles are Minecraft yaw degrees.
  */

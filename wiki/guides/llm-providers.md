@@ -19,8 +19,8 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'io.github.mcagentsmods:mcagents-core-api:{version}'
-    compileOnly 'io.github.mcagentsmods:mcagents-core-common:{version}'
+    compileOnly 'io.github.mcagentsmods:core-api:{version}'
+    compileOnly 'io.github.mcagentsmods:core-common:{version}'
 }
 ```
 

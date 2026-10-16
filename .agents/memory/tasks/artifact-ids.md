@@ -70,3 +70,13 @@ still build their jars, which the Release workflow picks up from `platforms/{loa
 unchanged. The Publish header, the root build comment, the dependency, setup and modules pages
 and the repository map now say the loader jars go to GitHub releases only. Artifact ids are
 still `mcagents-core-*` here; task 3 renames them.
+
+### Task 3 — build/artifact-ids
+
+The `artifactId` rule in the root build is `${rootProject.name}-${project.name}`, so core
+publishes `core-api`, `core-common`, `core-shared` and `core-client`, and common's extra
+test-fixture capability is `core-common-test-fixtures`. The API, module, setup and guide pages,
+`settings.gradle`, the state file and two `package-info` comments name the new coordinates;
+the dependency, module and test-fixture pages say what the ids were before 0.9.0. Released
+changelogs, the logs index and earlier task records keep the old names, which were true when
+written.

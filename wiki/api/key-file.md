@@ -11,7 +11,7 @@ SharedTokenStore store = new SharedTokenStore(gameDirectory, logger);
 MCAgentsProvider.instance.registerStore(LlmVendor.OPENROUTER, store);
 ```
 
-The types are in `mcagents-core-shared`: `…shared.store` for the file and the client's
+The types are in `core-shared`: `…shared.store` for the file and the client's
 directory, `…shared.server.ServerRunDirectory` for the server's.
 
 ## The file

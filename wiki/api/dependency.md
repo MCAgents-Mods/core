@@ -1,8 +1,8 @@
 # Dependency
 
-A mod compiles against `mcagents-core-api` and `mcagents-core-common` as `compileOnly`, and the
+A mod compiles against `core-api` and `core-common` as `compileOnly`, and the
 `mcagents_core` mod supplies both in game. A mod that opens holograms adds
-`mcagents-core-client` the same way, building for the Minecraft version core supports,
+`core-client` the same way, building for the Minecraft version core supports,
 26.3. This page says which artifact holds what, and how to reach them.
 
 ## Add it
@@ -19,11 +19,11 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'io.github.mcagentsmods:mcagents-core-api:{version}'
-    compileOnly 'io.github.mcagentsmods:mcagents-core-common:{version}'
+    compileOnly 'io.github.mcagentsmods:core-api:{version}'
+    compileOnly 'io.github.mcagentsmods:core-common:{version}'
     // Only to open holograms, and only in a module that compiles against Minecraft:
     // built for the one Minecraft version core supports, the latest release.
-    compileOnly 'io.github.mcagentsmods:mcagents-core-client:{version}'
+    compileOnly 'io.github.mcagentsmods:core-client:{version}'
 }
 ```
 
@@ -32,7 +32,7 @@ dependencies {
 classpath. GitHub Packages asks for credentials even to read, so the token needs
 `read:packages`.
 
-`mcagents-core-client` names Minecraft's client classes and declares no dependency
+`core-client` names Minecraft's client classes and declares no dependency
 of its own, so the module that uses it brings that Minecraft version through its own toolchain,
 and calls it only from code that runs on the client. Core builds it for the latest Minecraft
 release alone, and its id carries no Minecraft version, so a mod builds for that release too.
@@ -45,15 +45,16 @@ coordinates as `testImplementation`.
 
 | Artifact | Packages | Holds | Page |
 |---|---|---|---|
-| `mcagents-core-api` | `…core.api`, `.chat`, `.llm`, `.token`, `.model`, `.http`, `.hologram` | Contracts only: interfaces, records, enums. No implementation. | Every page below |
-| `mcagents-core-common` | `…core.common`, `.model`, `.http`, `.hologram` | The implementations: `MCAgentsProvider`, `OpenRouterClient`, `JdkHttpTransport`, and the hologram's placement, layout, scrolling and text arithmetic, which `mcagents-core-client` uses. | [`provider.md`](provider.md), [`model-client.md`](model-client.md), [`http.md`](http.md) |
-| `mcagents-core-common`, test fixtures | `…core.common.testing` | `StubTransport` and `StubKeySource`, for a consumer's tests. | [`test-fixtures.md`](test-fixtures.md) |
-| `mcagents-core-shared` | `…core.shared` and below | What the loader entry points start: sides, the shared key file, the token commands. | [`mod-runtime.md`](mod-runtime.md), [`key-file.md`](key-file.md), [`token-commands.md`](token-commands.md) |
-| `mcagents-core-client` | `…core.client.hologram` | `Holograms`, which opens and closes holograms, and the drawing and input behind it. Client only; published for the latest Minecraft release alone, compiled against it. | [`hologram.md`](hologram.md), [`hologram-panels.md`](hologram-panels.md) |
+| `core-api` | `…core.api`, `.chat`, `.llm`, `.token`, `.model`, `.http`, `.hologram` | Contracts only: interfaces, records, enums. No implementation. | Every page below |
+| `core-common` | `…core.common`, `.model`, `.http`, `.hologram` | The implementations: `MCAgentsProvider`, `OpenRouterClient`, `JdkHttpTransport`, and the hologram's placement, layout, scrolling and text arithmetic, which `core-client` uses. | [`provider.md`](provider.md), [`model-client.md`](model-client.md), [`http.md`](http.md) |
+| `core-common`, test fixtures | `…core.common.testing` | `StubTransport` and `StubKeySource`, for a consumer's tests. | [`test-fixtures.md`](test-fixtures.md) |
+| `core-shared` | `…core.shared` and below | What the loader entry points start: sides, the shared key file, the token commands. | [`mod-runtime.md`](mod-runtime.md), [`key-file.md`](key-file.md), [`token-commands.md`](token-commands.md) |
+| `core-client` | `…core.client.hologram` | `Holograms`, which opens and closes holograms, and the drawing and input behind it. Client only; published for the latest Minecraft release alone, compiled against it. | [`hologram.md`](hologram.md), [`hologram-panels.md`](hologram-panels.md) |
 
 Every package is prefixed `io.github.mcagentsmods`. Every artifact is published under the
 group `io.github.mcagentsmods` with the same version; `project-version` in core's
-`gradle.properties` is that version. The Fabric, NeoForge and Forge mod jars are not on
+`gradle.properties` is that version. Before 0.9.0 each artifact id started with `mcagents-`,
+as in `mcagents-core-api`. The Fabric, NeoForge and Forge mod jars are not on
 GitHub Packages: each version's GitHub release carries one per loader, for a player or for a
 development run that needs core loaded.
 

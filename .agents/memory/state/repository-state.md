@@ -21,7 +21,7 @@ history, read `wiki/logs/`.
   entry points: `MCAgentsProvider`, one client per vendor for OpenRouter, OpenAI,
   DeepSeek, and Anthropic; and `OpenRouterClient`, the routed client moved from
   `MCAgents-Mods/chat` with tool calling, embeddings, prompt-cache hints, retries,
-  key rotation and direct provider routes. `mcagents-core-common` publishes `StubTransport`
+  key rotation and direct provider routes. `core-common` publishes `StubTransport`
   and `StubKeySource` as test fixtures.
 - Holograms, in `platforms/client`: panels a mod opens in the level with
   `Holograms.open`, described by the records in `api.hologram`. The player aims and

@@ -1,7 +1,7 @@
 # Hologram Panels
 
 The kinds of panel a [hologram](hologram.md) is made of. `HologramPanel` is a sealed interface
-in `mcagents-core-api`, under `io.github.mcagentsmods.core.api.hologram`, and each kind is a
+in `core-api`, under `io.github.mcagentsmods.core.api.hologram`, and each kind is a
 record that implements it. A mod builds the records; core draws them and handles the player's
 clicks, scrolling and typing on them. Opening, closing and moving a hologram are on
 [`hologram.md`](hologram.md).
