@@ -5,7 +5,8 @@ description: Dropping the repeated mcagents- from every published artifact id, p
 
 # Task: shorter artifact ids, library modules only
 
-**Status:** in progress
+**Status:** done once the pull requests below merge and Publish puts `core-*` 0.9.0 on GitHub
+Packages; agents, chat and the template follow in their own repositories
 
 ## The request
 
@@ -53,10 +54,10 @@ by the Release workflow.
 
 | # | Title | Branch | PR |
 |---|---|---|---|
-| 1 | Task record | `chore/artifact-ids-plan` | |
-| 2 | Library modules only | `build/publish-scope` | |
-| 3 | Shorter artifact ids | `build/artifact-ids` | |
-| 4 | Release 0.9.0 | `release/0.9.0` | |
+| 1 | Task record | `chore/artifact-ids-plan` | #40 |
+| 2 | Library modules only | `build/publish-scope` | #41 |
+| 3 | Shorter artifact ids | `build/artifact-ids` | #42 |
+| 4 | Release 0.9.0 | `release/0.9.0` | #43 |
 
 ### Task 1 — chore/artifact-ids-plan
 
@@ -80,3 +81,11 @@ test-fixture capability is `core-common-test-fixtures`. The API, module, setup a
 the dependency, module and test-fixture pages say what the ids were before 0.9.0. Released
 changelogs, the logs index and earlier task records keep the old names, which were true when
 written.
+
+### Task 4 — release/0.9.0
+
+`project-version` is `0.9.0`, a minor: every coordinate a consumer resolves changes. The 0.9.0
+changelog and its logs-index row are new, and the rule, the repository map, the overview and
+the state file say 0.9.0. Merging this branch is the release: Publish finds no `v0.9.0` tag,
+publishes the library modules and tags the commit, and Release then makes the `v0.9.0`
+release with the three loader jars.
