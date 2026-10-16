@@ -43,6 +43,7 @@ match on it before opening anything. Writing here needs no approval; see
 | [`../memory/tasks/release-workflow.md`](../memory/tasks/release-workflow.md) | `.github/workflows/`, GitHub releases | The Release workflow that attaches the Forge, Fabric and NeoForge jars to each tag's GitHub release, and releasing 0.6.1. |
 | [`../memory/tasks/minecraft-26-3.md`](../memory/tasks/minecraft-26-3.md) | Gradle builds, `platforms/`, Minecraft versions | Building every loader jar for Minecraft 26.2 and 26.3, one subproject per version, and releasing 0.7.0. |
 | [`../memory/tasks/latest-minecraft.md`](../memory/tasks/latest-minecraft.md) | Gradle builds, `platforms/`, Minecraft versions, published coordinates | Dropping 26.2 so core supports only the latest Minecraft release, removing the Minecraft suffix from project and artifact ids, and releasing 0.8.0. |
+| [`../memory/tasks/artifact-ids.md`](../memory/tasks/artifact-ids.md) | Gradle builds, published coordinates | Dropping `mcagents-` from every artifact id, publishing only the library modules, and releasing 0.9.0. |
 
 ## Decisions
 
