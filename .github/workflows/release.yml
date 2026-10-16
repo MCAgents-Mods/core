@@ -1,8 +1,9 @@
 name: Release
 
 # Builds core's mod jars, MCAgentsCoreForge, MCAgentsCoreFabric and
-# MCAgentsCoreNeoforge, once for every Minecraft version (each loader has a
-# subproject per version, platforms/{loader}/{minecraft}), and attaches them to a
+# MCAgentsCoreNeoforge, for every Minecraft version the tag builds (each loader
+# has a subproject per version, platforms/{loader}/{minecraft}; from 0.8.0 that is
+# the latest release alone), and attaches them to a
 # GitHub release for the v{version} tag that Publish created:
 # MCAgentsCoreFabric-{version}+{minecraft}.jar and so on. api, common, shared and
 # client are bundled inside each of them, so they are not attached on their own.

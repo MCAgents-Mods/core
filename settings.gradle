@@ -41,13 +41,16 @@ include 'common'
 // one is running. Plain Java, compiled without any loader toolchain.
 include 'platforms:shared'
 
-// Every Minecraft version core builds for. Each module below compiles against
-// Minecraft, so it is a folder of shared sources, platforms/{module}/src, with
-// one subproject per version in platforms/{module}/{version}, holding only what
-// differs for that version. The subproject is named {module}-{version}, as in
-// :platforms:fabric-26.2: two projects of one name would be one module to
-// Gradle. The catalog carries one block of coordinates per version.
-def minecraftVersions = ['26.2', '26.3']
+// The Minecraft version core builds for: only ever the latest release, never an
+// older one beside it. Each module below compiles against Minecraft, so it is a
+// folder of shared sources, platforms/{module}/src, with a subproject for the
+// version in platforms/{module}/{version}, holding only what is particular to
+// that version. The subproject is named {module}-{version}, as in
+// :platforms:fabric-26.3: two projects of one name would be one module to
+// Gradle. The catalog carries the version's block of coordinates. Moving to a
+// new Minecraft release replaces the entry here, the catalog block and each
+// module's version folder; nothing else names the version.
+def minecraftVersions = ['26.3']
 
 // What core draws in the game and the input that drives it, on the client only.
 // Compiled against vanilla Minecraft, never a loader.

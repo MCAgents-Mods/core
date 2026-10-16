@@ -43,3 +43,17 @@ project's shared files.
 ### Task 1 — chore/latest-minecraft-plan
 
 This record, the decision record, and their rows in the memory index.
+
+### Task 2 — build/latest-minecraft
+
+Every `platforms/{module}/26.2/` folder is gone: the four `build.gradle` files, 26.2's
+`RectangleSubmitter` and `AttackListener`, and its Forge `pack.mcmeta` (format 107).
+`settings.gradle` lists `['26.3']` alone, and the catalog lost its `-26-2` block. The comments
+in `settings.gradle`, the catalog, `platforms/minecraft.gradle`, `forge.gradle`, the two
+version classes, `build.gradle` and both workflows now describe one version, the latest
+release, and how moving to the next one replaces it. `release.yml` needs no logic change: it
+already collects `platforms/{loader}/*/build.gradle`, so it attaches three jars. Docs updated:
+README, `wiki/information/{modules,overview}.md`, `wiki/environments/setup.md`,
+`wiki/api/dependency.md`, the repository map and the state file. The instruction files
+`.agents/rules/repository.md` and `.agents/knowledge/minecraft-platform.md` still name 26.2;
+they are findings for the owner, not edited here.

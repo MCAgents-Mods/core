@@ -22,7 +22,7 @@ dependencies {
     compileOnly 'io.github.mcagentsmods:mcagents-core-api:{version}'
     compileOnly 'io.github.mcagentsmods:mcagents-core-common:{version}'
     // Only to open holograms, and only in a module that compiles against Minecraft:
-    // the one built for that module's Minecraft version, such as mcagents-core-client-26.2.
+    // the one built for the Minecraft version core supports, mcagents-core-client-26.3.
     compileOnly 'io.github.mcagentsmods:mcagents-core-client-{minecraft}:{version}'
 }
 ```
@@ -48,7 +48,7 @@ coordinates as `testImplementation`.
 | `mcagents-core-common` | `…core.common`, `.model`, `.http`, `.hologram` | The implementations: `MCAgentsProvider`, `OpenRouterClient`, `JdkHttpTransport`, and the hologram's placement, layout, scrolling and text arithmetic, which `mcagents-core-client` uses. | [`provider.md`](provider.md), [`model-client.md`](model-client.md), [`http.md`](http.md) |
 | `mcagents-core-common`, test fixtures | `…core.common.testing` | `StubTransport` and `StubKeySource`, for a consumer's tests. | [`test-fixtures.md`](test-fixtures.md) |
 | `mcagents-core-shared` | `…core.shared` and below | What the loader entry points start: sides, the shared key file, the token commands. | [`mod-runtime.md`](mod-runtime.md), [`key-file.md`](key-file.md), [`token-commands.md`](token-commands.md) |
-| `mcagents-core-client-{minecraft}` | `…core.client.hologram` | `Holograms`, which opens and closes holograms, and the drawing and input behind it. Client only; one artifact per Minecraft version, compiled against that version. | [`hologram.md`](hologram.md), [`hologram-panels.md`](hologram-panels.md) |
+| `mcagents-core-client-{minecraft}` | `…core.client.hologram` | `Holograms`, which opens and closes holograms, and the drawing and input behind it. Client only; published for the latest Minecraft release alone, compiled against it. | [`hologram.md`](hologram.md), [`hologram-panels.md`](hologram-panels.md) |
 | `mcagents-core-fabric-{minecraft}`, `-neoforge-`, `-forge-` | `…core.{loader}` | One mod jar per loader and Minecraft version, for a development run that needs core loaded. | — |
 
 Every package is prefixed `io.github.mcagentsmods`. Every artifact is published under the

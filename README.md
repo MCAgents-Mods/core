@@ -23,7 +23,7 @@ wants and replays it.
 - A Gradle multi project build on **Java 25**: `api`, `common`,
   `platforms/shared`, `platforms/client`, and one module per mod loader —
   `platforms/forge`, `platforms/neoforge` and `platforms/fabric` — each building
-  its own jar, one per Minecraft version (26.2 and 26.3), all under
+  its own jar for Minecraft 26.3, the only version core supports, all under
   `io.github.mcagentsmods.core`. See
   [`wiki/information/modules.md`](wiki/information/modules.md).
 - `MCAgentsProvider` — one registered client per vendor, for a simple question
