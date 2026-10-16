@@ -1,6 +1,6 @@
 ---
 name: wiki-information-agent
-description: How core's agent answers a prompt — the three model steps and tool rounds — with the calls and the player's settings on the API pages.
+description: How core's agent answers a prompt — the three model steps and tool rounds — with the calls, the player's settings and the agents menu on the API pages.
 ---
 
 # The agent
@@ -10,7 +10,8 @@ model client. It never sends the model every tool at once: it narrows them down 
 steps, each one request.
 
 This page says how it works. The calls are on the API pages:
-[asking the agent](../api/agent.md) and [the player's settings](../api/settings.md).
+[asking the agent](../api/agent.md), [the player's settings](../api/settings.md) and
+[the agents menu's buttons](../api/buttons.md).
 
 ## The three steps
 

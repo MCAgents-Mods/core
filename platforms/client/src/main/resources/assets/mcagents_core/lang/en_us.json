@@ -1,8 +1,18 @@
 {
   "key.category.mcagents_core.main": "MCAgents Core",
   "key.mcagents_core.move": "Move a hologram (hold)",
+  "key.mcagents_core.agents": "Show or hide the agents menu",
   "hologram.mcagents_core.hint": "Hold %s to Move | Auto dismiss beyond 2 Chunks",
   "hologram.mcagents_core.send": "Send",
   "hologram.mcagents_core.prompt.hint": "Click here to type",
-  "hologram.mcagents_core.typing": "Enter to send | Shift+Enter for a new line | Esc to stop typing"
+  "hologram.mcagents_core.typing": "Enter to send | Shift+Enter for a new line | Esc to stop typing",
+  "gui.mcagents_core.agents.title": "MCAgents",
+  "gui.mcagents_core.agents.settings": "Settings",
+  "gui.mcagents_core.agents.settings.title": "Agents settings",
+  "gui.mcagents_core.agents.settings.workers": "Tool calls at once",
+  "gui.mcagents_core.agents.settings.workers.help": "Default %s, from %s to %s.",
+  "gui.mcagents_core.agents.settings.rounds": "Tool rounds per question",
+  "gui.mcagents_core.agents.settings.rounds.help": "Default %s, up to %s.",
+  "gui.mcagents_core.agents.settings.defaults": "Defaults",
+  "gui.mcagents_core.agents.settings.save": "Save"
 }

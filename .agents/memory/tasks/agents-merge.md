@@ -86,3 +86,17 @@ and the start-up, which arrive in task 4; the tool pages regained `Agents.tools(
 `Agents.workers()` and the settings paragraph. The dependency, module, model-client pages,
 the repository map and both wiki indexes name the new packages. Nothing calls `Agents.start`
 yet, so until task 4 the settings apply in memory only.
+
+### Task 4 — feat/agents-menu
+
+Agents' game code is in `platforms/client`, package `core.client.agent`: `AgentsRuntime`,
+`AgentsKeys`, `AgentsMenu`, `ClientThreadTools` and `gui.AgentsSettingsScreen`, logging through
+`java.util.logging` under `MCAgents Core` like the rest of the client module. Each loader's
+client half registers G beside Z in core's Controls category, calls `AgentsKeys.onEndTick` every
+tick and starts `AgentsRuntime` with the game directory. The menu's id is `mcagents_core.menu`
+and its strings moved into core's `en_us.json` as `key.mcagents_core.agents` and
+`gui.mcagents_core.agents.*`. All three manifests refuse `mcagents_agents`: Fabric through
+`breaks`, NeoForge as `incompatible`, Forge as an optional dependency whose range, `(,0.1.0)`,
+holds no released agents version. The buttons page moved from agents, `mod-runtime.md` gained
+the agent layer's start-up and `AgentsPaths`, and the tool, settings, agent, dependency,
+module, overview pages, the README, the map and the state file describe the menu.

@@ -33,8 +33,8 @@ call-2 The tool call failed: The argument 'text' is required
 call-3 The tool call failed: there is no tool called 'missing'
 ```
 
-Every type on this page is in `io.github.mcagentsmods.core.tool`, in `core-tool`.
-What the two kinds of work and the worker limit mean is on
+Every type on this page is in `io.github.mcagentsmods.core.tool`, in `core-tool`,
+except `ClientThreadTools`. What the two kinds of work and the worker limit mean is on
 [`../information/tools.md`](../information/tools.md).
 
 ## Tool and AsyncTool
@@ -49,6 +49,28 @@ Both are functional interfaces; register the first with `register` and the secon
 
 Neither runs on the game's thread. Anything either throws, a stage that fails, and a call past
 its timeout become error results, listed under [`ToolExecutor`](#toolexecutor).
+
+## ClientThreadTools
+
+Most of Minecraft may only be touched from the game's thread. In `core-client`,
+`io.github.mcagentsmods.core.client.agent.ClientThreadTools` turns a `Tool` into an
+`AsyncTool` whose body runs there, between frames:
+
+```java
+Agents.tools().registerAsync(spec, ClientThreadTools.onClientThread(arguments -> {
+    LocalPlayer player = Minecraft.getInstance().player;
+    return player == null
+            ? ToolResult.error("the player is not in a world")
+            : ToolResult.ok(player.blockPosition().toShortString());
+}));
+```
+
+| Method | Returns | What it does |
+|---|---|---|
+| `onClientThread(Tool body)` | `AsyncTool` | Static. Hands `body` to `Minecraft.getInstance().execute` when the tool is called, and completes the stage with what it returns or throws. |
+
+The call keeps its worker slot and its timeout while the body waits for the game's thread.
+Keep the body short: the game draws no frame while it runs.
 
 ## ToolExecutor
 
@@ -152,5 +174,5 @@ slot back, and a blocking body is interrupted. One that ignores the interrupt ke
 until it returns, but no longer its slot. Cancelling the future interrupts it the same way.
 
 The shared pool's limit is the player's setting. Change it through `Agents.update`
-([`settings.md`](settings.md)), which saves it; a `setLimit` on the shared pool directly is
-not saved, and the player's next save replaces it.
+([`settings.md`](settings.md)), which saves it and shows it on the settings screen; a
+`setLimit` on the shared pool directly is neither, and the player's next save replaces it.

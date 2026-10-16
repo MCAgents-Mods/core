@@ -66,7 +66,8 @@ results come back in the order asked.
   work handed to the game's thread. The call keeps its worker slot until the stage completes.
 
 Neither runs on the game's thread. A tool that must touch the game hands that part to the
-game's thread and returns the stage.
+game's thread and returns the stage;
+[`ClientThreadTools`](../api/tool-execution.md#clientthreadtools) does that for a whole tool.
 
 ## The worker limit
 

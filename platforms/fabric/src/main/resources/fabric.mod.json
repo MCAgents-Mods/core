@@ -3,7 +3,7 @@
   "id": "mcagents_core",
   "version": "${version}",
   "name": "MCAgents Core",
-  "description": "The shared foundation MCAgents mods build on: the language model client and the in-game holograms other mods open.",
+  "description": "The shared foundation MCAgents mods build on: the language model client, the in-game holograms other mods open, and the agent layer: the tool registry mods add tools to, the agent that calls them, and the menu G shows.",
   "authors": [
     "MCAgents"
   ],
@@ -29,6 +29,7 @@
     "fabric-api": "*"
   },
   "breaks": {
-    "mcagents": "<0.4.0"
+    "mcagents": "<0.4.0",
+    "mcagents_agents": "*"
   }
 }

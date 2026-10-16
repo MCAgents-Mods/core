@@ -50,7 +50,7 @@ coordinates as `testImplementation`.
 | `core-common` | `…core.common`, `.model`, `.http`, `.hologram`, `.agent` | The implementations: `MCAgentsProvider`, `OpenRouterClient`, `JdkHttpTransport`, the hologram's placement, layout, scrolling and text arithmetic, which `core-client` uses, and the agent layer: `Agents`, `ToolAgent`, `AgentSettings`, `AgentButtons`, `AgentsPaths`. | [`provider.md`](provider.md), [`model-client.md`](model-client.md), [`http.md`](http.md), [`agent.md`](agent.md), [`settings.md`](settings.md) |
 | `core-common`, test fixtures | `…core.common.testing` | `StubTransport` and `StubKeySource`, for a consumer's tests. | [`test-fixtures.md`](test-fixtures.md) |
 | `core-shared` | `…core.shared` and below | What the loader entry points start: sides, the shared key file, the token commands. | [`mod-runtime.md`](mod-runtime.md), [`key-file.md`](key-file.md), [`token-commands.md`](token-commands.md) |
-| `core-client` | `…core.client.hologram` | `Holograms`, which opens and closes holograms, and the drawing and input behind it. Client only; published for the latest Minecraft release alone, compiled against it. | [`hologram.md`](hologram.md), [`hologram-panels.md`](hologram-panels.md) |
+| `core-client` | `…core.client.hologram`, `…core.client.agent` | `Holograms`, which opens and closes holograms, and the drawing and input behind it; the agents menu, its G key, its settings screen and start-up, and `ClientThreadTools`. Client only; published for the latest Minecraft release alone, compiled against it. | [`hologram.md`](hologram.md), [`hologram-panels.md`](hologram-panels.md), [`buttons.md`](buttons.md), [`tool-execution.md`](tool-execution.md#clientthreadtools) |
 
 Every package is prefixed `io.github.mcagentsmods`. Every artifact is published under the
 group `io.github.mcagentsmods` with the same version; `project-version` in core's
@@ -65,6 +65,13 @@ The player installs the core jar for their loader and Minecraft version
 (`MCAgentsCoreFabric-{version}+{minecraft}.jar`, `MCAgentsCoreNeoforge-…` or
 `MCAgentsCoreForge-…`), mod id `mcagents_core`. A mod built on core
 declares that mod id as a dependency in its own manifest.
+
+From 0.10.0 core carries what the MCAgents agents mod (`mcagents_agents`) did: the tool
+registry, the agent, and the menu G shows. A mod that depended on agents depends on core alone,
+and imports `io.github.mcagentsmods.core.tool`, `…core.api.agent`, `…core.api.button`,
+`…core.common.agent` and `…core.client.agent` in place of the `…agents` packages; every class
+kept its name. Core refuses to load beside the agents mod, on all three loaders, since the game
+would otherwise have two menus on G and two tool registries that do not see each other.
 
 From 0.6.0 core refuses to load beside MCAgents chat (mod id `mcagents`) older than 0.4.0,
 on Fabric and NeoForge, the loaders chat ships for: those versions open the web console,

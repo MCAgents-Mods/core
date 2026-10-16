@@ -23,6 +23,11 @@ history, read `wiki/logs/`.
   `MCAgents-Mods/chat` with tool calling, embeddings, prompt-cache hints, retries,
   key rotation and direct provider routes. `core-common` publishes `StubTransport`
   and `StubKeySource` as test fixtures.
+- The agent layer, folded in from the agents mod for 0.10.0 (see
+  [`../tasks/agents-merge.md`](../tasks/agents-merge.md)): the `tool` module, `Agents` and
+  `ToolAgent` in `common.agent`, and in `platforms/client` the agents menu G shows, its settings
+  screen and `AgentsRuntime`, which every loader's client half starts. The settings file stays
+  at `MCAgents/agents/settings.properties`. All three manifests refuse `mcagents_agents`.
 - Holograms, in `platforms/client`: panels a mod opens in the level with
   `Holograms.open`, described by the records in `api.hologram`. The player aims and
   left-clicks, scrolls with the wheel, holds Z to carry one, and clicks its X to close

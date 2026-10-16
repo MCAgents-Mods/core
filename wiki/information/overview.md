@@ -9,7 +9,10 @@ OpenRouter, OpenAI, DeepSeek, and Anthropic — from a mod, either through
 `MCAgentsProvider` or through `OpenRouterClient`, the routed client with tool
 calling, embeddings, prompt caching and retries. It also draws the holograms
 mods open in the world, the only way MCAgents talks to the player: no MCAgents
-mod serves a web page. The core is API only: it opens no hologram of its own. It
+mod serves a web page. Since 0.10.0 it also carries the agent layer that was the
+agents mod: the tool registry mods add tools to, the agent that picks and calls
+them, and the menu the player shows with G, where each mod adds its button. That
+menu, with its settings screen, is the only hologram core opens itself. It
 has no commands, no permissions, and no memory: it stores no conversation and no
 per player state, so a consumer keeps whatever history it wants and replays it.
 
