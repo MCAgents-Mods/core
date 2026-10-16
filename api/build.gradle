@@ -2,6 +2,12 @@ plugins {
     id 'java-library'
 }
 
+dependencies {
+    // The tool registry, worker pool and executor: pure Java, and part of core's API, so a
+    // mod that depends on api can register tools without naming a second module.
+    api project(':tool')
+}
+
 base {
     archivesName = 'MCAgentsCoreApi'
 }

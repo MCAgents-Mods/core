@@ -1,0 +1,26 @@
+// Tools: what a tool is, the registry that holds them, and the worker pool that runs them.
+//
+// Pure Java. This module compiles against the JDK and nothing else — no Minecraft, no loader,
+// no other core module, no third-party library — so any code can register a tool with it: a
+// mod reaching into the game, or plain Java that never touches Minecraft. api builds on it.
+
+plugins {
+    id 'java-library'
+}
+
+base {
+    archivesName = 'MCAgentsCoreTool'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            pom {
+                name = 'MCAgentsCoreTool'
+                description = "MCAgents Core Tool"
+            }
+        }
+    }
+}

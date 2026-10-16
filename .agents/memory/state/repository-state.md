@@ -43,7 +43,7 @@ history, read `wiki/logs/`.
   (`LlmCredentials.DEFAULT_TIMEOUT`), and 10 seconds to connect and 120 to answer in
   `JdkHttpTransport`, which the routed client uses. Each path also has a deadline over the
   whole exchange, body included.
-- Seven build modules: `api`, `common`, `platforms/shared` (the loader-agnostic mod
+- Eight build modules: `tool` (tools in pure Java, from the agents mod), `api`, `common`, `platforms/shared` (the loader-agnostic mod
   code, with the client and server halves as packages), `platforms/client` (the
   holograms, against vanilla Minecraft) and one module per loader —
   `platforms/forge`, `platforms/neoforge`, `platforms/fabric` — each building its own

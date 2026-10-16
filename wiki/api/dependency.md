@@ -27,7 +27,7 @@ dependencies {
 }
 ```
 
-`compileOnly`, because every core loader jar already carries `api`, `common`,
+`compileOnly`, because every core loader jar already carries `tool`, `api`, `common`,
 `platforms/shared` and `platforms/client`. Bundling your own copy puts two of each class on the
 classpath. GitHub Packages asks for credentials even to read, so the token needs
 `read:packages`.
@@ -45,7 +45,8 @@ coordinates as `testImplementation`.
 
 | Artifact | Packages | Holds | Page |
 |---|---|---|---|
-| `core-api` | `…core.api`, `.chat`, `.llm`, `.token`, `.model`, `.http`, `.hologram` | Contracts only: interfaces, records, enums. No implementation. | Every page below |
+| `core-tool` | `…core.tool` | Tools in pure Java: specs, schemas, arguments, results, the registry, the worker pool and the executor. Depends on the JDK alone, so plain Java that only needs tools names it alone, as `implementation`. | [`tool-registry.md`](tool-registry.md), [`tool-spec.md`](tool-spec.md), [`tool-arguments.md`](tool-arguments.md), [`tool-execution.md`](tool-execution.md) |
+| `core-api` | `…core.api`, `.chat`, `.llm`, `.token`, `.model`, `.http`, `.hologram` | Contracts only: interfaces, records, enums. No implementation. Brings `core-tool` with it. | Every page below |
 | `core-common` | `…core.common`, `.model`, `.http`, `.hologram` | The implementations: `MCAgentsProvider`, `OpenRouterClient`, `JdkHttpTransport`, and the hologram's placement, layout, scrolling and text arithmetic, which `core-client` uses. | [`provider.md`](provider.md), [`model-client.md`](model-client.md), [`http.md`](http.md) |
 | `core-common`, test fixtures | `…core.common.testing` | `StubTransport` and `StubKeySource`, for a consumer's tests. | [`test-fixtures.md`](test-fixtures.md) |
 | `core-shared` | `…core.shared` and below | What the loader entry points start: sides, the shared key file, the token commands. | [`mod-runtime.md`](mod-runtime.md), [`key-file.md`](key-file.md), [`token-commands.md`](token-commands.md) |

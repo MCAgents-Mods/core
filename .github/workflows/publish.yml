@@ -1,6 +1,6 @@
 name: Publish
 
-# Publishes the library modules, api, common, shared and client, to GitHub
+# Publishes the library modules, tool, api, common, shared and client, to GitHub
 # Packages and tags the commit when a release lands on master. The fabric, forge
 # and neoforge mod jars are not published here; the Release workflow attaches
 # them to the tag's GitHub release.

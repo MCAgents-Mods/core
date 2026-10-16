@@ -20,7 +20,7 @@ wants and replays it.
 
 ## What is here today
 
-- A Gradle multi project build on **Java 25**: `api`, `common`,
+- A Gradle multi project build on **Java 25**: `tool`, `api`, `common`,
   `platforms/shared`, `platforms/client`, and one module per mod loader —
   `platforms/forge`, `platforms/neoforge` and `platforms/fabric` — each building
   its own jar for Minecraft 26.3, the only version core supports, all under
@@ -31,6 +31,9 @@ wants and replays it.
   embeddings, prompt caching, retries and key rotation. See
   [`wiki/api/provider.md`](wiki/api/provider.md) and
   [`wiki/api/model-client.md`](wiki/api/model-client.md).
+- Tools in pure Java: a mod registers a tool, with its spec and categories, in the shared
+  `ToolRegistry`, and a worker pool runs the calls. See
+  [`wiki/api/tool-registry.md`](wiki/api/tool-registry.md).
 - Holograms: panels a mod opens in the world in front of the player, who aims and
   clicks, holds Z to move them, and leaves them behind beyond two chunks. See
   [`wiki/api/hologram.md`](wiki/api/hologram.md).

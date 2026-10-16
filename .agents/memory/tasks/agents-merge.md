@@ -59,3 +59,16 @@ name; only its package and module change.
 ### Task 1 — chore/agents-merge-plan
 
 This record, and its row in the memory index.
+
+### Task 2 — feat/tool-registry
+
+Agents' `tool/` is core's `tool/` module, project `:tool`, package `io.github.mcagentsmods.core.tool`,
+jar `MCAgentsCoreTool`, published as `core-tool`. The classes and their five test classes are
+unchanged but for the package, two comments that named the agents mod, and the pool's thread
+names (`mcagents-tool-worker`, `mcagents-tool-pool`). It builds with core's root conventions
+(Java 25 toolchain, JUnit wired once) instead of its own. `api` exposes it as an `api`
+dependency, so `core-api` brings `core-tool`, and each loader jar bundles it. The four tool
+API pages and `wiki/information/tools.md` moved from agents, without the parts about the agent,
+its settings and `ClientThreadTools`, which arrive with that code in tasks 3 and 4. The module,
+dependency, setup and overview pages, the README, the repository map, the state file, the
+Publish header and both wiki indexes name the new module.
