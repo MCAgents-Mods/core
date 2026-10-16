@@ -34,6 +34,9 @@ wants and replays it.
 - Tools in pure Java: a mod registers a tool, with its spec and categories, in the shared
   `ToolRegistry`, and a worker pool runs the calls. See
   [`wiki/api/tool-registry.md`](wiki/api/tool-registry.md).
+- The agent layer: `Agents.agent(client)` answers a prompt with the registered tools it
+  needs, and G shows the agents menu, where each mod adds its button. See
+  [`wiki/api/agent.md`](wiki/api/agent.md) and [`wiki/api/buttons.md`](wiki/api/buttons.md).
 - Holograms: panels a mod opens in the world in front of the player, who aims and
   clicks, holds Z to move them, and leaves them behind beyond two chunks. See
   [`wiki/api/hologram.md`](wiki/api/hologram.md).

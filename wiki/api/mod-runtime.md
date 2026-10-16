@@ -78,3 +78,35 @@ point connects its own events to these; a mod opens holograms through
 
 Each loader reaches `core-client` only from that client half, so a dedicated server
 never links a client class.
+
+## The agent layer's start-up
+
+`…core.client.agent`, in `core-client`. Each loader's client half also registers the agents
+menu's key and starts the agent layer, after `CoreRuntime.start`; a mod built on core calls
+none of it. What the menu and the key do is on [`buttons.md`](buttons.md).
+
+```java
+// What each loader's client half does, beside the hologram's hooks:
+KeyMappingHelper.registerKeyMapping(AgentsKeys.create(category));   // with the move key, first
+ClientTickEvents.END_CLIENT_TICK.register(AgentsKeys::onEndTick);
+AgentsRuntime.start(FabricLoader.getInstance().getGameDir());       // FMLPaths.GAMEDIR on NeoForge and Forge
+```
+
+| Member | What it does |
+|---|---|
+| `AgentsKeys.create(KeyMapping.Category)` | Builds the key that shows the agents menu, `key.mcagents_core.agents`, bound to G, in core's category beside the move key. Called first in client start-up, for the same reason. |
+| `AgentsKeys.onEndTick(Minecraft)` | Shows or hides the menu when the key was pressed. Called at the end of every client tick. |
+| `AgentsRuntime.start(Path gameDirectory)` | Creates `{game_dir}/MCAgents/agents/`, then loads and applies the player's settings through `Agents.start` ([`settings.md`](settings.md)). Only the first call does anything. A failure at either step is logged and the game carries on, with the default settings if they could not be loaded. A `null` directory throws `NullPointerException`. |
+| `AgentsRuntime.paths()` | `Optional<AgentsPaths>`: the layout on disk, once `start` has run; empty before. |
+
+`AgentsPaths`, in `core-common` under `…core.common.agent`, is that layout. It knows nothing
+about Minecraft, so a test hands it a temporary directory.
+
+| Member | What it is |
+|---|---|
+| `DATA_DIRECTORY` | `MCAgents`, the directory every MCAgents mod keeps its files under, inside the game directory. |
+| `AGENTS_DIRECTORY` | `agents`, the agent layer's own directory inside it. The agents mod used the same one before it became part of core, so a player's settings carried over. |
+| `AgentsPaths.under(Path gameDirectory)` | Static. Describes the layout under the game directory. Creates nothing; a `null` directory throws `NullPointerException`. |
+| `dataDirectory()` | `{game_dir}/MCAgents/agents`. |
+| `settingsFile()` | `{game_dir}/MCAgents/agents/settings.properties`, what the player set in game. |
+| `createDataDirectory()` | Creates the data directory and its parents. Safe to repeat. Throws `IOException`. |

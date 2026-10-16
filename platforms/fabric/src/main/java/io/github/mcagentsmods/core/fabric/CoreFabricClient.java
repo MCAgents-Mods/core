@@ -1,5 +1,7 @@
 package io.github.mcagentsmods.core.fabric;
 
+import io.github.mcagentsmods.core.client.agent.AgentsKeys;
+import io.github.mcagentsmods.core.client.agent.AgentsRuntime;
 import io.github.mcagentsmods.core.client.hologram.HologramClient;
 import io.github.mcagentsmods.core.shared.CoreRuntime;
 import io.github.mcagentsmods.core.shared.environment.PhysicalSide;
@@ -25,11 +27,14 @@ public final class CoreFabricClient implements ClientModInitializer {
         // the game's options exist.
         KeyMapping.Category category = KeyMapping.Category.register(HologramClient.KEY_CATEGORY);
         KeyMappingHelper.registerKeyMapping(HologramClient.createMoveKey(category));
+        KeyMappingHelper.registerKeyMapping(AgentsKeys.create(category));
 
         CoreRuntime.start(PhysicalSide.CLIENT, FabricLoader.getInstance().getGameDir());
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> CoreRuntime.stop());
+        AgentsRuntime.start(FabricLoader.getInstance().getGameDir());
 
         ClientTickEvents.END_CLIENT_TICK.register(HologramClient::onEndTick);
+        ClientTickEvents.END_CLIENT_TICK.register(AgentsKeys::onEndTick);
         LevelRenderEvents.COLLECT_SUBMITS.register(context ->
                 HologramClient.submit(context.levelState(), context.submitNodeCollector()));
         // Returning true cancels the attack, so the block behind a hologram is not hit.

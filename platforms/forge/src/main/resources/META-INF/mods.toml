@@ -9,7 +9,7 @@ version = "${version}"
 displayName = "MCAgents Core"
 authors = "MCAgents"
 description = '''
-The shared foundation MCAgents mods build on: the language model client and the in-game holograms other mods open.
+The shared foundation MCAgents mods build on: the language model client, the in-game holograms other mods open, and the agent layer: the tool registry mods add tools to, the agent that calls them, and the menu G shows.
 '''
 
 [[dependencies.mcagents_core]]
@@ -23,5 +23,15 @@ side = "BOTH"
 modId = "minecraft"
 mandatory = true
 versionRange = "[${minecraft},${minecraftNext})"
+ordering = "NONE"
+side = "BOTH"
+
+# The agents mod became part of core in 0.10.0; beside it the game would have two agents menus
+# on G and two tool registries that do not see each other. Forge has no incompatible type: an
+# optional dependency whose range no released agents version is in refuses any of them.
+[[dependencies.mcagents_core]]
+modId = "mcagents_agents"
+mandatory = false
+versionRange = "(,0.1.0)"
 ordering = "NONE"
 side = "BOTH"

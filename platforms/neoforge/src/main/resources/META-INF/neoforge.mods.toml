@@ -9,7 +9,7 @@ version = "${version}"
 displayName = "MCAgents Core"
 authors = "MCAgents"
 description = '''
-The shared foundation MCAgents mods build on: the language model client and the in-game holograms other mods open.
+The shared foundation MCAgents mods build on: the language model client, the in-game holograms other mods open, and the agent layer: the tool registry mods add tools to, the agent that calls them, and the menu G shows.
 '''
 
 [[dependencies.mcagents_core]]
@@ -32,5 +32,15 @@ modId = "mcagents"
 type = "incompatible"
 reason = "MCAgents chat before 0.4.0 needs the web console, which MCAgents Core 0.6.0 removed. Update MCAgents chat."
 versionRange = "(,0.4.0)"
+ordering = "NONE"
+side = "BOTH"
+
+# The agents mod became part of core in 0.10.0; beside it the game would have two agents menus
+# on G and two tool registries that do not see each other.
+[[dependencies.mcagents_core]]
+modId = "mcagents_agents"
+type = "incompatible"
+reason = "MCAgents agents is part of MCAgents Core from 0.10.0. Remove the MCAgents agents jar."
+versionRange = "[0,)"
 ordering = "NONE"
 side = "BOTH"
