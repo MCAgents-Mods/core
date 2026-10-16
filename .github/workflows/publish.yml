@@ -1,8 +1,9 @@
 name: Publish
 
-# Publishes the api, common and shared jars, and the client, fabric, forge and
-# neoforge jars of the Minecraft version core supports, to GitHub Packages and tags the commit
-# when a release lands on master.
+# Publishes the library modules, api, common, shared and client, to GitHub
+# Packages and tags the commit when a release lands on master. The fabric, forge
+# and neoforge mod jars are not published here; the Release workflow attaches
+# them to the tag's GitHub release.
 #
 # The version is project-version in gradle.properties. The first step looks for
 # the v{version} tag on the remote: when it exists the run stops there, so an

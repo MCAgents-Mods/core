@@ -50,11 +50,12 @@ coordinates as `testImplementation`.
 | `mcagents-core-common`, test fixtures | `…core.common.testing` | `StubTransport` and `StubKeySource`, for a consumer's tests. | [`test-fixtures.md`](test-fixtures.md) |
 | `mcagents-core-shared` | `…core.shared` and below | What the loader entry points start: sides, the shared key file, the token commands. | [`mod-runtime.md`](mod-runtime.md), [`key-file.md`](key-file.md), [`token-commands.md`](token-commands.md) |
 | `mcagents-core-client` | `…core.client.hologram` | `Holograms`, which opens and closes holograms, and the drawing and input behind it. Client only; published for the latest Minecraft release alone, compiled against it. | [`hologram.md`](hologram.md), [`hologram-panels.md`](hologram-panels.md) |
-| `mcagents-core-fabric`, `-neoforge`, `-forge` | `…core.{loader}` | One mod jar per loader, built for Minecraft 26.3, for a development run that needs core loaded. | — |
 
 Every package is prefixed `io.github.mcagentsmods`. Every artifact is published under the
 group `io.github.mcagentsmods` with the same version; `project-version` in core's
-`gradle.properties` is that version.
+`gradle.properties` is that version. The Fabric, NeoForge and Forge mod jars are not on
+GitHub Packages: each version's GitHub release carries one per loader, for a player or for a
+development run that needs core loaded.
 
 ## In game
 

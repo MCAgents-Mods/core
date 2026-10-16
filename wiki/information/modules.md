@@ -126,8 +126,9 @@ only to compile against the game; the hologram's arithmetic lives in
 
 ## Published artifacts
 
-Every module carries a publication, a Minecraft-facing module one for the Minecraft
-version core supports. The jar a module builds is named `MCAgentsCore{Module}-{version}.jar`, with
+Only the library modules carry a publication: `api`, `common`, `shared` and `client`. The
+three loader modules build their mod jars but publish nothing to GitHub Packages; the Release
+workflow attaches those jars to each version's GitHub release instead. The jar a module builds is named `MCAgentsCore{Module}-{version}.jar`, with
 `+{minecraft}` before `.jar` for a Minecraft-facing one; its Maven coordinates are:
 
 | Module | Jar base name | Coordinates |
@@ -136,14 +137,15 @@ version core supports. The jar a module builds is named `MCAgentsCore{Module}-{v
 | `common` | `MCAgentsCoreCommon` | `io.github.mcagentsmods:mcagents-core-common` |
 | `platforms/shared` | `MCAgentsCoreShared` | `io.github.mcagentsmods:mcagents-core-shared` |
 | `platforms/client/{minecraft}` | `MCAgentsCoreClient` | `io.github.mcagentsmods:mcagents-core-client` |
-| `platforms/forge/{minecraft}` | `MCAgentsCoreForge` | `io.github.mcagentsmods:mcagents-core-forge` |
-| `platforms/neoforge/{minecraft}` | `MCAgentsCoreNeoforge` | `io.github.mcagentsmods:mcagents-core-neoforge` |
-| `platforms/fabric/{minecraft}` | `MCAgentsCoreFabric` | `io.github.mcagentsmods:mcagents-core-fabric` |
+| `platforms/forge/{minecraft}` | `MCAgentsCoreForge` | Not published: attached to the GitHub release |
+| `platforms/neoforge/{minecraft}` | `MCAgentsCoreNeoforge` | Not published: attached to the GitHub release |
+| `platforms/fabric/{minecraft}` | `MCAgentsCoreFabric` | Not published: attached to the GitHub release |
 
 `{minecraft}` is the Minecraft version, `26.3`; it is in the jar's name but not in any
 artifact id. Before 0.7.0 these four ids had no version suffix either and were built for
 Minecraft 26.2 only; 0.7.0 published a `-26.2` and a `-26.3` id for each, side by side, and
-from 0.8.0 the ids are those above again, built for 26.3.
+from 0.8.0 the ids are those above again, built for 26.3. Up to 0.8.0 the loader modules were
+published too, as `mcagents-core-{loader}`.
 
 `mcagents-core-common` also publishes its test fixtures as a variant, so a consumer can
 test against `StubTransport` and `StubKeySource` with
@@ -157,13 +159,12 @@ deliberately. Without it, every project in this group would publish a colliding
 `io.github.mcagentsmods:api`, and a consumer could not depend on `core` and
 another mod at the same time.
 
-A loader module publishes its mod jar alone, with no dependency list: the jar
-already carries `api`, `common`, `shared` and `client`, and the loader supplies
-the rest. `mcagents-core-client` declares no dependency either:
+`mcagents-core-client` declares no dependency:
 Minecraft comes from the consumer's own toolchain. A mod compiles against
 `mcagents-core-api` and `mcagents-core-common`, and the
 `mcagents-core-client`, built for the Minecraft version core supports, to open
-holograms; the loader artifacts are for a development run that needs core loaded.
+holograms. A development run that needs core loaded takes the loader jar from core's GitHub
+release, or builds it from a core checkout.
 
 ## Dependency versions
 
