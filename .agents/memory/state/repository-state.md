@@ -8,10 +8,10 @@ description: Current known state of MCAgents-Mods/core — what exists, the stac
 This file is **overwritten in place** and is always current. It is not a log — for
 history, read `wiki/logs/`.
 
-## 2026-10-13
+## 2026-10-16
 
 **Stack.** Gradle multi project build, Java 25, root project `core`, group
-`io.github.mcagentsmods`. Version `0.7.0`, carried by `project-version` in
+`io.github.mcagentsmods`. Version `0.8.0`, carried by `project-version` in
 `gradle.properties`. Default branch `master`. License MIT,
 `Copyright (c) 2026 MCAgents`.
 
