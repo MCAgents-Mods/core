@@ -20,6 +20,7 @@ see `{shared}/rules/versioning.md`.
 
 | Version | Summary | Files |
 |---|---|---|
+| [`0/10/0/`](../../wiki/logs/0/10/0/CHANGELOG.md) | The agents mod folded in: the `tool` module, the agent, the agents menu on G and its settings, under core's packages; `mcagents_agents` refused. | `CHANGELOG.md` |
 | [`0/9/0/`](../../wiki/logs/0/9/0/CHANGELOG.md) | Artifact ids drop the repeated `mcagents-`, as in `core-api`, and only the library modules are published; the loader jars go to GitHub releases only. | `CHANGELOG.md` |
 | [`0/8/0/`](../../wiki/logs/0/8/0/CHANGELOG.md) | Only the latest Minecraft release, 26.3: the 26.2 jars are gone and artifact ids no longer carry the Minecraft version. | `CHANGELOG.md` |
 | [`0/7/0/`](../../wiki/logs/0/7/0/CHANGELOG.md) | Minecraft 26.3 beside 26.2: every loader jar built once per Minecraft version, with the version in jar names and artifact ids. | `CHANGELOG.md` |
