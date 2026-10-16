@@ -25,6 +25,7 @@ tools.categories();                     // [] — the category is kept, but hold
 ```
 
 Every type on this page is in `io.github.mcagentsmods.core.tool`, in `core-tool`.
+`Agents.tools()` in `core-common` returns the same shared registry.
 
 ## ToolRegistry
 

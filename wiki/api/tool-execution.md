@@ -128,7 +128,7 @@ the game from exiting.
 | Member | Returns | What it does |
 |---|---|---|
 | `DEFAULT_LIMIT`, `MIN_LIMIT`, `MAX_LIMIT` | `int` | 2, 1 and 32. |
-| `WorkerPool.shared()` | `WorkerPool` | Static. The pool core's agent runs every tool on. |
+| `WorkerPool.shared()` | `WorkerPool` | Static. The pool core's agent runs every tool on, and whose limit the player sets. `Agents.workers()` returns it. |
 | `WorkerPool()` | — | A pool of your own with the default limit. |
 | `WorkerPool(int limit)` | — | A pool of your own with that limit. |
 | `WorkerPool.clampLimit(int limit)` | `int` | Static. `limit` brought into 1 to 32. |
@@ -151,3 +151,6 @@ negative one means no limit. Work past its timeout fails with `TimeoutException`
 slot back, and a blocking body is interrupted. One that ignores the interrupt keeps its thread
 until it returns, but no longer its slot. Cancelling the future interrupts it the same way.
 
+The shared pool's limit is the player's setting. Change it through `Agents.update`
+([`settings.md`](settings.md)), which saves it; a `setLimit` on the shared pool directly is
+not saved, and the player's next save replaces it.

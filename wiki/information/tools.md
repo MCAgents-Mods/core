@@ -32,7 +32,7 @@ back a handle; closing it removes the tool, for when what backs it goes away.
 A category is a group of tools the agent picks as a whole. A tool belongs to one or more: a
 tool that counts items might sit in `inventory` and in `minecraft`. The agent's first step
 picks categories from their ids and descriptions alone, so only the tools in those categories
-are described to the model afterwards.
+are described to the model afterwards; see [`agent.md`](agent.md).
 
 A category nobody declared is created when a tool names it. Declaring one gives it the
 description the model reads, and the first description given stays, so mods that share a
@@ -72,5 +72,5 @@ game's thread and returns the stage.
 
 All tool calls share one worker pool. At most its limit run at once, whether they block or
 wait on a stage, and the rest queue, so a slow server counts against the limit exactly as a
-long computation does. A new limit applies at once, as
-[the pool's page](../api/tool-execution.md#workerpool) describes.
+long computation does. The player sets the limit in game ([settings](../api/settings.md)), and
+it applies at once, as [the pool's page](../api/tool-execution.md#workerpool) describes.
