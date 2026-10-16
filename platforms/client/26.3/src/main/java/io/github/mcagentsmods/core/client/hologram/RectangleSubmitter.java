@@ -7,9 +7,9 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import java.util.List;
 
 /**
- * Sends a panel's rectangles to the game, for Minecraft 26.3. Every Minecraft version core
- * builds for has its own copy of this class, because 26.3 removed the render type 26.2's
- * draws with.
+ * Sends a panel's rectangles to the game, for Minecraft 26.3. It sits in the version folder
+ * because the way a coloured rectangle is drawn changes between Minecraft releases: 26.3
+ * removed the render type the release before it drew with.
  *
  * <p>26.3 draws a coloured rectangle as a text background, the way a text display's
  * background is drawn, one submission per rectangle. The game sorts those by their pose's

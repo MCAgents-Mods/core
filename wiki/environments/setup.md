@@ -33,9 +33,9 @@ The default branch is `master`.
 ```
 
 That compiles every module, runs the tests, and produces one jar per module under
-`{module}/build/libs/`, and one per Minecraft version for the modules built against
+`{module}/build/libs/`, or `{module}/{minecraft}/build/libs/` for the modules built against
 Minecraft (see [`../information/modules.md`](../information/modules.md)). The ones
-that matter are the mod jars, one per loader and Minecraft version:
+that matter are the mod jars, one per loader:
 
 | Loader | Jar |
 |---|---|
@@ -43,28 +43,27 @@ that matter are the mod jars, one per loader and Minecraft version:
 | NeoForge | `platforms/neoforge/{minecraft}/build/libs/MCAgentsCoreNeoforge-{version}+{minecraft}.jar` |
 | Fabric | `platforms/fabric/{minecraft}/build/libs/MCAgentsCoreFabric-{version}+{minecraft}.jar` |
 
-`{minecraft}` is the Minecraft version, `26.2` or `26.3`. Drop the jar matching your
-loader and game version into the game's `mods/` folder. Fabric also needs Fabric API.
+`{minecraft}` is the Minecraft version, `26.3`: core supports only the latest release. Drop
+the jar matching your loader into the game's `mods/` folder. Fabric also needs Fabric API.
 
 Useful variants:
 
 ```sh
 ./gradlew :api:build                     # one module only
-./gradlew :platforms:fabric-26.2:build    # one loader's jar, for one Minecraft version
+./gradlew :platforms:fabric-26.3:build    # one loader's jar
 ./gradlew clean                      # delete the root build directory
 ./gradlew javaToolchains             # show which JDK the build resolved
 ```
 
 ## Run a development client
 
-Each loader starts a development client with core loaded, one per Minecraft version, in
-that version subproject's own `run/` directory, which git ignores:
+Each loader starts a development client with core loaded, in its version subproject's own
+`run/` directory, which git ignores:
 
 ```sh
-./gradlew :platforms:fabric-26.2:runClient
-./gradlew :platforms:neoforge-26.2:runClient
-./gradlew :platforms:forge-26.2:runClient
-./gradlew :platforms:fabric-26.3:runClient    # and neoforge-26.3, forge-26.3
+./gradlew :platforms:fabric-26.3:runClient
+./gradlew :platforms:neoforge-26.3:runClient
+./gradlew :platforms:forge-26.3:runClient
 ```
 
 The client loads the mod the way its jar would: `api`, `common` and `shared` are part of
@@ -118,7 +117,7 @@ when a release reaches `master` — so run this command before opening one.
 
 Every module is published to GitHub Packages as
 `io.github.mcagentsmods:mcagents-core-{module}` — `api`, `common` and `shared` once,
-and `client`, `forge`, `neoforge` and `fabric` once per Minecraft version, as
+and `client`, `forge`, `neoforge` and `fabric` for the supported Minecraft version, as
 `mcagents-core-{module}-{minecraft}`:
 
 ```sh

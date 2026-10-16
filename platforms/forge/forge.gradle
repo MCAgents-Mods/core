@@ -84,7 +84,7 @@ tasks.named('jar', Jar) {
 
 processResources {
     // The jar declares its own Minecraft version, and the Forge major it was built
-    // against: 65 from 26.2-65.1.3.
+    // against: 66 from 26.3-66.0.11.
     def properties = [version: project.version, minecraft: minecraftVersion,
                       minecraftNext: minecraftNext,
                       forgeMajor: forgeVersion.tokenize('-')[1].tokenize('.')[0]]

@@ -3,8 +3,8 @@
 The build is a Gradle multi project defined in `settings.gradle`, with
 `rootProject.name = core`. It has seven modules, and every package under them is
 prefixed `io.github.mcagentsmods.core`. The four that compile against Minecraft
-are built once per Minecraft version; see
-[One build per Minecraft version](#one-build-per-minecraft-version).
+are built for the one Minecraft version core supports, the latest release; see
+[The Minecraft version](#the-minecraft-version).
 
 ## The module graph
 
@@ -30,40 +30,44 @@ Each loader module depends on both `platforms/shared` and `platforms/client`, an
 | `common` | `…core.common` | Pure Java implementations of those contracts — `common.model` holds `OpenRouterClient`, `common.http` the JDK transport, and `common.hologram` the arithmetic that places, aims at, lays out and scrolls a hologram, and wraps and edits its text. Still no platform type. Its `testFixtures` source set holds `StubTransport` and `StubKeySource`. |
 | `platforms:shared` | `…core.shared` | The code every loader shares: `CoreRuntime` (start and stop), the machinery that decides which physical side is running, and the two sides as packages — `…shared.client` and `…shared.server`. Plain Java, no loader toolchain. |
 | `platforms:client` | `…core.client` | What core draws in the game and the input that drives it: `…client.hologram` draws the open hologram, takes the player's clicks, wheel and move key, and closes it out of range, and `Holograms` is what a mod calls. Compiled against vanilla Minecraft through Loom; no loader type. Client only. |
-| `platforms:forge` | `…core.forge` | Only what Forge needs: the `@Mod` class, `META-INF/mods.toml`, and `pack.mcmeta` (one per Minecraft version, in that version's folder), without which Forge refuses the jar's resources and crashes when a world is created. NeoForge and Fabric build that metadata themselves. |
+| `platforms:forge` | `…core.forge` | Only what Forge needs: the `@Mod` class, `META-INF/mods.toml`, and `pack.mcmeta` (in the Minecraft version's folder), without which Forge refuses the jar's resources and crashes when a world is created. NeoForge and Fabric build that metadata themselves. |
 | `platforms:neoforge` | `…core.neoforge` | Only what NeoForge needs: the `@Mod` class and `META-INF/neoforge.mods.toml`. |
 | `platforms:fabric` | `…core.fabric` | Only what Fabric needs: the main and client entry points and `fabric.mod.json`. |
 
-## One build per Minecraft version
+## The Minecraft version
 
-`platforms/client` and the three loader modules compile against Minecraft, so each is
-built once for every Minecraft version core supports. The versions are listed once, in
-`settings.gradle`. Each of those modules is a folder of shared sources with one
-Gradle subproject per version:
+Core supports **only the latest Minecraft release, today 26.3**, and never an older one
+beside it. `platforms/client` and the three loader modules compile against Minecraft, so
+each is built for that version. The version is listed once, in `settings.gradle`. Each
+of those modules is a folder of shared sources with a Gradle subproject for the version:
 
 ```
 platforms/fabric/
-├── fabric.gradle        the module's build, applied by every version
-├── src/                 the sources every version shares
-└── 26.2/                the subproject :platforms:fabric-26.2
+├── fabric.gradle        the module's build, applied by the version subproject
+├── src/                 the sources that do not depend on the Minecraft version
+└── 26.3/                the subproject :platforms:fabric-26.3
     ├── build.gradle     applies the loader plugin, then ../fabric.gradle
-    └── src/             only what differs for 26.2, often nothing
+    └── src/             only what is particular to 26.3, often nothing
 ```
 
 The subproject's folder is named for its version, and the subproject for its module
-and version: `:platforms:fabric-26.2`, since two projects of one name would be one module
-to Gradle. It compiles the shared `src/` together with its own, and
-`platforms/minecraft.gradle`, which every version subproject applies, takes the version
-from the folder's name, finds its coordinates in
-the catalog (each entry carries the version as a suffix, such as `fabric-api-26-2`),
-and names the jar `MCAgentsCoreFabric-{version}+{minecraft}.jar`. The loader metadata
-(`fabric.mod.json`, `mods.toml`, `neoforge.mods.toml`) is expanded per version, so
-each jar declares its own Minecraft version and no other.
+and version: `:platforms:fabric-26.3`. It compiles the shared `src/` together with its
+own, and `platforms/minecraft.gradle`, which the version subproject applies, takes the
+version from the folder's name, finds its coordinates in the catalog (each entry carries
+the version as a suffix, such as `fabric-api-26-3`), and names the jar
+`MCAgentsCoreFabric-{version}+{minecraft}.jar`, so the jar name keeps the game's version.
+The loader metadata (`fabric.mod.json`, `mods.toml`, `neoforge.mods.toml`) is expanded
+from the version, so each jar declares that Minecraft version and no other.
 
-When a Minecraft version changes an API core uses, the shared code calls a small
-class that each version folder carries under the same name, and never checks the
-version itself. Forge's `pack.mcmeta`, whose formats move with Minecraft, lives in
-each version folder too.
+Code whose Minecraft API changes between releases is a small class in the version
+folder, which the shared code calls without ever checking the version: the hologram's
+`RectangleSubmitter` and Forge's `AttackListener`. Forge's `pack.mcmeta`, whose formats
+move with Minecraft, lives in the version folder too.
+
+Moving to a new Minecraft release replaces the version: the entry in `settings.gradle`,
+the catalog block, and each module's version folder are renamed and updated, and the old
+version is not kept. Core 0.7.0 built for 26.2 and 26.3 side by side; from 0.8.0 core
+builds for 26.3 alone.
 
 `api`, `common` and `platforms:shared` name no Minecraft type, so they are built once.
 
@@ -112,7 +116,7 @@ How the right half is started without linking the other is on
 
 The three plugins are declared once in the root `build.gradle` with
 `apply false`, so they share one build classloader, and each version subproject
-applies its own. Core builds for **Minecraft 26.2 and 26.3**. Minecraft 26.x ships
+applies its own. Core builds for **Minecraft 26.3**, the latest release. Minecraft 26.x ships
 unobfuscated, so no module declares a mappings coordinate.
 
 `api`, `common` and `platforms:shared` use none of these toolchains. That is
@@ -122,8 +126,8 @@ only to compile against the game; the hologram's arithmetic lives in
 
 ## Published artifacts
 
-Every module carries a publication, a Minecraft-facing module one per Minecraft
-version. The jar a module builds is named `MCAgentsCore{Module}-{version}.jar`, with
+Every module carries a publication, a Minecraft-facing module one for the Minecraft
+version core supports. The jar a module builds is named `MCAgentsCore{Module}-{version}.jar`, with
 `+{minecraft}` before `.jar` for a Minecraft-facing one; its Maven coordinates are:
 
 | Module | Jar base name | Coordinates |
@@ -136,8 +140,9 @@ version. The jar a module builds is named `MCAgentsCore{Module}-{version}.jar`, 
 | `platforms/neoforge/{minecraft}` | `MCAgentsCoreNeoforge` | `io.github.mcagentsmods:mcagents-core-neoforge-{minecraft}` |
 | `platforms/fabric/{minecraft}` | `MCAgentsCoreFabric` | `io.github.mcagentsmods:mcagents-core-fabric-{minecraft}` |
 
-`{minecraft}` is the Minecraft version, `26.2` or `26.3`. Before 0.7.0 these four had no
-version suffix and were built for Minecraft 26.2 only.
+`{minecraft}` is the Minecraft version, `26.3`. Before 0.7.0 these four had no
+version suffix and were built for Minecraft 26.2 only; 0.7.0 published a `-26.2` and a
+`-26.3` id for each, side by side.
 
 `mcagents-core-common` also publishes its test fixtures as a variant, so a consumer can
 test against `StubTransport` and `StubKeySource` with
@@ -162,8 +167,8 @@ holograms; the loader artifacts are for a development run that needs core loaded
 ## Dependency versions
 
 Every coordinate lives in `gradle/libs.versions.toml`, so a version bump is one
-change in one file. The entries that move with Minecraft come in one block per
-version, suffixed with it (`-26-2` for 26.2):
+change in one file. The entries that move with Minecraft come in one block for the
+supported version, suffixed with it (`-26-3` for 26.3):
 
 | Catalog entry | Coordinate | Used by |
 |---|---|---|

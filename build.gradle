@@ -72,9 +72,9 @@ subprojects {
             // io.github.mcagentsmods:api — a consumer could not depend on core
             // and another mod at the same time. Gives mcagents-core-api,
             // mcagents-core-common and mcagents-core-shared, and, for the
-            // modules built once per Minecraft version, whose subprojects are
-            // named {module}-{version}, mcagents-core-client-26.2,
-            // mcagents-core-fabric-26.2 and so on. The jar names are the
+            // modules built for the Minecraft version core supports, whose
+            // subprojects are named {module}-{version}, mcagents-core-client-26.3,
+            // mcagents-core-fabric-26.3 and so on. The jar names are the
             // archivesName each module sets, MCAgentsCore{Module}.
             artifactId = "mcagents-${rootProject.name}-${project.name}"
 

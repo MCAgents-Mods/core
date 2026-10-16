@@ -1,8 +1,0 @@
-// core's Forge jar for Minecraft 26.2. Everything but the version, and the pack.mcmeta in
-// src/main/resources, is in ../forge.gradle.
-
-plugins {
-    id 'net.minecraftforge.gradle'
-}
-
-apply from: '../forge.gradle'

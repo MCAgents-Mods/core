@@ -4,9 +4,9 @@ import io.github.mcagentsmods.core.client.hologram.HologramClient;
 import net.minecraftforge.client.event.InputEvent;
 
 /**
- * Listens for the attack key on Forge for Minecraft 26.3. Every Minecraft version core builds
- * for has its own copy of this class, because Forge for 26.2 fires one event for every
- * interaction key.
+ * Listens for the attack key on Forge for Minecraft 26.3. It sits in the version folder
+ * because Forge's interaction key events change between Minecraft releases: before 26.3,
+ * one event fired for every interaction key.
  */
 final class AttackListener {
 

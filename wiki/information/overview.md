@@ -18,8 +18,8 @@ per player state, so a consumer keeps whatever history it wants and replays it.
 The `api` and `common` modules carry the agent API and its implementation.
 `platforms/shared` holds what every loader shares, including the two physical
 sides, `platforms/client` the holograms, drawn through vanilla Minecraft, and
-`platforms/{forge,neoforge,fabric}` each build one mod jar per Minecraft version, today
-26.2 and 26.3. What exists today is:
+`platforms/{forge,neoforge,fabric}` each build one mod jar for the latest Minecraft
+release, today 26.3, the only version core supports. What exists today is:
 
 | Path | What it is |
 |---|---|
