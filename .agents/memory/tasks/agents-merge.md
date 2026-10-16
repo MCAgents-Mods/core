@@ -5,7 +5,7 @@ description: Folding the MCAgents agents mod into core — the tool module, the 
 
 # Task: merge the agents mod into core
 
-**Status:** in progress
+**Status:** done
 
 ## The request
 
@@ -54,7 +54,7 @@ name; only its package and module change.
 | 2 | Tool module | `feat/tool-registry` | |
 | 3 | Agent, buttons and settings | `feat/tool-agent` | |
 | 4 | Agents menu, G key and settings screen | `feat/agents-menu` | |
-| 5 | Release | `release/{version}` | |
+| 5 | Release 0.10.0 | `release/0.10.0` | |
 
 ### Task 1 — chore/agents-merge-plan
 
@@ -100,3 +100,11 @@ and its strings moved into core's `en_us.json` as `key.mcagents_core.agents` and
 holds no released agents version. The buttons page moved from agents, `mod-runtime.md` gained
 the agent layer's start-up and `AgentsPaths`, and the tool, settings, agent, dependency,
 module, overview pages, the README, the map and the state file describe the menu.
+
+### Task 5 — release/0.10.0
+
+`project-version` is `0.10.0`, a minor: a module, an API and a menu arrive. The 0.10.0
+changelog and its logs-index row are new, and the rule, the repository map, the overview and
+the state file say 0.10.0. Merging this branch is the release: Publish finds no `v0.10.0` tag,
+publishes `core-tool` beside the other library modules and tags the commit, and Release
+attaches the three loader jars. Chat 0.9.0 and the template follow on it.
