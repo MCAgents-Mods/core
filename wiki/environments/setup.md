@@ -115,10 +115,10 @@ when a release reaches `master` — so run this command before opening one.
 
 ## Publish the modules
 
-Every module is published to GitHub Packages as
-`io.github.mcagentsmods:mcagents-core-{module}` — `api`, `common` and `shared` once,
-and `client`, `forge`, `neoforge` and `fabric` built for the supported Minecraft version,
-with no version in their id:
+The library modules are published to GitHub Packages as
+`io.github.mcagentsmods:mcagents-core-{module}` — `api`, `common`, `shared` and `client`,
+with no Minecraft version in their id. The `forge`, `neoforge` and `fabric` mod jars are not
+published there; the Release workflow below attaches them to the version's GitHub release:
 
 ```sh
 ./gradlew publish
@@ -139,8 +139,8 @@ Nobody runs `./gradlew publish` by hand for a release. The **Publish** workflow,
 1. It reads `project-version` from `gradle.properties` and looks for the tag
    `v{version}` on GitHub. If the tag exists, the run stops: a merge that leaves the
    version alone publishes nothing.
-2. Otherwise it builds and tests every module, publishes every module to GitHub Packages,
-   and only then tags the commit `v{version}`.
+2. Otherwise it builds and tests every module, publishes the library modules to GitHub
+   Packages, and only then tags the commit `v{version}`.
 
 So a release is the merge that changes `project-version`. A failed run leaves no tag,
 and the next push to `master` — or **Run workflow** on the Publish workflow's page in

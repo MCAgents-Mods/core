@@ -33,7 +33,7 @@ Full description: [`../../../wiki/information/overview.md`](../../../wiki/inform
 | `gradle/libs.versions.toml` | Every dependency coordinate. Never declare one inline in a module. |
 | `.agents/` | This repository's own instructions, plus the index, agent-wiki, and memory trees. The universal conventions are **not** here — they come from the connector. |
 | `wiki/` | Human documentation, including `wiki/api/` (one page per public API scope) and `wiki/logs/` release history. |
-| `.github/workflows/publish.yml` | The Publish workflow: on a push to `master` whose `project-version` has no `v{version}` tag yet, build, test, publish every module, then tag. |
+| `.github/workflows/publish.yml` | The Publish workflow: on a push to `master` whose `project-version` has no `v{version}` tag yet, build, test, publish the library modules (`api`, `common`, `shared`, `client`), then tag. |
 | `.github/workflows/release.yml` | The Release workflow: after each Publish run on `master`, if `v{version}` has no GitHub release yet, build the Forge, Fabric and NeoForge jars from the tag and attach them to a new release, then delete the run's copy of the jars. |
 
 ## Where the conventions come from

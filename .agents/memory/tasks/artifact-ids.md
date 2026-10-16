@@ -61,3 +61,12 @@ by the Release workflow.
 ### Task 1 — chore/artifact-ids-plan
 
 This record, and its row in the memory index.
+
+### Task 2 — build/publish-scope
+
+The `publishing` block is gone from `platforms/{fabric,forge,neoforge}/{loader}.gradle`, so
+`./gradlew publish` sends only `api`, `common`, `shared` and `client`. The loader subprojects
+still build their jars, which the Release workflow picks up from `platforms/{loader}/build/libs/`
+unchanged. The Publish header, the root build comment, the dependency, setup and modules pages
+and the repository map now say the loader jars go to GitHub releases only. Artifact ids are
+still `mcagents-core-*` here; task 3 renames them.
