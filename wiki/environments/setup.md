@@ -50,7 +50,7 @@ Useful variants:
 
 ```sh
 ./gradlew :api:build                     # one module only
-./gradlew :platforms:fabric-26.3:build    # one loader's jar
+./gradlew :platforms:fabric:build    # one loader's jar
 ./gradlew clean                      # delete the root build directory
 ./gradlew javaToolchains             # show which JDK the build resolved
 ```
@@ -61,9 +61,9 @@ Each loader starts a development client with core loaded, in its version subproj
 `run/` directory, which git ignores:
 
 ```sh
-./gradlew :platforms:fabric-26.3:runClient
-./gradlew :platforms:neoforge-26.3:runClient
-./gradlew :platforms:forge-26.3:runClient
+./gradlew :platforms:fabric:runClient
+./gradlew :platforms:neoforge:runClient
+./gradlew :platforms:forge:runClient
 ```
 
 The client loads the mod the way its jar would: `api`, `common` and `shared` are part of
@@ -117,8 +117,8 @@ when a release reaches `master` — so run this command before opening one.
 
 Every module is published to GitHub Packages as
 `io.github.mcagentsmods:mcagents-core-{module}` — `api`, `common` and `shared` once,
-and `client`, `forge`, `neoforge` and `fabric` for the supported Minecraft version, as
-`mcagents-core-{module}-{minecraft}`:
+and `client`, `forge`, `neoforge` and `fabric` built for the supported Minecraft version,
+with no version in their id:
 
 ```sh
 ./gradlew publish

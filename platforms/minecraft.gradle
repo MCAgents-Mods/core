@@ -2,7 +2,7 @@
 // There is one per module: core supports only the latest Minecraft release.
 //
 // The subproject's folder is named for the Minecraft version it builds for, and the
-// subproject itself {module}-{version}. Its module's shared sources sit one folder up,
+// subproject itself for its module alone, :platforms:{module}. Its module's shared sources sit one folder up,
 // in platforms/{module}/src, and are compiled together with the subproject's own src/,
 // which holds only what is particular to that version: a class whose code changes
 // between Minecraft releases, or a resource such as Forge's pack.mcmeta. Shared code

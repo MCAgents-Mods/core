@@ -7,7 +7,7 @@
 
 apply from: '../../minecraft.gradle'
 
-def clientModule = ":platforms:client-${minecraftVersion}"
+def clientModule = ':platforms:client'
 def forgeVersion = versionFor('forge')
 
 repositories {
@@ -42,7 +42,7 @@ def devMod = tasks.register('devModDirectory', Sync) {
 
 minecraft {
     runs {
-        // A development client: ./gradlew :platforms:forge-{version}:runClient, in run/.
+        // A development client: ./gradlew :platforms:forge:runClient, in run/.
         client {
             workingDir = project.file('run')
             // The jar names its mixins in its manifest; a run from a directory has no

@@ -3,7 +3,7 @@
 A hologram is a set of panels standing in the level in front of the player, who aims at them
 and clicks instead of opening a screen. A mod describes one with `Hologram`, in
 `mcagents-core-api` under `io.github.mcagentsmods.core.api.hologram`, and opens it with
-`Holograms`, in `mcagents-core-client-{minecraft}` under `io.github.mcagentsmods.core.client.hologram`. Core
+`Holograms`, in `mcagents-core-client` under `io.github.mcagentsmods.core.client.hologram`. Core
 draws it, takes the player's clicks, mouse wheel and move key, and removes it. Core opens no
 hologram of its own. This page covers opening, closing and what the player does; the kinds of
 panel are on [`hologram-panels.md`](hologram-panels.md).
@@ -97,5 +97,5 @@ other text.
 ## Related
 
 - The panel kinds and how each is drawn: [`hologram-panels.md`](hologram-panels.md).
-- Depending on `mcagents-core-client-{minecraft}`: [`dependency.md`](dependency.md).
+- Depending on `mcagents-core-client`: [`dependency.md`](dependency.md).
 - How each loader hooks the hologram into the game: [`mod-runtime.md`](mod-runtime.md).

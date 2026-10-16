@@ -2,8 +2,8 @@
 
 A mod compiles against `mcagents-core-api` and `mcagents-core-common` as `compileOnly`, and the
 `mcagents_core` mod supplies both in game. A mod that opens holograms adds
-`mcagents-core-client-{minecraft}`, for the Minecraft version it builds against, the same way. This page says which artifact holds what, and how to reach
-them.
+`mcagents-core-client` the same way, building for the Minecraft version core supports,
+26.3. This page says which artifact holds what, and how to reach them.
 
 ## Add it
 
@@ -22,8 +22,8 @@ dependencies {
     compileOnly 'io.github.mcagentsmods:mcagents-core-api:{version}'
     compileOnly 'io.github.mcagentsmods:mcagents-core-common:{version}'
     // Only to open holograms, and only in a module that compiles against Minecraft:
-    // the one built for the Minecraft version core supports, mcagents-core-client-26.3.
-    compileOnly 'io.github.mcagentsmods:mcagents-core-client-{minecraft}:{version}'
+    // built for the one Minecraft version core supports, the latest release.
+    compileOnly 'io.github.mcagentsmods:mcagents-core-client:{version}'
 }
 ```
 
@@ -32,10 +32,11 @@ dependencies {
 classpath. GitHub Packages asks for credentials even to read, so the token needs
 `read:packages`.
 
-`mcagents-core-client-{minecraft}` names Minecraft's client classes and declares no dependency
+`mcagents-core-client` names Minecraft's client classes and declares no dependency
 of its own, so the module that uses it brings that Minecraft version through its own toolchain,
-and calls it only from code that runs on the client. A mod that builds for several Minecraft
-versions depends on each version's artifact from that version's module.
+and calls it only from code that runs on the client. Core builds it for the latest Minecraft
+release alone, and its id carries no Minecraft version, so a mod builds for that release too.
+Up to 0.7.0 the Minecraft-facing ids ended in the version, as in `mcagents-core-client-26.3`.
 
 `compileOnly` does not reach the test classpath. A module with tests repeats the same two
 coordinates as `testImplementation`.
@@ -48,8 +49,8 @@ coordinates as `testImplementation`.
 | `mcagents-core-common` | `…core.common`, `.model`, `.http`, `.hologram` | The implementations: `MCAgentsProvider`, `OpenRouterClient`, `JdkHttpTransport`, and the hologram's placement, layout, scrolling and text arithmetic, which `mcagents-core-client` uses. | [`provider.md`](provider.md), [`model-client.md`](model-client.md), [`http.md`](http.md) |
 | `mcagents-core-common`, test fixtures | `…core.common.testing` | `StubTransport` and `StubKeySource`, for a consumer's tests. | [`test-fixtures.md`](test-fixtures.md) |
 | `mcagents-core-shared` | `…core.shared` and below | What the loader entry points start: sides, the shared key file, the token commands. | [`mod-runtime.md`](mod-runtime.md), [`key-file.md`](key-file.md), [`token-commands.md`](token-commands.md) |
-| `mcagents-core-client-{minecraft}` | `…core.client.hologram` | `Holograms`, which opens and closes holograms, and the drawing and input behind it. Client only; published for the latest Minecraft release alone, compiled against it. | [`hologram.md`](hologram.md), [`hologram-panels.md`](hologram-panels.md) |
-| `mcagents-core-fabric-{minecraft}`, `-neoforge-`, `-forge-` | `…core.{loader}` | One mod jar per loader and Minecraft version, for a development run that needs core loaded. | — |
+| `mcagents-core-client` | `…core.client.hologram` | `Holograms`, which opens and closes holograms, and the drawing and input behind it. Client only; published for the latest Minecraft release alone, compiled against it. | [`hologram.md`](hologram.md), [`hologram-panels.md`](hologram-panels.md) |
+| `mcagents-core-fabric`, `-neoforge`, `-forge` | `…core.{loader}` | One mod jar per loader, built for Minecraft 26.3, for a development run that needs core loaded. | — |
 
 Every package is prefixed `io.github.mcagentsmods`. Every artifact is published under the
 group `io.github.mcagentsmods` with the same version; `project-version` in core's
