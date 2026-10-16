@@ -1,18 +1,18 @@
 # Test Fixtures
 
-`mcagents-core-common` publishes two fakes for a consumer's tests: `StubTransport`, an
+`core-common` publishes two fakes for a consumer's tests: `StubTransport`, an
 `HttpTransport` that answers from a script, and `StubKeySource`, an `ApiKeySource` that
 records which keys were rejected. With them, the [model client](model-client.md)'s retries,
 key rotation and JSON handling run without a network or an API key.
 
 ```groovy
 dependencies {
-    testImplementation testFixtures('io.github.mcagentsmods:mcagents-core-common:{version}')
+    testImplementation testFixtures('io.github.mcagentsmods:core-common:{version}')
 }
 ```
 
-From 0.5.1 on. 0.5.0 published the fixtures under a capability that notation does not ask
-for. The fixtures are never bundled into a loader jar.
+From 0.9.0 on; 0.5.1 to 0.8.0 answer the same notation with `mcagents-core-common`. 0.5.0
+published the fixtures under a capability that notation does not ask for. The fixtures are never bundled into a loader jar.
 
 ```java
 StubTransport transport = new StubTransport()

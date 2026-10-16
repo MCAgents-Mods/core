@@ -116,7 +116,7 @@ when a release reaches `master` — so run this command before opening one.
 ## Publish the modules
 
 The library modules are published to GitHub Packages as
-`io.github.mcagentsmods:mcagents-core-{module}` — `api`, `common`, `shared` and `client`,
+`io.github.mcagentsmods:core-{module}` — `api`, `common`, `shared` and `client`,
 with no Minecraft version in their id. The `forge`, `neoforge` and `fabric` mod jars are not
 published there; the Release workflow below attaches them to the version's GitHub release:
 

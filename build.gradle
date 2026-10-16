@@ -66,18 +66,18 @@ subprojects {
         }
 
         publications.withType(MavenPublication) {
-            // Qualify the coordinates with the family and the root project
-            // name. Without this the artifactId defaults to the bare module
-            // name, so every project in this group would publish a colliding
-            // io.github.mcagentsmods:api — a consumer could not depend on core
-            // and another mod at the same time. Gives mcagents-core-api,
-            // mcagents-core-common, mcagents-core-shared, mcagents-core-client
-            // and so on: the Minecraft-facing modules carry no Minecraft
-            // version in their id, since core supports only the latest release.
-            // Only these library modules declare a publication: the loader mod
-            // jars go to GitHub releases instead. The jar names are the
-            // archivesName each module sets, MCAgentsCore{Module}.
-            artifactId = "mcagents-${rootProject.name}-${project.name}"
+            // Qualify the coordinates with the root project name. Without this
+            // the artifactId defaults to the bare module name, so every project
+            // in this group would publish a colliding io.github.mcagentsmods:api
+            // — a consumer could not depend on core and another mod at the same
+            // time. The group already says MCAgents, so the id does not repeat
+            // it. Gives core-api, core-common, core-shared and core-client: the
+            // Minecraft-facing modules carry no Minecraft version in their id,
+            // since core supports only the latest release. Only these library
+            // modules declare a publication: the loader mod jars go to GitHub
+            // releases instead. The jar names are the archivesName each module
+            // sets, MCAgentsCore{Module}.
+            artifactId = "${rootProject.name}-${project.name}"
 
             pom {
                 url = "https://github.com/${project.property('git-org-name')}/${project.property('git-repository')}"

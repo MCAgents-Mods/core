@@ -4,9 +4,9 @@ How core starts inside a game. Each loader's entry point calls `CoreRuntime.star
 gameDirectory)` once and `CoreRuntime.stop()` at shutdown; core then starts the client half or
 the dedicated-server half, and never links the other. A mod built on core does not call any
 of this, because the core mod does it. Read this page to write a loader entry point, or to
-check which side code is running on. Everything here is in `mcagents-core-shared`, under
+check which side code is running on. Everything here is in `core-shared`, under
 `io.github.mcagentsmods.core.shared`, except the hologram's hooks, which are in
-`mcagents-core-client`.
+`core-client`.
 
 ```java
 // A loader's client entry point, as core's Fabric one does it
@@ -57,7 +57,7 @@ file: [`key-file.md`](key-file.md).
 
 ## The hologram's hooks
 
-`…core.client.hologram.HologramClient`, in `mcagents-core-client`. A loader's client entry
+`…core.client.hologram.HologramClient`, in `core-client`. A loader's client entry
 point connects its own events to these; a mod opens holograms through
 [`Holograms`](hologram.md) instead. Every method runs on the client thread.
 
@@ -76,5 +76,5 @@ point connects its own events to these; a mod opens holograms through
 | NeoForge | `CoreNeoForgeClient`, `@Mod(dist = Dist.CLIENT)` | `SubmitCustomGeometryEvent` |
 | Forge | `CoreForgeClient.start()`, called by `CoreForgeMod` on the client only | A mixin on `LevelRenderer.submitFeatures`, named in the jar's `MixinConfigs` manifest attribute, because Forge has no event for drawing in the level |
 
-Each loader reaches `mcagents-core-client` only from that client half, so a dedicated server
+Each loader reaches `core-client` only from that client half, so a dedicated server
 never links a client class.
