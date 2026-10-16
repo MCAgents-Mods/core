@@ -57,3 +57,16 @@ README, `wiki/information/{modules,overview}.md`, `wiki/environments/setup.md`,
 `wiki/api/dependency.md`, the repository map and the state file. The instruction files
 `.agents/rules/repository.md` and `.agents/knowledge/minecraft-platform.md` still name 26.2;
 they are findings for the owner, not edited here.
+
+### Task 3 — build/unversioned-ids
+
+`settings.gradle` holds one `minecraftVersion` instead of a list and includes each
+Minecraft-facing module as `:platforms:{module}`, with its project directory still the version
+folder `platforms/{module}/26.3`. So the published ids are `mcagents-core-client` and
+`mcagents-core-{fabric,neoforge,forge}`, without `-26.3`, while the jars keep
+`+26.3` from `platforms/minecraft.gradle`. The loader builds name the client module
+`:platforms:client`; dev clients are `./gradlew :platforms:{loader}:runClient`. Docs updated:
+`wiki/api/{dependency,hologram,mod-runtime}.md`, `wiki/environments/setup.md`,
+`wiki/information/modules.md`, the repository map, and the `build.gradle` comment.
+agents and chat substitute these project paths for the published ids in their composite
+builds, so they move to the new names in their own `build/unversioned-ids`.

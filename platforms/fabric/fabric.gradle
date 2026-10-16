@@ -6,7 +6,7 @@
 
 apply from: '../../minecraft.gradle'
 
-def clientModule = ":platforms:client-${minecraftVersion}"
+def clientModule = ':platforms:client'
 
 loom {
     mods {

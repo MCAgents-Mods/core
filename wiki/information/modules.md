@@ -45,13 +45,13 @@ of those modules is a folder of shared sources with a Gradle subproject for the 
 platforms/fabric/
 ├── fabric.gradle        the module's build, applied by the version subproject
 ├── src/                 the sources that do not depend on the Minecraft version
-└── 26.3/                the subproject :platforms:fabric-26.3
+└── 26.3/                the subproject :platforms:fabric
     ├── build.gradle     applies the loader plugin, then ../fabric.gradle
     └── src/             only what is particular to 26.3, often nothing
 ```
 
 The subproject's folder is named for its version, and the subproject for its module
-and version: `:platforms:fabric-26.3`. It compiles the shared `src/` together with its
+alone: `:platforms:fabric`, so no project path or artifact id carries the version. It compiles the shared `src/` together with its
 own, and `platforms/minecraft.gradle`, which the version subproject applies, takes the
 version from the folder's name, finds its coordinates in the catalog (each entry carries
 the version as a suffix, such as `fabric-api-26-3`), and names the jar
@@ -135,14 +135,15 @@ version core supports. The jar a module builds is named `MCAgentsCore{Module}-{v
 | `api` | `MCAgentsCoreApi` | `io.github.mcagentsmods:mcagents-core-api` |
 | `common` | `MCAgentsCoreCommon` | `io.github.mcagentsmods:mcagents-core-common` |
 | `platforms/shared` | `MCAgentsCoreShared` | `io.github.mcagentsmods:mcagents-core-shared` |
-| `platforms/client/{minecraft}` | `MCAgentsCoreClient` | `io.github.mcagentsmods:mcagents-core-client-{minecraft}` |
-| `platforms/forge/{minecraft}` | `MCAgentsCoreForge` | `io.github.mcagentsmods:mcagents-core-forge-{minecraft}` |
-| `platforms/neoforge/{minecraft}` | `MCAgentsCoreNeoforge` | `io.github.mcagentsmods:mcagents-core-neoforge-{minecraft}` |
-| `platforms/fabric/{minecraft}` | `MCAgentsCoreFabric` | `io.github.mcagentsmods:mcagents-core-fabric-{minecraft}` |
+| `platforms/client/{minecraft}` | `MCAgentsCoreClient` | `io.github.mcagentsmods:mcagents-core-client` |
+| `platforms/forge/{minecraft}` | `MCAgentsCoreForge` | `io.github.mcagentsmods:mcagents-core-forge` |
+| `platforms/neoforge/{minecraft}` | `MCAgentsCoreNeoforge` | `io.github.mcagentsmods:mcagents-core-neoforge` |
+| `platforms/fabric/{minecraft}` | `MCAgentsCoreFabric` | `io.github.mcagentsmods:mcagents-core-fabric` |
 
-`{minecraft}` is the Minecraft version, `26.3`. Before 0.7.0 these four had no
-version suffix and were built for Minecraft 26.2 only; 0.7.0 published a `-26.2` and a
-`-26.3` id for each, side by side.
+`{minecraft}` is the Minecraft version, `26.3`; it is in the jar's name but not in any
+artifact id. Before 0.7.0 these four ids had no version suffix either and were built for
+Minecraft 26.2 only; 0.7.0 published a `-26.2` and a `-26.3` id for each, side by side, and
+from 0.8.0 the ids are those above again, built for 26.3.
 
 `mcagents-core-common` also publishes its test fixtures as a variant, so a consumer can
 test against `StubTransport` and `StubKeySource` with
@@ -158,10 +159,10 @@ another mod at the same time.
 
 A loader module publishes its mod jar alone, with no dependency list: the jar
 already carries `api`, `common`, `shared` and `client`, and the loader supplies
-the rest. `mcagents-core-client-{minecraft}` declares no dependency either:
+the rest. `mcagents-core-client` declares no dependency either:
 Minecraft comes from the consumer's own toolchain. A mod compiles against
 `mcagents-core-api` and `mcagents-core-common`, and the
-`mcagents-core-client-{minecraft}` of the Minecraft version it builds for to open
+`mcagents-core-client`, built for the Minecraft version core supports, to open
 holograms; the loader artifacts are for a development run that needs core loaded.
 
 ## Dependency versions

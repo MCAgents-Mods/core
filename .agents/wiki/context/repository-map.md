@@ -28,7 +28,7 @@ Full description: [`../../../wiki/information/overview.md`](../../../wiki/inform
 | `platforms/shared/` | What every loader shares: `CoreRuntime`, the side-guard machinery, and the client and server halves as packages. Plain Java. |
 | `platforms/client/` | The holograms: drawing, aiming, clicks, the wheel, the Z key and the two-chunk range, against vanilla Minecraft through Loom, and the `en_us` lang file for the key and the footer. Client only; no loader type. |
 | `platforms/{forge,neoforge,fabric}/` | One entry point and one manifest per loader, a client half that wires the hologram to the loader's events, and Forge's drawing mixin; each with its own toolchain and its own mod jar. |
-| `platforms/{client,forge,neoforge,fabric}/{minecraft}/` | The Gradle subproject for the one Minecraft version core supports (26.3), `:platforms:{module}-{minecraft}`: a `build.gradle` that applies the toolchain and `../{module}.gradle`, and a `src/` with only what is particular to that version. The shared sources are in `platforms/{module}/src/`. |
+| `platforms/{client,forge,neoforge,fabric}/{minecraft}/` | The Gradle subproject for the one Minecraft version core supports (26.3), `:platforms:{module}`: a `build.gradle` that applies the toolchain and `../{module}.gradle`, and a `src/` with only what is particular to that version. The shared sources are in `platforms/{module}/src/`. |
 | `platforms/minecraft.gradle` | What each version subproject applies: its version from the folder name, the catalog lookups by version suffix, the two source folders, and the `+{minecraft}` jar name. |
 | `gradle/libs.versions.toml` | Every dependency coordinate. Never declare one inline in a module. |
 | `.agents/` | This repository's own instructions, plus the index, agent-wiki, and memory trees. The universal conventions are **not** here — they come from the connector. |
@@ -72,7 +72,7 @@ Public API surface, one page per scope, method by method: `wiki/api/`, routed by
 ./gradlew :common:test                   # one module
 ./gradlew test --tests '*TokenHandles*'  # one class
 ./gradlew publishToMavenLocal            # a release dry run
-./gradlew :platforms:fabric-26.3:runClient    # a dev client (also neoforge, forge)
+./gradlew :platforms:fabric:runClient    # a dev client (also neoforge, forge)
 ./gradlew clean
 ```
 
