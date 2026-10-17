@@ -46,3 +46,11 @@ rebase-merged in order.
 ### Task 1 — chore/own-modules-plan
 
 This record, and its row in the memory index.
+
+### Task 2 — build/own-modules
+
+The Fabric, Forge and NeoForge modules declare `tool`, `api`, `common`, `shared` and `client` with
+`implementation` and nothing else; Fabric Loader, Fabric API and Forge stay `compileOnly`, with
+the `runtimeOnly` line `runClient` needs, and NeoForge stays undeclared because ModDevGradle
+provides it. `./gradlew build` is green, and the three loader jars hold exactly the entries, at
+the same sizes, of the v0.13.0 release jars.
