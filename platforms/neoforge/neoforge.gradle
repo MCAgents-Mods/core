@@ -37,11 +37,21 @@ neoForge {
 }
 
 dependencies {
-    implementation project(':tool')
-    implementation project(':api')
-    implementation project(':common')
-    implementation project(':platforms:shared')
-    implementation project(clientModule)
+    // Compiled against, never shipped through a configuration: ModDevGradle provides NeoForge
+    // itself, and the jar task below merges core's own modules.
+    compileOnly project(':tool')
+    compileOnly project(':api')
+    compileOnly project(':common')
+    compileOnly project(':platforms:shared')
+    compileOnly project(clientModule)
+
+    // The dev client (runClient) runs from this module's class path, so it needs them there
+    // too. This module is never published, so runtimeOnly reaches nothing else.
+    runtimeOnly project(':tool')
+    runtimeOnly project(':api')
+    runtimeOnly project(':common')
+    runtimeOnly project(':platforms:shared')
+    runtimeOnly project(clientModule)
 }
 
 tasks.named('jar', Jar) {
