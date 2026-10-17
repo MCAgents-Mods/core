@@ -140,7 +140,8 @@ A box the player types into, with a send button under it.
 
 The empty box says "Click here to type". Clicking it starts typing: core opens a screen of
 its own that draws nothing over the world except one line at the top saying how to send and
-stop, and takes the keys. While it does, the box is ringed in blue and shows the caret.
+stop, and takes the keys and the typed text. An input method's candidates open by that line.
+While the screen is open, the box is ringed in blue and shows the caret.
 
 | Key | What it does |
 |---|---|
