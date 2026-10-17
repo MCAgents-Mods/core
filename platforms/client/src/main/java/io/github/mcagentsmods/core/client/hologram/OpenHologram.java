@@ -3,6 +3,7 @@ package io.github.mcagentsmods.core.client.hologram;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import io.github.mcagentsmods.core.api.hologram.Hologram;
+import io.github.mcagentsmods.core.common.hologram.HologramFootprint;
 import io.github.mcagentsmods.core.common.hologram.HologramPose;
 import io.github.mcagentsmods.core.common.hologram.HologramSpace;
 import io.github.mcagentsmods.core.common.hologram.PanelHit;
@@ -13,6 +14,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,6 +37,7 @@ final class OpenHologram {
     final ClientLevel level;
     private final List<PanelView> views;
     private final List<PanelPlacement> placements;
+    private final double halfWidth;
     private HologramPose pose;
 
     private int hoverPanel = -1;
@@ -45,7 +48,14 @@ final class OpenHologram {
     private Vector3 grip;
     private double gripDistance;
 
-    OpenHologram(Hologram spec, ClientLevel level, List<PanelView> views, Vector3 eye, double yaw) {
+    /**
+     * Stands a hologram in front of the player, turned aside when one of {@code others} is in
+     * the way.
+     *
+     * @param others the footprints of the holograms already standing
+     */
+    OpenHologram(Hologram spec, ClientLevel level, List<PanelView> views, Vector3 eye, double yaw,
+                 Collection<HologramFootprint> others) {
         this.spec = spec;
         this.level = level;
         this.views = List.copyOf(views);
@@ -57,15 +67,33 @@ final class OpenHologram {
         }
         double radius = Math.max(MIN_RADIUS, total * RADIUS_PER_WIDTH);
         this.placements = HologramSpace.arrange(widths, radius);
-        this.pose = HologramSpace.inFront(eye, yaw, radius);
+        this.halfWidth = total / 2;
+        this.pose = HologramSpace.clearOf(eye, yaw, radius, halfWidth, others);
     }
 
     HologramPose pose() {
         return pose;
     }
 
+    /** @return the ground the hologram takes up where it stands now */
+    HologramFootprint footprint() {
+        return new HologramFootprint(pose.anchor(), halfWidth);
+    }
+
     boolean hovered() {
         return hoverPanel >= 0;
+    }
+
+    /** @return how far away the point aimed at is, or infinity when nothing is aimed at */
+    double aimDistance() {
+        return hoverPanel >= 0 ? hoverDistance : Double.POSITIVE_INFINITY;
+    }
+
+    /** Forgets what was aimed at, as when a nearer hologram stands under the crosshair. */
+    void clearAim() {
+        hoverPanel = -1;
+        hoverU = Double.NaN;
+        hoverV = Double.NaN;
     }
 
     boolean carried() {
@@ -79,9 +107,7 @@ final class OpenHologram {
      * @param blocked how far away the crosshair's own target is, or infinity
      */
     void aim(Vector3 eye, Vector3 look, double blocked) {
-        hoverPanel = -1;
-        hoverU = Double.NaN;
-        hoverV = Double.NaN;
+        clearAim();
         if (eye == null) {
             return;
         }

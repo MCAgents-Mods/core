@@ -24,7 +24,7 @@ Holograms.toggle(menu);
 
 | Member | Meaning |
 |---|---|
-| `id` | Whose hologram it is: 1 to 64 lowercase letters, digits, dots, dashes or underscores, conventionally `{modid}.{name}`. |
+| `id` | Which hologram it is: 1 to 64 lowercase letters, digits, dots, dashes or underscores, conventionally `{modid}.{name}`. One hologram per id is open at a time; a mod that shows several of a kind gives each its own id, such as `{modid}.{name}.{key}`. |
 | `panels` | The panels, left to right, copied. At least one and at most `MAX_PANELS`. |
 | `of(String id, HologramPanel... panels)` | The same, from a list of arguments. |
 | `MAX_PANELS` | `3`. More would run off the sides of the screen. |
@@ -39,19 +39,23 @@ nothing.
 
 | Method | Meaning |
 |---|---|
-| `open(Hologram)` | Opens it in front of the player, closing whichever hologram is open. With no player in a world it logs a warning and does nothing. |
-| `toggle(Hologram)` | Closes the open hologram when it has this one's id, and otherwise opens this one. What a key that shows and hides a hologram calls. |
-| `close(String id)` | Closes the hologram with this id, if it is the one open. |
-| `closeAll()` | Closes whichever hologram is open. |
-| `isOpen(String id)` | Whether the hologram with this id is the one open. |
-| `openId()` | The open hologram's id, as an `Optional<String>`. |
+| `open(Hologram)` | Opens it in front of the player, beside any already standing. One with the same id closes first, so it moves rather than doubles. With no player in a world it logs a warning and does nothing. |
+| `toggle(Hologram)` | Closes the hologram with this one's id when it is open, and otherwise opens this one. What a key that shows and hides a hologram calls. |
+| `close(String id)` | Closes the hologram with this id, if it is open. |
+| `closeAll()` | Closes every hologram. |
+| `replacing(String id, Runnable action)` | Runs `action`; the first hologram it opens takes the place of the hologram with this id, which closes. When `action` opens none, that one stays. A menu runs its buttons this way. |
+| `isOpen(String id)` | Whether the hologram with this id is open. |
+| `openIds()` | The ids of the holograms open, as a `List<String>`, the one opened longest ago first. |
+| `MAX_OPEN` | `8`, the most holograms that stand at once. |
 
-**One hologram at a time.** Opening a hologram closes the one already open, so a menu button
-that opens another hologram replaces the menu with it.
+**Several at once.** Up to `MAX_OPEN` holograms stand at once, and the player aims at, clicks,
+scrolls, carries and closes each on its own. Opening one more closes the one opened longest
+ago, so opening never fails.
 
-**Threading.** Call `open`, `toggle`, `close` and `closeAll` from the client thread. A call from
-any other thread is handed to the client thread and takes effect on its next turn, so `isOpen`
-answers `false` until then. `isOpen` and `openId` may be read from any thread.
+**Threading.** Call `open`, `toggle`, `close`, `closeAll` and `replacing` from the client
+thread. A call from any other thread is handed to the client thread and takes effect on its
+next turn, so `isOpen` answers `false` until then. `isOpen` and `openIds` may be read from any
+thread.
 
 A button's action runs on the client thread, inside the click. It must not block: hand slow
 work to a future, and come back to the client thread with `Minecraft.execute`. An action that
@@ -64,6 +68,12 @@ blocks away, or further for a wider hologram so that its edges stay on screen. S
 stand in an arc around the player, the outer ones turned towards them. It then stays at that
 place in the world until the player moves it.
 
+When a hologram already stands on that spot, the new one turns around the player instead: 40°
+to the player's right, then 40° to the left, then 80° and 120° each way, and opens on the first
+spot that is clear. When none is clear, it opens straight ahead, in front of the other. A spot
+is clear when the two holograms' widths, measured on the ground around their middles, do not
+meet.
+
 Nothing is saved. An open hologram lives in memory and is gone when it closes; it does not
 survive leaving the world.
 
@@ -71,21 +81,21 @@ survive leaving the world.
 
 | The player | What happens |
 |---|---|
-| Aims the crosshair at a panel, within 12 blocks and with nothing nearer in the way | The button under the crosshair lightens. |
+| Aims the crosshair at a panel, within 12 blocks and with nothing nearer in the way | The button under the crosshair lightens. Where holograms stand one behind another, the nearest one is aimed at. |
 | Left-clicks a button | Its action runs. The block behind the hologram is not hit. |
 | Left-clicks a list's row, or a prompt's box | The mod is told which row was chosen, or typing starts; see [`hologram-panels.md`](hologram-panels.md). |
 | Turns the mouse wheel while aiming at a panel | The panel scrolls, and the hotbar slot does not change. |
-| Holds the move key while aiming at the hologram | The hologram follows the crosshair at the distance it was taken from, turned to face the player. |
+| Holds the move key while aiming at a hologram | That hologram follows the crosshair at the distance it was taken from, turned to face the player. One hologram is carried at a time. |
 | Lets go of the move key | The hologram stays where it is. |
 | Clicks the X in the top right corner of the last panel | The hologram closes. |
 | Is more than two chunks from the hologram's chunk, on either axis | The hologram closes. Placed in chunk 1, it stays while the player is in chunks 2 and 3 and goes in chunk 4. The chunk counted is the one the hologram stands in now, after any move. |
-| Changes dimension or leaves the world | The hologram closes. |
+| Changes dimension or leaves the world | Every hologram closes. |
 
 The move key is **Z** unless the player rebinds it, under *Controls*, in the *MCAgents Core*
 category, as *Move a hologram (hold)*. Every button grid says so in its footer, naming the key
 as it is bound.
 
-While a screen is open, such as the inventory or chat, the hologram is drawn but takes no
+While a screen is open, such as the inventory or chat, the holograms are drawn but take no
 clicks, wheel or move key.
 
 ## Text

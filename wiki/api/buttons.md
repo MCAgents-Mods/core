@@ -60,16 +60,17 @@ with the mouse wheel past that.
 | **SETTINGS** after them | Always. It opens the settings screen ([`settings.md`](settings.md)), which goes back to the game when it closes. |
 | The menu staying open, and the reason in the log | A button's action threw. |
 
-A button whose action opens another hologram, as chat's does, replaces the menu with it: core
-shows one hologram at a time.
+A button whose action opens another hologram, as chat's does, replaces the menu with it: the
+menu runs every button through `Holograms.replacing`, so the new hologram opens where the menu
+stood. A button whose action opens a screen leaves the menu standing.
 
 | Member | What it is |
 |---|---|
 | `ID` | `mcagents_core.menu`, the menu's hologram id. |
-| `toggle()` | Closes the menu when it is the hologram open, and opens it otherwise, as G does. |
-| `open()` | Opens the menu, closing any other hologram. |
-| `close()` | Closes the menu, if it is the hologram open. |
-| `isOpen()` | Whether the menu is the hologram open. |
+| `toggle()` | Closes the menu when it is open, and opens it otherwise, as G does. Other holograms stay. |
+| `open()` | Opens the menu in front of the player, moving it there if it is open already. |
+| `close()` | Closes the menu, if it is open. |
+| `isOpen()` | Whether the menu is open. |
 
 Call them on the game's thread. A mod built on core needs none of them to add a button;
 they are for a mod that wants to bring the menu back, from its own hologram for instance.
