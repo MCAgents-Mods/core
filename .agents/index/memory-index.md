@@ -48,6 +48,7 @@ match on it before opening anything. Writing here needs no approval; see
 | [`../memory/tasks/prompt-typing.md`](../memory/tasks/prompt-typing.md) | `platforms/client/`, the hologram's prompt | Making typed text reach a hologram's prompt box on Minecraft 26.3, which hands characters only to a screen that asks for text input, and releasing 0.10.1. |
 | [`../memory/tasks/multi-hologram.md`](../memory/tasks/multi-hologram.md) | `platforms/client/`, `api/hologram`, holograms | Letting several holograms stand at once, the pick list panel and transcript buttons chat's session picker needs, and releasing 0.11.0. |
 | [`../memory/tasks/compile-only.md`](../memory/tasks/compile-only.md) | Gradle builds, `platforms/` | Replacing every `implementation` in the loader modules with `compileOnly` plus a dev-client `runtimeOnly` twin, with no jar changing, and releasing 0.11.1. |
+| [`../memory/tasks/hologram-forms.md`](../memory/tasks/hologram-forms.md) | `platforms/client/`, `api/hologram`, holograms, the agents menu | Adding the form panel so every agents menu button can open a hologram, core's Settings as one, and releasing 0.12.0. |
 
 ## Decisions
 
