@@ -32,9 +32,10 @@ Hologram chat = Hologram.of("mymod.chat",
 ```
 
 There are two shapes of panel. The **button grid** is wide and short: a menu. The **lists**,
-the **transcript** and the **prompt** are tall, made to stand side by side: each has its title
-in a band across the top and a sunken box under it with a scrollbar down its right side. A
-pick list's band is a nav bar, with the title on the left and buttons on the right.
+the **transcript**, the **prompt** and the **form** are tall, made to stand side by side: each
+has its title in a band across the top. The lists, the transcript and the prompt have a sunken
+box under it with a scrollbar down its right side; a form has rows of text, fields and buttons.
+A pick list's band is a nav bar, with the title on the left and buttons on the right.
 
 **Suppliers are read every frame**, on the client thread. They must answer at once from
 memory: never read a file or a database, or wait on a future, inside one. A supplier that
@@ -43,7 +44,7 @@ click or key that caused them, and must not block either; one that throws is log
 
 ## HologramPanel
 
-`sealed interface HologramPanel permits ButtonGrid, SelectList, Transcript, PromptInput`
+`sealed interface HologramPanel permits ButtonGrid, SelectList, PickList, Transcript, PromptInput, Form`
 
 | Member | Meaning |
 |---|---|
@@ -189,6 +190,7 @@ While the screen is open, the box is ringed in blue and shows the caret.
 | Shift+Enter | Starts a new line. |
 | Escape, or any click | Stops typing and keeps the text. |
 | Backspace, Delete | Deletes the character before or after the caret. |
+| Ctrl+Backspace | Deletes from the start of the caret's line to the caret: End then Ctrl+Backspace empties a field. |
 | Left, Right | Move the caret one character. |
 | Home, End | Move the caret to the start or end of its line. |
 | Ctrl+V | Pastes. A carriage return becomes a line break, a tab a space, and other control characters are dropped. |
@@ -196,3 +198,78 @@ While the screen is open, the box is ringed in blue and shows the caret.
 While typing, the player cannot look around or scroll the hologram. Aiming at the send button
 and clicking sends the same way as Enter. The text is kept in memory while the hologram is
 open and is gone when it closes; typing stops on its own when the hologram closes.
+
+### Form
+
+`record Form(String title, List<FormRow> rows, List<FormButton> buttons, FormWidth width) implements HologramPanel`
+
+A page of settings or a dialog: rows of text, fields, toggles, steppers and buttons, top to
+bottom, and buttons along the bottom. It replaces a flat settings screen.
+
+```java
+// A settings page: a key that is never shown, a model picked from a list or typed, a switch.
+Hologram settings = Hologram.of("mymod.settings", new Form("mymod.settings", List.of(
+        FormField.of("mymod.key", () -> draft.key, text -> draft.key = text).hidden(),
+        FormField.of("mymod.model", () -> draft.model, text -> draft.model = text)
+                .withChoices(() -> SUGGESTED_MODELS),
+        new FormToggle("mymod.retrieval", () -> draft.retrieval, () -> draft.retrieval ^= true),
+        new FormText(() -> status, () -> statusTone, 2)),
+        List.of(FormButton.of("mymod.save", this::save))));
+```
+
+| Member | Meaning |
+|---|---|
+| `title` | The title in the top band. |
+| `rows` | The rows, top to bottom, copied. At most one `FormArea`. |
+| `buttons` | Up to `MAX_BUTTONS` buttons in a row along the bottom, sharing the width. Copied; may be empty. |
+| `width` | `FormWidth.NORMAL`, 160 pixels like the other tall panels, or `FormWidth.WIDE`, 240 pixels. |
+| `MAX_BUTTONS` | `3`. |
+| `Form(title, rows, buttons)` | A normal-width form. |
+| `wide()` | The same form, wide. |
+
+Core keeps none of a form's values: the mod holds them, its suppliers are read every frame,
+and every edit goes to its callbacks as it is typed. Rows take the heights below, with three
+pixels between them; an area takes the room the others leave. Rows that do not fit above the
+bottom buttons are not drawn, so a form is kept to what fits: a normal form holds about six
+labelled fields. A long list belongs in a `SelectList` beside the form.
+
+| Row | Height | What it is |
+|---|---|---|
+| `FormText(Supplier<String> text, Supplier<FormTone> tone, int lines)` | 10 per line | Text wrapped to the width, in `FormTone` `TEXT`, `SOFT` (grey), `GOOD` (green), `BAD` (red) or `WARN` (amber). Always `lines` lines tall, 1 to 8; text needing more ends in three dots, and blank text leaves the room empty. `FormText.label(key)` is a one-line label; `FormText.of(key, tone, lines)` text that never changes. |
+| `FormField` | 24, or 14 with no label | A one-line box under its label. See below. |
+| `FormArea(Supplier<String> value, Consumer<String> onChange, String hint, int maxLength)` | What is left, at least 38 | A box for several lines, wrapped and scrolling, up to `FormArea.MAX_LENGTH` (64000) characters. |
+| `FormToggle(String label, BooleanSupplier on, Runnable flip)` | 16 | A button across the form saying `LABEL: ON` in green or `LABEL: OFF` in red. Pressing it calls `flip`. |
+| `FormStepper(String label, IntSupplier value, IntConsumer step)` | 16 | The label on the left, then a minus button, the number and a plus button on the right. They call `step` with `-1` or `+1`; the mod keeps the number in its limits. |
+| `FormButtons(List<FormButton> buttons)` | 16 | One to `FormButtons.MAX_BUTTONS` (3) buttons sharing the width, such as a button acting on the field above. `FormButtons.of(...)` takes them as arguments. |
+
+`record FormButton(String label, BooleanSupplier enabled, Runnable action)`: a button along the
+bottom or in a `FormButtons` row. `enabled` is read every frame; a button that answers `false`
+is greyed and ignores clicks. `FormButton.of(label, action)` can always be pressed.
+
+#### FormField
+
+`record FormField(String label, Supplier<String> value, Consumer<String> onChange, Supplier<String> hint, int maxLength, boolean secret, Supplier<List<String>> choices, Consumer<String> onPick, BooleanSupplier editable) implements FormRow`
+
+Built with `FormField.of(label, value, onChange)` (up to `DEFAULT_MAX_LENGTH`, 256, characters,
+no hint, no choices, always editable) and these, each returning a changed copy:
+
+| Method | Meaning |
+|---|---|
+| `withHint(String)` or `withHint(Supplier<String>)` | What the empty box shows in grey. The supplier is read every frame; null shows nothing. |
+| `withMaxLength(int)` | The most characters the box takes, 1 to `MAX_LENGTH` (4000). |
+| `hidden()` | The text is drawn as stars, while typed and after. For an API key. |
+| `withChoices(Supplier<List<String>>)` | An arrow at the box's right opens these as a list over the rows below, or above the box when there is no room below, up to eight at once and scrolling past that. The current value is highlighted. Picking one calls `onPick`, which is `onChange` unless `onPick(Consumer<String>)` says otherwise. The choices suggest and never limit: the player can still type anything. Read every frame to decide whether the arrow shows. |
+| `editableWhen(BooleanSupplier)` | Whether the player can type into the box or open its list now. A box that cannot is greyed and ignores clicks. |
+
+The box shows `value` while the player is not typing in it. Clicking the box starts typing,
+as in a prompt: core opens its screen, rings the box in blue and shows the caret, with the
+start of a long text scrolled out of view as the caret reaches the right end. `onChange` gets
+the whole text after every key. In a field, line breaks typed or pasted become spaces.
+
+| Key | In a field | In an area |
+|---|---|---|
+| Enter, Shift+Enter | Stops typing. | Starts a new line. |
+| Tab | Moves typing to the form's next box that can be typed into, going round; stops when there is none. | The same. |
+| Escape, or any click | Stops typing. | Stops typing. |
+
+The other keys are the prompt's. Typing stops on its own when the hologram closes.

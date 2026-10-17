@@ -50,3 +50,15 @@ part (its Keys, Models, Persona and Wallets pages and their dialogs) is chat's o
 ### Task 1 — chore/hologram-forms-plan
 
 This record, and its row in the memory index.
+
+### Task 2 — feat/hologram-form
+
+`Form` and its rows in `core-api` (`FormRow` is sealed: `FormText`, `FormField`, `FormArea`,
+`FormToggle`, `FormStepper`, `FormButtons`; plus `FormButton`, `FormTone`, `FormWidth`), drawn
+by `FormPanelView` from the layout in `common`'s `FormLayout`, which `FormLayoutTest` covers.
+`TypingScreen` now types into any `TypingTarget`: the prompt, a field or an area each say what
+Enter does, and Tab asks the form for its next box. `Hologram` carries `onClose`, which
+`HologramClient` runs after disposing the panels, however the hologram closed; its two-argument
+constructor and `of` stay. `ColumnPanelView`'s width is no longer fixed, so a wide form draws
+its band across its whole width. New text: the two typing lines and ON and OFF. Documented in
+`wiki/api/hologram-panels.md` and `wiki/api/hologram.md`. Task 3 builds SETTINGS from it.

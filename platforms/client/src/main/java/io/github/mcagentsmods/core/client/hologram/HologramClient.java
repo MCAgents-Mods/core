@@ -2,6 +2,7 @@ package io.github.mcagentsmods.core.client.hologram;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import io.github.mcagentsmods.core.api.hologram.ButtonGrid;
+import io.github.mcagentsmods.core.api.hologram.Form;
 import io.github.mcagentsmods.core.api.hologram.Hologram;
 import io.github.mcagentsmods.core.api.hologram.HologramButton;
 import io.github.mcagentsmods.core.api.hologram.HologramPanel;
@@ -269,6 +270,7 @@ public final class HologramClient {
             aimed = null;
         }
         hologram.dispose();
+        run("Closing the hologram " + hologram.spec.id(), hologram.spec.onClose());
     }
 
     /** @return the ids of the holograms standing, oldest first */
@@ -298,6 +300,7 @@ public final class HologramClient {
             case Transcript transcript -> new TranscriptPanelView(transcript, HologramClient::run);
             case PromptInput prompt -> new PromptPanelView(prompt, HologramClient::run,
                     HologramClient::startTyping);
+            case Form form -> new FormPanelView(form, HologramClient::run, HologramClient::startTyping);
         };
     }
 
@@ -320,8 +323,8 @@ public final class HologramClient {
         }
     }
 
-    private static void startTyping(PromptPanelView prompt) {
-        Minecraft.getInstance().setScreenAndShow(new TypingScreen(prompt));
+    private static void startTyping(TypingTarget box) {
+        Minecraft.getInstance().setScreenAndShow(new TypingScreen(box));
     }
 
     private static double blockedAt(HitResult target, Vector3 eye) {

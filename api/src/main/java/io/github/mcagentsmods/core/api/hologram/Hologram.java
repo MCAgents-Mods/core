@@ -12,12 +12,15 @@ import java.util.regex.Pattern;
  * the player closes it or walks away. Several holograms can stand at once; the id tells them
  * apart, so a mod that shows several of a kind gives each its own id.
  *
- * @param id     which hologram this is: 1 to 64 lowercase letters, digits, dots, dashes or
- *               underscores, conventionally {@code {modid}.{name}}; one hologram per id is
- *               open at a time
- * @param panels the panels, left to right; at least one and at most {@link #MAX_PANELS}
+ * @param id      which hologram this is: 1 to 64 lowercase letters, digits, dots, dashes or
+ *                underscores, conventionally {@code {modid}.{name}}; one hologram per id is
+ *                open at a time
+ * @param panels  the panels, left to right; at least one and at most {@link #MAX_PANELS}
+ * @param onClose run once when the hologram closes, whatever closes it: its X, the mod, the
+ *                player walking away, or a hologram with the same id opening in its place. It
+ *                runs on the client thread and must not block; one that throws is logged
  */
-public record Hologram(String id, List<HologramPanel> panels) {
+public record Hologram(String id, List<HologramPanel> panels, Runnable onClose) {
 
     /** The most panels one hologram stands; more would run off the sides of the screen. */
     public static final int MAX_PANELS = 3;
@@ -27,6 +30,7 @@ public record Hologram(String id, List<HologramPanel> panels) {
     public Hologram {
         Objects.requireNonNull(id, "id");
         Objects.requireNonNull(panels, "panels");
+        Objects.requireNonNull(onClose, "onClose");
         if (!ID.matcher(id).matches()) {
             throw new IllegalArgumentException("The hologram id '" + id
                     + "' must be 1 to 64 lowercase letters, digits, dots, dashes or underscores");
@@ -36,6 +40,24 @@ public record Hologram(String id, List<HologramPanel> panels) {
             throw new IllegalArgumentException("A hologram has 1 to " + MAX_PANELS
                     + " panels, not " + panels.size());
         }
+    }
+
+    /**
+     * A hologram that does nothing when it closes.
+     *
+     * @param id     which hologram this is
+     * @param panels the panels, left to right
+     */
+    public Hologram(String id, List<HologramPanel> panels) {
+        this(id, panels, () -> { });
+    }
+
+    /**
+     * @param onClose what to run once when the hologram closes
+     * @return this hologram, running it
+     */
+    public Hologram withOnClose(Runnable onClose) {
+        return new Hologram(id, panels, onClose);
     }
 
     /**

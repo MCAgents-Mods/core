@@ -113,4 +113,15 @@ class TextBufferTest {
         assertEquals("", buffer.text());
         assertEquals(0, buffer.caret());
     }
+
+    @Test
+    void controlBackspaceEmptiesTheLineUpToTheCaret() {
+        TextBuffer buffer = new TextBuffer(100);
+        buffer.insert("first\nsecond line");
+
+        assertTrue(buffer.backspaceLine());
+        assertEquals("first\n", buffer.text());
+        assertEquals(6, buffer.caret());
+        assertFalse(buffer.backspaceLine());
+    }
 }
