@@ -1,6 +1,7 @@
 package io.github.mcagentsmods.core.common.hologram;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -37,6 +38,39 @@ public final class HologramSpace {
         Objects.requireNonNull(eye, "eye");
         Vector3 ahead = new Vector3(0, 0, distance).rotateY(-yaw);
         return new HologramPose(eye.add(ahead).add(new Vector3(0, -0.15, 0)), yaw);
+    }
+
+    /**
+     * The turns, in degrees and in the order tried, that {@link #clearOf} turns a new
+     * hologram's place around the player by: straight ahead, then right and left in widening
+     * steps. A positive turn is to the player's right.
+     */
+    static final double[] TURNS = {0, 40, -40, 80, -80, 120, -120};
+
+    /**
+     * Where a hologram opens when others already stand: in front of the player as
+     * {@link #inFront} places it or, when that spot overlaps a hologram in {@code others}, the
+     * first spot turned around the player by one of {@link #TURNS} that is clear. When none is
+     * clear, straight ahead, overlapping.
+     *
+     * @param eye       the player's eye
+     * @param yaw       the player's yaw
+     * @param distance  how far ahead
+     * @param halfWidth half the new hologram's width, in blocks
+     * @param others    the footprints of the holograms already standing
+     * @return the pose, facing the player
+     */
+    public static HologramPose clearOf(Vector3 eye, double yaw, double distance, double halfWidth,
+                                       Collection<HologramFootprint> others) {
+        Objects.requireNonNull(others, "others");
+        for (double turn : TURNS) {
+            HologramPose pose = inFront(eye, yaw + turn, distance);
+            HologramFootprint footprint = new HologramFootprint(pose.anchor(), halfWidth);
+            if (others.stream().noneMatch(footprint::overlaps)) {
+                return pose;
+            }
+        }
+        return inFront(eye, yaw, distance);
     }
 
     /**

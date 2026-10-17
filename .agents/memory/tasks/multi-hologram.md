@@ -51,3 +51,20 @@ own task record, `session-picker.md`, released as chat 0.10.0 against this relea
 ### Task 1 — chore/multi-hologram-plan
 
 This record, and its row in the memory index.
+
+### Task 2 — feat/multiple-holograms
+
+`HologramClient` keeps the standing holograms in a list, oldest first, replaced rather than
+changed so another thread reads a whole one. Every frame each hologram finds the point the
+crosshair meets, and only the nearest keeps it (`aimed`); a click, the mouse wheel and Z go to
+that one, and one hologram is carried at a time. Each tick checks every hologram's range and
+level on its own. Opening an id that is open closes that one first; past `Holograms.MAX_OPEN`
+(8) the oldest closes. `HologramSpace.clearOf` turns a new hologram's spot around the player
+(`TURNS`: 0, 40, -40, 80, -80, 120, -120 degrees) until its `HologramFootprint`, a circle of
+half its width around its anchor, meets no standing one's.
+
+`Holograms.openId()` became `openIds()`, and `Holograms.replacing(id, action)` lets the first
+hologram `action` opens take the place of hologram `id`. The G menu runs every button through
+it, so CHAT still replaces the menu while KEYS, MODEL and the other screen buttons leave it
+standing. `wiki/api/hologram.md` and `wiki/api/buttons.md` say so; the `Hologram` record no
+longer says one hologram is open at a time.

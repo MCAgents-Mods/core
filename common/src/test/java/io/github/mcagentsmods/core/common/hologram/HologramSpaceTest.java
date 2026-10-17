@@ -147,4 +147,57 @@ class HologramSpaceTest {
         assertEquals(before.u(), again.u(), 1e-6);
         assertEquals(before.v(), again.v(), 1e-6);
     }
+
+    @Test
+    void aHologramOpensStraightAheadWhenNothingStandsThere() {
+        Vector3 eye = new Vector3(0, 70, 0);
+
+        HologramPose pose = HologramSpace.clearOf(eye, 0, 3, 1, List.of());
+
+        assertNear(HologramSpace.inFront(eye, 0, 3).anchor(), pose.anchor());
+    }
+
+    @Test
+    void aHologramInTheWayTurnsTheNewOneToThePlayersRightFirst() {
+        Vector3 eye = new Vector3(0, 70, 0);
+        HologramFootprint ahead = new HologramFootprint(HologramSpace.inFront(eye, 0, 3).anchor(), 1);
+
+        HologramPose pose = HologramSpace.clearOf(eye, 0, 3, 1, List.of(ahead));
+
+        // Facing south, the right hand is west: yaw 40 turns the spot towards -x.
+        assertNear(HologramSpace.inFront(eye, 40, 3).anchor(), pose.anchor());
+        assertEquals(40, pose.yaw(), EPSILON);
+        assertTrue(pose.anchor().x() < 0);
+    }
+
+    @Test
+    void theLeftIsTriedWhenTheRightIsTakenToo() {
+        Vector3 eye = new Vector3(0, 70, 0);
+        List<HologramFootprint> others = List.of(
+                new HologramFootprint(HologramSpace.inFront(eye, 0, 3).anchor(), 1),
+                new HologramFootprint(HologramSpace.inFront(eye, 40, 3).anchor(), 1));
+
+        HologramPose pose = HologramSpace.clearOf(eye, 0, 3, 1, others);
+
+        assertEquals(-40, pose.yaw(), EPSILON);
+    }
+
+    @Test
+    void aHologramOpensAheadOverlappingWhenEverySpotIsTaken() {
+        Vector3 eye = new Vector3(0, 70, 0);
+        // One wide hologram all around the player.
+        HologramFootprint everywhere = new HologramFootprint(eye, 10);
+
+        HologramPose pose = HologramSpace.clearOf(eye, 0, 3, 1, List.of(everywhere));
+
+        assertNear(HologramSpace.inFront(eye, 0, 3).anchor(), pose.anchor());
+    }
+
+    @Test
+    void footprintsOverlapOnlyWhenTheirCirclesMeet() {
+        HologramFootprint a = new HologramFootprint(new Vector3(0, 70, 0), 1);
+
+        assertTrue(a.overlaps(new HologramFootprint(new Vector3(1.5, 90, 0), 1)));
+        assertTrue(!a.overlaps(new HologramFootprint(new Vector3(0, 70, 2.5), 1)));
+    }
 }

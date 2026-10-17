@@ -9,11 +9,12 @@ import java.util.regex.Pattern;
  * left to right, and are placed, moved and closed together.
  *
  * <p>The panels are data: a mod builds a hologram, hands it to core, and core draws it until
- * the player closes it or walks away. Only one hologram is open at a time, so opening another
- * closes this one.
+ * the player closes it or walks away. Several holograms can stand at once; the id tells them
+ * apart, so a mod that shows several of a kind gives each its own id.
  *
- * @param id     who the hologram belongs to: 1 to 64 lowercase letters, digits, dots, dashes
- *               or underscores, conventionally {@code {modid}.{name}}
+ * @param id     which hologram this is: 1 to 64 lowercase letters, digits, dots, dashes or
+ *               underscores, conventionally {@code {modid}.{name}}; one hologram per id is
+ *               open at a time
  * @param panels the panels, left to right; at least one and at most {@link #MAX_PANELS}
  */
 public record Hologram(String id, List<HologramPanel> panels) {

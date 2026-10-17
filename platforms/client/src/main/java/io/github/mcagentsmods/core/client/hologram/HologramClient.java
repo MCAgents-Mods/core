@@ -8,6 +8,7 @@ import io.github.mcagentsmods.core.api.hologram.HologramPanel;
 import io.github.mcagentsmods.core.api.hologram.PromptInput;
 import io.github.mcagentsmods.core.api.hologram.SelectList;
 import io.github.mcagentsmods.core.api.hologram.Transcript;
+import io.github.mcagentsmods.core.common.hologram.HologramFootprint;
 import io.github.mcagentsmods.core.common.hologram.HologramRange;
 import io.github.mcagentsmods.core.common.hologram.Vector3;
 import net.minecraft.client.KeyMapping;
@@ -43,7 +44,22 @@ public final class HologramClient {
     private static final Logger LOGGER = Logger.getLogger("MCAgents Core");
 
     private static KeyMapping moveKey;
-    private static volatile OpenHologram open;
+
+    /**
+     * The holograms standing, oldest first. Replaced, never changed in place, so a reader on
+     * another thread always sees a whole list.
+     */
+    private static volatile List<OpenHologram> open = List.of();
+
+    /** The hologram being carried, if any; one at a time. */
+    private static OpenHologram carried;
+
+    /** The hologram under the crosshair this frame, if any: the nearest one aimed at. */
+    private static OpenHologram aimed;
+
+    /** While a press runs: the id of a hologram the first one it opens takes the place of. */
+    private static String replacing;
+
     private static boolean attackArmed = true;
 
     private HologramClient() {
@@ -64,8 +80,7 @@ public final class HologramClient {
     }
 
     /**
-     * Carries, lets go of, or dismisses the open hologram. Called at the end of every client
-     * tick.
+     * Carries, lets go of, or dismisses the holograms. Called at the end of every client tick.
      *
      * @param minecraft the game
      */
@@ -79,75 +94,97 @@ public final class HologramClient {
         if (!minecraft.options.keyAttack.isDown()) {
             attackArmed = true;
         }
-        OpenHologram hologram = open;
-        if (hologram == null) {
+        List<OpenHologram> holograms = open;
+        if (holograms.isEmpty()) {
             return;
         }
         LocalPlayer player = minecraft.player;
-        if (player == null || minecraft.level != hologram.level) {
-            close();
+        if (player == null) {
+            closeAll();
             return;
         }
         boolean holding = moveKey != null && moveKey.isDown() && minecraft.gui.screen() == null;
         Vector3 eye = vector(player.getEyePosition());
         Vector3 look = vector(player.getViewVector(1));
-        if (hologram.carried()) {
+        if (carried != null) {
             if (holding) {
-                hologram.follow(eye, look, player.getYRot());
+                carried.follow(eye, look, player.getYRot());
             } else {
-                hologram.release();
+                carried.release();
+                carried = null;
             }
-        } else if (holding && hologram.hovered()) {
-            hologram.take(eye, look);
+        } else if (holding && aimed != null) {
+            carried = aimed;
+            carried.take(eye, look);
         }
-        if (!HologramRange.inRange(hologram.pose().anchor(),
-                new Vector3(player.getX(), player.getY(), player.getZ()))) {
-            close();
+        Vector3 feet = new Vector3(player.getX(), player.getY(), player.getZ());
+        for (OpenHologram hologram : holograms) {
+            if (minecraft.level != hologram.level
+                    || !HologramRange.inRange(hologram.pose().anchor(), feet)) {
+                close(hologram);
+            }
         }
     }
 
     /**
-     * Draws the open hologram. Called once a frame while the level's features are gathered.
+     * Draws the holograms. Called once a frame while the level's features are gathered.
      *
      * @param state     the frame's level state, for the camera
      * @param collector where the frame's geometry and text go
      */
     public static void submit(LevelRenderState state, SubmitNodeCollector collector) {
-        OpenHologram hologram = open;
+        List<OpenHologram> holograms = open;
         Minecraft minecraft = Minecraft.getInstance();
         LocalPlayer player = minecraft.player;
-        if (hologram == null || player == null) {
+        if (holograms.isEmpty() || player == null) {
+            aimed = null;
             return;
         }
         float partialTick = minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(false);
         Vector3 eye = vector(player.getEyePosition(partialTick));
         Vector3 look = vector(player.getViewVector(partialTick));
-        if (hologram.carried()) {
-            hologram.follow(eye, look, player.getViewYRot(partialTick));
+        if (carried != null) {
+            carried.follow(eye, look, player.getViewYRot(partialTick));
         }
         boolean free = minecraft.gui.screen() == null;
-        hologram.aim(free ? eye : null, look, blockedAt(minecraft.hitResult, eye));
-        hologram.submit(collector, state.cameraRenderState.pos, minecraft.font);
+        double blocked = blockedAt(minecraft.hitResult, eye);
+        // Every hologram finds its own point, then only the nearest keeps it: one in front
+        // hides the parts of another behind it.
+        OpenHologram nearest = null;
+        for (OpenHologram hologram : holograms) {
+            hologram.aim(free ? eye : null, look, blocked);
+            if (hologram.aimDistance() < (nearest == null ? Double.POSITIVE_INFINITY
+                    : nearest.aimDistance())) {
+                nearest = hologram;
+            }
+        }
+        for (OpenHologram hologram : holograms) {
+            if (hologram != nearest) {
+                hologram.clearAim();
+            }
+            hologram.submit(collector, state.cameraRenderState.pos, minecraft.font);
+        }
+        aimed = nearest;
     }
 
     /**
-     * Presses what the player aims at on the open hologram. Called when the attack key fires,
-     * which happens once when it is pressed and then every tick while it is held on a block.
+     * Presses what the player aims at. Called when the attack key fires, which happens once
+     * when it is pressed and then every tick while it is held on a block.
      *
-     * @return {@code true} when the hologram took the click and the attack must be cancelled
+     * @return {@code true} when a hologram took the click and the attack must be cancelled
      */
     public static boolean onAttack() {
-        OpenHologram hologram = open;
+        OpenHologram hologram = aimed;
         if (hologram == null || !hologram.hovered()
                 || Minecraft.getInstance().gui.screen() != null) {
-            // This press belongs to the world, even if the crosshair reaches the hologram later.
+            // This press belongs to the world, even if the crosshair reaches a hologram later.
             attackArmed = false;
             return false;
         }
         if (attackArmed) {
             attackArmed = false;
             if (hologram.click()) {
-                close();
+                close(hologram);
             }
         }
         return true;
@@ -157,10 +194,10 @@ public final class HologramClient {
      * Scrolls the panel the player aims at.
      *
      * @param amount the wheel's vertical movement, positive away from the player
-     * @return {@code true} when the hologram took the wheel and the hotbar must not change
+     * @return {@code true} when a hologram took the wheel and the hotbar must not change
      */
     public static boolean onScroll(double amount) {
-        OpenHologram hologram = open;
+        OpenHologram hologram = aimed;
         if (hologram == null || !hologram.hovered()
                 || Minecraft.getInstance().gui.screen() != null) {
             return false;
@@ -171,6 +208,10 @@ public final class HologramClient {
         return true;
     }
 
+    /**
+     * Stands {@code spec} in front of the player. One with the same id is closed first, so it
+     * moves rather than doubles; past {@link Holograms#MAX_OPEN}, the oldest closes.
+     */
     static void open(Hologram spec) {
         Minecraft minecraft = Minecraft.getInstance();
         LocalPlayer player = minecraft.player;
@@ -182,22 +223,70 @@ public final class HologramClient {
         for (HologramPanel panel : spec.panels()) {
             views.add(view(panel));
         }
-        close();
-        open = new OpenHologram(spec, minecraft.level, views, vector(player.getEyePosition()),
-                player.getYRot());
+        close(spec.id());
+        if (replacing != null) {
+            // The hologram pressed gives its place to this one, once.
+            close(replacing);
+            replacing = null;
+        }
+        while (open.size() >= Holograms.MAX_OPEN) {
+            close(open.getFirst());
+        }
+        List<HologramFootprint> others = open.stream().map(OpenHologram::footprint).toList();
+        OpenHologram hologram = new OpenHologram(spec, minecraft.level, views,
+                vector(player.getEyePosition()), player.getYRot(), others);
+        List<OpenHologram> now = new ArrayList<>(open);
+        now.add(hologram);
+        open = List.copyOf(now);
     }
 
-    static void close() {
-        OpenHologram hologram = open;
-        open = null;
-        if (hologram != null) {
-            hologram.dispose();
+    /** Closes the hologram with this id, if it is open. */
+    static void close(String id) {
+        for (OpenHologram hologram : open) {
+            if (hologram.spec.id().equals(id)) {
+                close(hologram);
+            }
         }
     }
 
-    static String openId() {
-        OpenHologram hologram = open;
-        return hologram == null ? null : hologram.spec.id();
+    static void closeAll() {
+        for (OpenHologram hologram : open) {
+            close(hologram);
+        }
+    }
+
+    private static void close(OpenHologram hologram) {
+        List<OpenHologram> now = new ArrayList<>(open);
+        if (!now.remove(hologram)) {
+            return;
+        }
+        open = List.copyOf(now);
+        if (carried == hologram) {
+            carried = null;
+        }
+        if (aimed == hologram) {
+            aimed = null;
+        }
+        hologram.dispose();
+    }
+
+    /** @return the ids of the holograms standing, oldest first */
+    static List<String> openIds() {
+        return open.stream().map(hologram -> hologram.spec.id()).toList();
+    }
+
+    /**
+     * Runs {@code action}; the first hologram it opens takes the place of the hologram with
+     * id {@code id}, which closes. A hologram it does not open leaves that one standing.
+     */
+    static void replacing(String id, Runnable action) {
+        String before = replacing;
+        replacing = id;
+        try {
+            action.run();
+        } finally {
+            replacing = before;
+        }
     }
 
     private static PanelView view(HologramPanel panel) {

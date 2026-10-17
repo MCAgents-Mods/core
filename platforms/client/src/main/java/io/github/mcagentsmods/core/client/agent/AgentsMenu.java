@@ -17,8 +17,9 @@ import java.util.List;
  * each agent feature a mod has added and then Settings.
  *
  * <p>Core draws it and takes the player's clicks; this class only builds it. It is built again
- * each time it opens, so a button registered late appears the next time. Call every method on
- * the game's thread.
+ * each time it opens, so a button registered late appears the next time. A button whose action
+ * opens a hologram replaces the menu with it; one that opens a screen leaves the menu standing.
+ * Call every method on the game's thread.
  */
 public final class AgentsMenu {
 
@@ -32,7 +33,7 @@ public final class AgentsMenu {
         throw new AssertionError("No instances.");
     }
 
-    /** Opens the menu, closing any other hologram, as a mod's own button might want. */
+    /** Opens the menu in front of the player, moving it there if it is open already. */
     public static void open() {
         Holograms.open(build());
     }
@@ -42,12 +43,12 @@ public final class AgentsMenu {
         Holograms.toggle(build());
     }
 
-    /** Closes the menu, if it is the hologram open. */
+    /** Closes the menu, if it is open. */
     public static void close() {
         Holograms.close(ID);
     }
 
-    /** Whether the menu is the hologram open. */
+    /** Whether the menu is open. */
     public static boolean isOpen() {
         return Holograms.isOpen(ID);
     }
@@ -55,7 +56,9 @@ public final class AgentsMenu {
     private static Hologram build() {
         List<HologramButton> buttons = new ArrayList<>();
         for (AgentButton button : Agents.buttons().list()) {
-            buttons.add(new HologramButton(button.label(), button.action()));
+            // A button that opens a hologram, as CHAT does, opens it in the menu's place.
+            buttons.add(new HologramButton(button.label(),
+                    () -> Holograms.replacing(ID, button.action())));
         }
         buttons.add(new HologramButton(SETTINGS, AgentsMenu::openSettings));
         return Hologram.of(ID, new ButtonGrid(TITLE, buttons));
