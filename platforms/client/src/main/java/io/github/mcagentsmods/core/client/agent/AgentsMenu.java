@@ -4,17 +4,15 @@ import io.github.mcagentsmods.core.api.button.AgentButton;
 import io.github.mcagentsmods.core.api.hologram.ButtonGrid;
 import io.github.mcagentsmods.core.api.hologram.Hologram;
 import io.github.mcagentsmods.core.api.hologram.HologramButton;
-import io.github.mcagentsmods.core.client.agent.gui.AgentsSettingsScreen;
 import io.github.mcagentsmods.core.client.hologram.Holograms;
 import io.github.mcagentsmods.core.common.agent.Agents;
-import net.minecraft.client.Minecraft;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * The menu G shows: a hologram in front of the player, titled MCAgents, with one button for
- * each agent feature a mod has added and then Settings.
+ * each agent feature a mod has added and then Settings, which opens {@link SettingsHologram}.
  *
  * <p>Core draws it and takes the player's clicks; this class only builds it. It is built again
  * each time it opens, so a button registered late appears the next time. A button whose action
@@ -60,11 +58,7 @@ public final class AgentsMenu {
             buttons.add(new HologramButton(button.label(),
                     () -> Holograms.replacing(ID, button.action())));
         }
-        buttons.add(new HologramButton(SETTINGS, AgentsMenu::openSettings));
+        buttons.add(new HologramButton(SETTINGS, () -> Holograms.replacing(ID, SettingsHologram::open)));
         return Hologram.of(ID, new ButtonGrid(TITLE, buttons));
-    }
-
-    private static void openSettings() {
-        Minecraft.getInstance().setScreenAndShow(new AgentsSettingsScreen(null));
     }
 }

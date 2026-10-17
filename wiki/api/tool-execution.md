@@ -174,5 +174,5 @@ slot back, and a blocking body is interrupted. One that ignores the interrupt ke
 until it returns, but no longer its slot. Cancelling the future interrupts it the same way.
 
 The shared pool's limit is the player's setting. Change it through `Agents.update`
-([`settings.md`](settings.md)), which saves it and shows it on the settings screen; a
+([`settings.md`](settings.md)), which saves it and shows it on the Settings hologram; a
 `setLimit` on the shared pool directly is neither, and the player's next save replaces it.

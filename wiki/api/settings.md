@@ -25,9 +25,12 @@ Agents.update(now.withWorkerLimit(4).withToolRounds(3))
 | Worker limit | `worker-limit` | 2 | 1 to 32 | How many tool calls run at once, across every question. It is the shared `WorkerPool`'s limit; see [`tool-execution.md`](tool-execution.md#workerpool). |
 | Tool rounds | `tool-rounds` | 1 | 1 to 8 | How many rounds of tool calls one question may take, unless the request sets its own; see [`agent.md`](agent.md#agentrequest). |
 
-The player changes both from **Settings** on the agents menu ([`buttons.md`](buttons.md)):
-**-** and **+** step each value within its range, **Defaults** puts 2 and 1 back on the screen, **Save**
-applies both at once through `Agents.update`, and **Cancel** leaves them as they were.
+The player changes both from **Settings** on the agents menu ([`buttons.md`](buttons.md)), a
+hologram with id `mcagents_core.settings`: **-** and **+** step each value within its range,
+**Defaults** puts 2 and 1 back on the hologram, and **Save** applies both at once through
+`Agents.update` and then says *Saved.*, or that they apply only until the game closes when the
+file could not be written. The hologram stays open; closing it with its X before **Save**
+leaves the settings as they were.
 
 ## The file
 
