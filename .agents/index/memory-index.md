@@ -45,6 +45,7 @@ match on it before opening anything. Writing here needs no approval; see
 | [`../memory/tasks/latest-minecraft.md`](../memory/tasks/latest-minecraft.md) | Gradle builds, `platforms/`, Minecraft versions, published coordinates | Dropping 26.2 so core supports only the latest Minecraft release, removing the Minecraft suffix from project and artifact ids, and releasing 0.8.0. |
 | [`../memory/tasks/artifact-ids.md`](../memory/tasks/artifact-ids.md) | Gradle builds, published coordinates | Dropping `mcagents-` from every artifact id, publishing only the library modules, and releasing 0.9.0. |
 | [`../memory/tasks/agents-merge.md`](../memory/tasks/agents-merge.md) | Whole repository, `tool/`, tool calling, the agents menu | Folding the agents mod into core: the tool module, the tool-calling agent, the menu G opens and its settings, so one foundation mod remains. |
+| [`../memory/tasks/prompt-typing.md`](../memory/tasks/prompt-typing.md) | `platforms/client/`, the hologram's prompt | Making typed text reach a hologram's prompt box on Minecraft 26.3, which hands characters only to a screen that asks for text input, and releasing 0.10.1. |
 
 ## Decisions
 
