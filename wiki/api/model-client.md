@@ -22,7 +22,8 @@ client.complete(new ChatRequest("openai/gpt-4o-mini", List.of(PromptMessage.user
 | Method | Returns | Meaning |
 |---|---|---|
 | `complete(ChatRequest)` | `CompletableFuture<ChatCompletion>` | Sends a conversation and returns the answer, or the tools the model wants run first. |
-| `embed(String model, String text)` | `CompletableFuture<float[]>` | Embeds text for retrieval. |
+| `embed(String model, String text)` | `CompletableFuture<float[]>` | Embeds text for retrieval, routed by the model name. |
+| `embed(ModelChoice choice, String text)` | `CompletableFuture<float[]>` | Embeds text with that model at that provider ([`model-routing.md`](model-routing.md#modelchoice)). A default method: a client that does not override it routes by the model name. |
 | `close()` | `void` | Closes the transport and the retry scheduler, and fails every request waiting on a backoff as `CLOSED`. Safe to call twice. |
 
 The request, message, tool and answer types are on [`model-exchange.md`](model-exchange.md).

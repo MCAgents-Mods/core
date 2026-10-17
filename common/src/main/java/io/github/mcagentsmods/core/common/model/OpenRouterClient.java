@@ -6,6 +6,7 @@ import io.github.mcagentsmods.core.api.http.HttpTransport;
 import io.github.mcagentsmods.core.api.model.ApiKeySource;
 import io.github.mcagentsmods.core.api.model.ChatCompletion;
 import io.github.mcagentsmods.core.api.model.ChatRequest;
+import io.github.mcagentsmods.core.api.model.ModelChoice;
 import io.github.mcagentsmods.core.api.model.ModelClient;
 import io.github.mcagentsmods.core.api.model.ModelException;
 import io.github.mcagentsmods.core.api.model.ProviderRoute;
@@ -145,7 +146,12 @@ public final class OpenRouterClient implements ModelClient {
         if (closed.get()) {
             return CompletableFuture.failedFuture(closedException());
         }
-        return routes.route(request.model()).thenCompose(route -> {
+        // A chosen provider is honoured exactly; only a request that chose none is routed by
+        // its model name, the way every request was before providers were chosen.
+        CompletableFuture<ProviderRoute> resolved = request.choice()
+                .map(routes::route)
+                .orElseGet(() -> routes.route(request.model()));
+        return resolved.thenCompose(route -> {
             // The route decides what the model is called on the wire: the whole stored name
             // through the gateway, the platform's own id when the platform is called directly.
             ChatRequest routed = route.isThroughOpenRouter()
@@ -168,7 +174,21 @@ public final class OpenRouterClient implements ModelClient {
             return CompletableFuture.failedFuture(new ModelException(
                     ModelException.Kind.REQUEST, "An embedding request needs a model"));
         }
-        return routes.route(model).thenCompose(route -> {
+        return embedVia(routes.route(model), text);
+    }
+
+    @Override
+    public CompletableFuture<float[]> embed(ModelChoice choice, String text) {
+        Objects.requireNonNull(choice, "choice");
+        Objects.requireNonNull(text, "text");
+        if (closed.get()) {
+            return CompletableFuture.failedFuture(closedException());
+        }
+        return embedVia(routes.route(choice), text);
+    }
+
+    private CompletableFuture<float[]> embedVia(CompletableFuture<ProviderRoute> resolved, String text) {
+        return resolved.thenCompose(route -> {
             String body = OpenRouterPayloads.embeddingRequestBody(route.modelId(), text);
             return withKeyRotation(route, route.embeddingsUrl(), body,
                     OpenRouterPayloads::readEmbedding, 0);

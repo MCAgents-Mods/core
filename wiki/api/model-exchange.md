@@ -30,7 +30,7 @@ client.complete(request).thenCompose(completion -> {
 
 | Type | What it is |
 |---|---|
-| `ChatRequest(model, messages, tools)` | One request. `ChatRequest(model, messages)` offers no tools. `continuedWith(messages)` keeps the model and tools for the next round of a tool exchange. |
+| `ChatRequest(model, messages, tools, provider)` | One request. `ChatRequest(model, messages, tools)` and `ChatRequest(model, messages)` (no tools) choose no provider, so the request is routed by the model name. `withProvider(provider)` sends it to that provider and `choice()` reads the pair back ([`model-routing.md`](model-routing.md#modelchoice)). `continuedWith(messages)` keeps the model, tools and provider for the next round of a tool exchange. |
 | `PromptMessage(role, text, cacheBreakpoint, toolCalls, toolCallId)` | One message on the wire. Build with `system`, `user`, `assistant`, `assistantToolCalls(text, calls)` and `toolResult(callId, text)`. `asCacheBreakpoint()` asks the provider to cache the prefix ending here. `isToolExchange()` says whether it carries calls or a result. |
 | `ToolDefinition(name, description, parametersSchema)` | A tool offered to the model; `parametersSchema` is the JSON Schema of its arguments, as text. The name is unique among the tools offered at once, and must be 1 to 64 letters, digits, `-` or `_` (`isAcceptable(name)` checks), because a provider rejects the whole request over one bad name. |
 | `ToolCall(id, name, arguments)` | The model asking for a tool. `arguments` stays the raw JSON text. |

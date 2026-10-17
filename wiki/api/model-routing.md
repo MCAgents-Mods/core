@@ -3,8 +3,9 @@
 How the [model client](model-client.md) decides where a request goes and which key it sends.
 A stored model name is `{platform}/{model}`, lowercase. `ProviderRoutes` turns it into a
 `ProviderRoute`: through OpenRouter, or straight to the platform's own API. `ApiKeySource`
-then supplies the key for that platform. Anything unknown goes through OpenRouter, so routing
-never fails. All types are in `io.github.mcagentsmods.core.api.model`.
+then supplies the key for that platform. A request can also name its provider, a
+`ModelChoice`: it then goes to that provider and nowhere else. All types are in
+`io.github.mcagentsmods.core.api.model`.
 
 ```java
 ModelName name = ModelName.of("openai", "gpt-4o-mini");   // openai/gpt-4o-mini
@@ -43,17 +44,52 @@ Constants and helpers for the platform half.
 | `isUsableBaseUrl(url)` | Whether a key may be sent there: `https`, or plain `http` to a loopback host for a local gateway. No user info, query or fragment. |
 | `normalise(platform)`, `isOpenRouter(platform)` | Trimmed and lowercased, blank meaning OpenRouter; and whether it is the gateway. |
 
+## ModelChoice
+
+`record ModelChoice(String provider, String model)`: a stored model name and the provider whose
+API it is called through. The provider is the route, kept apart from the name, so one model
+keeps one name whichever API answers it.
+
+| Member | Meaning |
+|---|---|
+| `provider` | `openrouter`, a built-in platform, or a custom provider's id. Lowercased; blank is `openrouter`. |
+| `model` | The stored name, lowercased, never blank. |
+| `throughOpenRouter(model)` | The model through the gateway. |
+| `qualified(provider, model)` | The same, but an unqualified model at a direct provider becomes `{provider}/{model}`, as the naming rule wants. |
+| `isThroughOpenRouter()`, `withModel(model)`, `withProvider(provider)` | Read and change one half. |
+| `orElse(own, fallback)` | Static. `own` when a task set one, else `fallback`: the fallback rule [`global-models.md`](global-models.md) builds on. |
+
+A chosen provider is honoured exactly. With no key stored for it the request fails with
+`NO_KEY`, naming the provider; it never goes through OpenRouter instead.
+
+## ModelProvider
+
+`record ModelProvider(String id, String baseUrl)`: an API a request can go to. The id is one
+lowercase segment of letters, digits, `.`, `-` or `_` (`isValidId`), and is what the provider's
+API key is stored under. The address must pass `ModelPlatform.isUsableBaseUrl`; a trailing
+slash is dropped. `openRouter()` is the gateway, `builtIns()` lists it first and then every
+`ModelPlatform.knownDirectBaseUrls()` entry, and `isBuiltIn()` says whether this exact id and
+address ship with core. Custom providers are the player's, kept in the global model
+([`global-models.md`](global-models.md)).
+
 ## ProviderRoute and ProviderRoutes
 
 `ProviderRoute(platform, baseUrl, modelId)` is where one request goes.
-`throughOpenRouter(storedModelName)` and `direct(ModelName, baseUrl)` build one;
+`throughOpenRouter(storedModelName)`, `direct(ModelName, baseUrl)` and
+`to(ModelProvider, storedModelName)` build one. `to` names the model the way that provider
+does: the whole stored name at OpenRouter; the bare id when the name's platform is the provider
+(`deepseek/deepseek-v4-flash` at `deepseek` is `deepseek-v4-flash`); and the whole name at any
+other provider, since a host like Together names other platforms' models `{platform}/{model}`.
 `isThroughOpenRouter()`, `chatUrl()` (`{base}/chat/completions`) and `embeddingsUrl()`
 (`{base}/embeddings`) read it.
 
-`ProviderRoutes` is one method, `route(storedModelName)`, returning a
-`CompletableFuture<ProviderRoute>`. `ProviderRoutes.throughOpenRouter()` sends everything
-through the gateway. A mod that stores per-platform keys and URLs implements its own, and
-falls back to the gateway for anything it cannot resolve.
+`ProviderRoutes.route(storedModelName)` returns a `CompletableFuture<ProviderRoute>` for a
+request that chose no provider; it never fails, and anything it cannot resolve goes through the
+gateway. `route(ModelChoice)` is for a request that did: it goes to that provider and, when no
+address is known for it, fails with a `REQUEST` error from `unknownProvider(id)`, which says to
+add it as a custom provider. By default it knows `ModelProvider.builtIns()`;
+`GlobalModels.routes(...)` also knows the player's custom providers.
+`ProviderRoutes.throughOpenRouter()` sends every unchosen request through the gateway.
 
 ## ApiKeySource
 

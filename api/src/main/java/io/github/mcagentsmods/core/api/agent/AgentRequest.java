@@ -1,5 +1,7 @@
 package io.github.mcagentsmods.core.api.agent;
 
+import io.github.mcagentsmods.core.api.model.ModelChoice;
+import io.github.mcagentsmods.core.api.model.ModelPlatform;
 import io.github.mcagentsmods.core.api.model.PromptMessage;
 
 import java.util.Collection;
@@ -24,13 +26,17 @@ import java.util.Set;
  * @param toolRounds   how many times the model may ask for tools before it must answer, from 1
  *                     to {@link #MAX_TOOL_ROUNDS}, or {@link #PLAYER_SETTING} for the number the
  *                     player set in game
+ * @param provider     the provider every step is sent to, see
+ *                     {@link io.github.mcagentsmods.core.api.model.ModelChoice}; empty means none
+ *                     was chosen and the model is routed by its name alone
  */
 public record AgentRequest(
         String model,
         String prompt,
         List<PromptMessage> conversation,
         Set<String> categories,
-        int toolRounds) {
+        int toolRounds,
+        String provider) {
 
     /** Use the number of tool rounds the player set in game. */
     public static final int PLAYER_SETTING = 0;
@@ -57,6 +63,13 @@ public record AgentRequest(
             throw new IllegalArgumentException("Tool rounds must be between 1 and " + MAX_TOOL_ROUNDS
                     + ", or PLAYER_SETTING, not " + toolRounds);
         }
+        provider = provider == null || provider.isBlank() ? "" : ModelPlatform.normalise(provider);
+    }
+
+    /** A request with no provider chosen, routed by the model name alone. */
+    public AgentRequest(String model, String prompt, List<PromptMessage> conversation,
+                        Set<String> categories, int toolRounds) {
+        this(model, prompt, conversation, categories, toolRounds, "");
     }
 
     /** A single question, answered from the prompt alone, with every category and the player's rounds. */
@@ -64,19 +77,30 @@ public record AgentRequest(
         return new AgentRequest(model, prompt, List.of(), Set.of(), PLAYER_SETTING);
     }
 
+    /** The same, asked of the model and at the provider {@code choice} names. */
+    public static AgentRequest of(ModelChoice choice, String prompt) {
+        return of(choice.model(), prompt).withProvider(choice.provider());
+    }
+
     /** This request answered from {@code messages}, which should end with the question. */
     public AgentRequest withConversation(List<PromptMessage> messages) {
-        return new AgentRequest(model, prompt, messages, categories, toolRounds);
+        return new AgentRequest(model, prompt, messages, categories, toolRounds, provider);
     }
 
     /** This request limited to the tools in {@code ids}. */
     public AgentRequest withCategories(Collection<String> ids) {
-        return new AgentRequest(model, prompt, conversation, new LinkedHashSet<>(ids), toolRounds);
+        return new AgentRequest(model, prompt, conversation, new LinkedHashSet<>(ids), toolRounds,
+                provider);
     }
 
     /** This request with its own number of tool rounds rather than the player's. */
     public AgentRequest withToolRounds(int rounds) {
-        return new AgentRequest(model, prompt, conversation, categories, rounds);
+        return new AgentRequest(model, prompt, conversation, categories, rounds, provider);
+    }
+
+    /** This request sent to {@code provider}; blank means none chosen. */
+    public AgentRequest withProvider(String provider) {
+        return new AgentRequest(model, prompt, conversation, categories, toolRounds, provider);
     }
 
     /** Whether the request is limited to some categories. */

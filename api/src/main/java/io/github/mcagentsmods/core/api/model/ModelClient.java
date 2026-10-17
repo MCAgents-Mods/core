@@ -24,6 +24,16 @@ public interface ModelClient extends AutoCloseable {
      */
     CompletableFuture<float[]> embed(String model, String text);
 
+    /**
+     * Embeds {@code text} with the model and at the provider {@code choice} names.
+     *
+     * <p>By default the provider is ignored and the model routed by its name, which is what a
+     * client written before providers were chosen does; core's client overrides this.
+     */
+    default CompletableFuture<float[]> embed(ModelChoice choice, String text) {
+        return embed(choice.model(), text);
+    }
+
     @Override
     void close();
 }
