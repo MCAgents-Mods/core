@@ -46,6 +46,7 @@ match on it before opening anything. Writing here needs no approval; see
 | [`../memory/tasks/artifact-ids.md`](../memory/tasks/artifact-ids.md) | Gradle builds, published coordinates | Dropping `mcagents-` from every artifact id, publishing only the library modules, and releasing 0.9.0. |
 | [`../memory/tasks/agents-merge.md`](../memory/tasks/agents-merge.md) | Whole repository, `tool/`, tool calling, the agents menu | Folding the agents mod into core: the tool module, the tool-calling agent, the menu G opens and its settings, so one foundation mod remains. |
 | [`../memory/tasks/prompt-typing.md`](../memory/tasks/prompt-typing.md) | `platforms/client/`, the hologram's prompt | Making typed text reach a hologram's prompt box on Minecraft 26.3, which hands characters only to a screen that asks for text input, and releasing 0.10.1. |
+| [`../memory/tasks/multi-hologram.md`](../memory/tasks/multi-hologram.md) | `platforms/client/`, `api/hologram`, holograms | Letting several holograms stand at once, the pick list panel and transcript buttons chat's session picker needs, and releasing 0.11.0. |
 
 ## Decisions
 
