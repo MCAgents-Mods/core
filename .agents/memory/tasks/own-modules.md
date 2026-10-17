@@ -5,7 +5,7 @@ description: Making each loader module declare core's own submodules with implem
 
 # Task: loader modules implement their own submodules
 
-**Status:** in progress
+**Status:** done
 
 ## The request
 
@@ -39,9 +39,9 @@ rebase-merged in order.
 
 | # | Title | Branch | PR |
 |---|---|---|---|
-| 1 | Task record | `chore/own-modules-plan` | |
-| 2 | implementation for own modules | `build/own-modules` | |
-| 3 | Release 0.13.1 | `release/0.13.1` | |
+| 1 | Task record | `chore/own-modules-plan` | #67 |
+| 2 | implementation for own modules | `build/own-modules` | #68 |
+| 3 | Release 0.13.1 | `release/0.13.1` | #69 |
 
 ### Task 1 — chore/own-modules-plan
 
@@ -54,3 +54,10 @@ The Fabric, Forge and NeoForge modules declare `tool`, `api`, `common`, `shared`
 the `runtimeOnly` line `runClient` needs, and NeoForge stays undeclared because ModDevGradle
 provides it. `./gradlew build` is green, and the three loader jars hold exactly the entries, at
 the same sizes, of the v0.13.0 release jars.
+
+### Task 3 — release/0.13.1
+
+`project-version` is `0.13.1`, a patch release: a build change, no API change, and jars with the
+same entries as 0.13.0's. `wiki/logs/0/13/1/` says players and mod authors need do nothing; the
+logs index has its row, and the repository rule, map, state and overview name the version. The
+`PR` column is filled.
