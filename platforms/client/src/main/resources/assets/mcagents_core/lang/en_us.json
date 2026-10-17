@@ -18,5 +18,8 @@
   "gui.mcagents_core.agents.settings.rounds": "Tool rounds per question",
   "gui.mcagents_core.agents.settings.rounds.help": "Default %s, up to %s.",
   "gui.mcagents_core.agents.settings.defaults": "Defaults",
-  "gui.mcagents_core.agents.settings.save": "Save"
+  "gui.mcagents_core.agents.settings.save": "Save",
+  "gui.mcagents_core.agents.settings.saving": "Saving...",
+  "gui.mcagents_core.agents.settings.saved": "Saved.",
+  "gui.mcagents_core.agents.settings.save_failed": "Not saved to disk: these apply until the game closes."
 }

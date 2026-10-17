@@ -57,12 +57,14 @@ with the mouse wheel past that.
 | What the player sees | When |
 |---|---|
 | One button for each `AgentButton`, in `list()` order | Always; the list is read each time the menu opens, so a button registered late appears the next time. |
-| **SETTINGS** after them | Always. It opens the settings screen ([`settings.md`](settings.md)), which goes back to the game when it closes. |
+| **SETTINGS** after them | Always. It opens the Settings hologram ([`settings.md`](settings.md)) in the menu's place. |
 | The menu staying open, and the reason in the log | A button's action threw. |
 
-A button whose action opens another hologram, as chat's does, replaces the menu with it: the
-menu runs every button through `Holograms.replacing`, so the new hologram opens where the menu
-stood. A button whose action opens a screen leaves the menu standing.
+A button whose action opens another hologram, as chat's and SETTINGS do, replaces the menu with
+it: the menu runs every button through `Holograms.replacing`, so the new hologram opens where
+the menu stood. A button whose action opens a screen leaves the menu standing; a page with
+fields belongs in a `Form` hologram ([`hologram-panels.md`](hologram-panels.md#form)) rather
+than a screen, so the menu's pages all look alike.
 
 | Member | What it is |
 |---|---|

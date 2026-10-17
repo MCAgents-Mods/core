@@ -12,7 +12,7 @@ mods open in the world, the only way MCAgents talks to the player: no MCAgents
 mod serves a web page. Since 0.10.0 it also carries the agent layer that was the
 agents mod: the tool registry mods add tools to, the agent that picks and calls
 them, and the menu the player shows with G, where each mod adds its button. That
-menu, with its settings screen, is the only hologram core opens itself. It
+menu, with its Settings hologram, is all core opens itself. It
 has no commands, no permissions, and no memory: it stores no conversation and no
 per player state, so a consumer keeps whatever history it wants and replays it.
 

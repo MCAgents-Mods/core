@@ -62,3 +62,12 @@ Enter does, and Tab asks the form for its next box. `Hologram` carries `onClose`
 constructor and `of` stay. `ColumnPanelView`'s width is no longer fixed, so a wide form draws
 its band across its whole width. New text: the two typing lines and ON and OFF. Documented in
 `wiki/api/hologram-panels.md` and `wiki/api/hologram.md`. Task 3 builds SETTINGS from it.
+
+### Task 3 — refactor/settings-hologram
+
+SETTINGS on the agents menu opens `SettingsHologram` (id `mcagents_core.settings`) through
+`Holograms.replacing`, so it takes the menu's place like chat's pages. It is a normal form:
+two steppers with their help lines and a two-line status, DEFAULTS and SAVE along the bottom.
+Each opening reads `Agents.settings()` into its own draft; SAVE calls `Agents.update` and puts
+*Saving...*, then *Saved.* or the failure, on the hologram, which stays open. The `gui` package
+and `AgentsSettingsScreen` are gone. Updated `wiki/api/buttons.md` and `wiki/api/settings.md`.
