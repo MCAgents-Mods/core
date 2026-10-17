@@ -5,7 +5,7 @@ description: Making typed text reach a hologram's prompt box again on Minecraft 
 
 # Task: typing into a hologram's prompt on 26.3
 
-**Status:** in progress
+**Status:** done
 
 ## The request
 
@@ -47,9 +47,9 @@ blinked), and "hello world" typed into it left the box empty.
 
 | # | Title | Branch | PR |
 |---|---|---|---|
-| 1 | Task record | `chore/prompt-typing-plan` | |
-| 2 | Ask for text input while typing | `fix/prompt-typing` | |
-| 3 | Release 0.10.1 | `release/0.10.1` | |
+| 1 | Task record | `chore/prompt-typing-plan` | #49 |
+| 2 | Ask for text input while typing | `fix/prompt-typing` | #50 |
+| 3 | Release 0.10.1 | `release/0.10.1` | #51 |
 
 ### Task 1 — chore/prompt-typing-plan
 
@@ -69,3 +69,11 @@ kept the text and E then opened the inventory, so the keys went back to the game
 click went on typing where the caret was; Enter sent the text, which the conversation panel
 showed, and emptied the box. The NeoForge and Forge 26.3 dev clients showed the same two
 lines in the box, and Enter sent them. `./gradlew build` passed.
+
+### Task 3 — release/0.10.1
+
+`project-version` is `0.10.1`, a patch: one bug fixed, no API changes. `wiki/logs/0/10/1/`
+says what players do (replace the core jar; chat needs no update) and what was fixed; the logs
+index has its row, and the repository rule, map, state and overview name the version. The
+`PR` column is filled. Screenshots of the box before and after, on each loader, are in the
+project's shared files under `reports/prompt-typing/`.
