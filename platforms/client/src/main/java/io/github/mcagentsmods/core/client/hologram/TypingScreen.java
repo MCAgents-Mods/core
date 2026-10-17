@@ -1,6 +1,7 @@
 package io.github.mcagentsmods.core.client.hologram;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.platform.TextInputManager;
 import io.github.mcagentsmods.core.common.hologram.TextBuffer;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
@@ -15,10 +16,17 @@ import net.minecraft.network.chat.Component;
  *
  * <p>Enter sends and stops typing, Shift+Enter starts a new line, and Escape or any click stops
  * typing and keeps the text. The screen also closes on its own when the hologram does.
+ *
+ * <p>The game hands typed characters only to a screen that asks for them: while this one is
+ * open it holds the game's text input, as the sign editor does, and the keys alone would
+ * otherwise reach it without a single letter.
  */
 final class TypingScreen extends Screen {
 
     private static final String HINT = "hologram.mcagents_core.typing";
+
+    /** How far down the screen the hint line sits. */
+    private static final int HINT_TOP = 12;
 
     private final PromptPanelView prompt;
 
@@ -29,11 +37,18 @@ final class TypingScreen extends Screen {
 
     @Override
     protected void init() {
+        // Run again when the window is resized, which moves the hint line; asking twice is harmless.
+        TextInputManager input = minecraft.textInputManager();
+        input.startTextInput(this);
+        // An input method's candidates open by the hint line: the box is in the world, not here.
+        int textWidth = font.width(title);
+        input.setTextInputArea((width - textWidth) / 2, HINT_TOP, textWidth, font.lineHeight);
         prompt.typing(true);
     }
 
     @Override
     public void removed() {
+        minecraft.textInputManager().stopTextInput(this);
         prompt.typing(false);
     }
 
@@ -110,6 +125,6 @@ final class TypingScreen extends Screen {
     public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
         // At the top, on a dark backdrop, clear of the hologram and the hotbar.
         int textWidth = font.width(title);
-        graphics.textWithBackdrop(font, title, (width - textWidth) / 2, 12, textWidth, 0xFFFFFFFF);
+        graphics.textWithBackdrop(font, title, (width - textWidth) / 2, HINT_TOP, textWidth, 0xFFFFFFFF);
     }
 }

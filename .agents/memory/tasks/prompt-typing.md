@@ -54,3 +54,18 @@ blinked), and "hello world" typed into it left the box empty.
 ### Task 1 — chore/prompt-typing-plan
 
 This record, and its row in the memory index.
+
+### Task 2 — fix/prompt-typing
+
+`TypingScreen` asks the game for text input in `init()` (`startTextInput(this)`), points the
+input method at the hint line (`setTextInputArea`, the line's own box at the top of the
+screen), and gives text input back in `removed()` (`stopTextInput(this)`). The class comment
+says why. `wiki/api/hologram-panels.md` says that the screen takes the typed text and where an
+input method's candidates open.
+
+Checked by hand on 2026-10-17 in the Fabric 26.3 dev client with chat 0.9.0: "hello world",
+Shift+Enter and "Can you read me?" showed in the box on two lines; Backspace deleted; Escape
+kept the text and E then opened the inventory, so the keys went back to the game; a second
+click went on typing where the caret was; Enter sent the text, which the conversation panel
+showed, and emptied the box. The NeoForge and Forge 26.3 dev clients showed the same two
+lines in the box, and Enter sent them. `./gradlew build` passed.
