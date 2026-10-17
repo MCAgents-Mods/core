@@ -1,10 +1,11 @@
 package io.github.mcagentsmods.core.common.hologram;
 
 /**
- * The layout of the tall panels a hologram stands side by side — the list, the transcript and
+ * The layout of the tall panels a hologram stands side by side — the lists, the transcript and
  * the prompt — in panel pixels from the panel's top left corner. Each has a title in a band
- * across the top, a sunken box under it with a scrollbar down its right side, and, for the list
- * and the prompt, a row of buttons along the bottom.
+ * across the top, a sunken box under it with a scrollbar down its right side, and, when it has
+ * buttons, a row of them along the bottom. A pick list's band is a nav bar instead: its title on
+ * the left and its buttons on the right.
  *
  * <p>Drawing and clicking both read this class, so a row or a button is hit exactly where it is
  * drawn.
@@ -52,6 +53,18 @@ public final class ColumnLayout {
 
     /** The height of one line of text. */
     public static final int LINE_HEIGHT = 10;
+
+    /** A nav bar button's width. */
+    public static final int NAV_BUTTON_WIDTH = 52;
+
+    /**
+     * The right end of a nav bar's buttons: clear of the close button, which sits in the
+     * band's right end on a hologram's last panel.
+     */
+    public static final int NAV_RIGHT = WIDTH - 20;
+
+    /** Where a nav bar's title starts. */
+    public static final int NAV_TITLE_LEFT = 10;
 
     private ColumnLayout() {
     }
@@ -151,5 +164,33 @@ public final class ColumnLayout {
     /** @return the send button, at the right end of the bottom row */
     public static PanelArea sendButton() {
         return new PanelArea(FOOTER.right() - SEND_WIDTH, FOOTER.top(), FOOTER.right(), FOOTER.bottom());
+    }
+
+    /**
+     * One of the buttons on a nav bar: the title band's right end, left of the close button,
+     * the last button rightmost.
+     *
+     * @param index the button, from the left
+     * @param count how many share the bar
+     * @return the button
+     */
+    public static PanelArea navButton(int index, int count) {
+        if (count < 1 || index < 0 || index >= count) {
+            throw new IllegalArgumentException("Button " + index + " of " + count);
+        }
+        double right = NAV_RIGHT - (count - 1 - index) * (NAV_BUTTON_WIDTH + BUTTON_GAP);
+        return new PanelArea(right - NAV_BUTTON_WIDTH, HEADER.top() + 2, right, HEADER.bottom() - 2);
+    }
+
+    /**
+     * How much room a nav bar's title has, from {@link #NAV_TITLE_LEFT} to just short of the
+     * first button.
+     *
+     * @param count how many buttons share the bar, 0 or more
+     * @return the width, in panel pixels
+     */
+    public static double navTitleRoom(int count) {
+        double end = count == 0 ? NAV_RIGHT : navButton(0, count).left() - BUTTON_GAP;
+        return end - NAV_TITLE_LEFT;
     }
 }

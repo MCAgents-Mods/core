@@ -1,6 +1,5 @@
 package io.github.mcagentsmods.core.client.hologram;
 
-import io.github.mcagentsmods.core.api.hologram.HologramButton;
 import io.github.mcagentsmods.core.api.hologram.SelectList;
 import io.github.mcagentsmods.core.common.hologram.ColumnLayout;
 import io.github.mcagentsmods.core.common.hologram.PanelArea;
@@ -63,22 +62,13 @@ final class ListPanelView extends ColumnPanelView {
         }
         drawScrollbar(painter, box, window, u, v);
 
-        List<HologramButton> buttons = spec.buttons();
-        for (int i = 0; i < buttons.size(); i++) {
-            PanelArea area = ColumnLayout.footerButton(i, buttons.size());
-            drawButton(painter, area, label(buttons.get(i).label()), area.contains(u, v), true);
-        }
+        drawFooter(painter, spec.buttons(), u, v);
     }
 
     @Override
     boolean click(double u, double v) {
-        List<HologramButton> buttons = spec.buttons();
-        for (int i = 0; i < buttons.size(); i++) {
-            if (ColumnLayout.footerButton(i, buttons.size()).contains(u, v)) {
-                HologramButton button = buttons.get(i);
-                actions.run("The hologram button " + button.label(), button.action());
-                return true;
-            }
+        if (clickFooter(spec.buttons(), actions, u, v)) {
+            return true;
         }
         if (clickScrollbar(box, window, u, v)) {
             return true;

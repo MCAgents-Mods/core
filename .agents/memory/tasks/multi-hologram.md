@@ -68,3 +68,16 @@ hologram `action` opens take the place of hologram `id`. The G menu runs every b
 it, so CHAT still replaces the menu while KEYS, MODEL and the other screen buttons leave it
 standing. `wiki/api/hologram.md` and `wiki/api/buttons.md` say so; the `Hologram` record no
 longer says one hologram is open at a time.
+
+### Task 3 — feat/pick-list
+
+`PickList` and `PickRow` join the panel kinds in `api`. A pick list's title band is a nav bar:
+the title on the left, shrunk and then cut to the room left, and up to 2 buttons on the right,
+52 pixels wide each, ending 20 pixels short of the panel's right edge so the close button
+keeps its place (`ColumnLayout.navButton`, `navTitleRoom`). Its rows are drawn as given; a row
+that is not enabled is drawn in grey on a paler band, never lightens, and a click on it does
+nothing. `Transcript` gains a `heading` supplier, read every frame and shown in place of the
+title while it gives text, and up to 3 buttons under the entries; `Transcript(title, entries)`
+still builds one with neither. `ColumnPanelView` shares the band and the footer buttons
+between the list, the pick list and the transcript. `wiki/api/hologram-panels.md` describes
+both, with an example of a picker that fades the conversations already open.

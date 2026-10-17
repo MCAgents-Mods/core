@@ -1,9 +1,11 @@
 package io.github.mcagentsmods.core.client.hologram;
 
+import io.github.mcagentsmods.core.api.hologram.HologramButton;
 import io.github.mcagentsmods.core.common.hologram.ColumnLayout;
 import io.github.mcagentsmods.core.common.hologram.PanelArea;
 import io.github.mcagentsmods.core.common.hologram.ScrollWindow;
 
+import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
@@ -40,20 +42,35 @@ abstract class ColumnPanelView extends PanelView {
         return title;
     }
 
-    /** Draws the frame and the title band. */
+    /**
+     * What the title band shows. The title, unless the panel shows something that changes
+     * while it stands.
+     *
+     * @return a translation key, or the text itself
+     */
+    String heading() {
+        return title;
+    }
+
+    /** Draws the frame and the title band with the heading centred in it. */
     final void drawColumn(HologramPainter painter) {
+        drawBand(painter);
+        String text = label(heading());
+        // Clear of the close button, which sits in the band's right end.
+        float room = width() - 2 * (CLOSE_INSET + CLOSE_SIZE + 4);
+        float scale = Math.max(0.5f, Math.min(1, room / painter.width(text)));
+        painter.centred(text, width() / 2f, ColumnLayout.TITLE_TOP + (8 - 8 * scale) / 2, 4, scale,
+                HologramStyle.TEXT, 0);
+    }
+
+    /** Draws the frame and the empty title band. */
+    final void drawBand(HologramPainter painter) {
         drawFrame(painter);
         PanelArea header = ColumnLayout.HEADER;
         painter.rect((float) header.left(), (float) header.top(), (float) header.right(),
                 (float) header.bottom(), 2, HologramStyle.HEADER);
         painter.rect((float) header.left(), (float) header.bottom() - 1, (float) header.right(),
                 (float) header.bottom(), 3, HologramStyle.FRAME_SHADE);
-        String text = label(title);
-        // Clear of the close button, which sits in the band's right end.
-        float room = width() - 2 * (CLOSE_INSET + CLOSE_SIZE + 4);
-        float scale = Math.max(0.5f, Math.min(1, room / painter.width(text)));
-        painter.centred(text, width() / 2f, ColumnLayout.TITLE_TOP + (8 - 8 * scale) / 2, 4, scale,
-                HologramStyle.TEXT, 0);
     }
 
     /** Draws the sunken box, ringed in the focus colour while it takes the keys. */
@@ -66,6 +83,30 @@ abstract class ColumnPanelView extends PanelView {
         painter.rect(left + 1, top + 1, right - 1, bottom - 1, 3, HologramStyle.BOX);
         if (focused) {
             painter.outline(left + 1, top + 1, right - 1, bottom - 1, 4, HologramStyle.FOCUS);
+        }
+    }
+
+    /**
+     * Runs the button along the bottom that a point is on, if any.
+     *
+     * @return whether the point was on a button
+     */
+    static boolean clickFooter(List<HologramButton> buttons, Actions actions, double u, double v) {
+        for (int i = 0; i < buttons.size(); i++) {
+            if (ColumnLayout.footerButton(i, buttons.size()).contains(u, v)) {
+                HologramButton button = buttons.get(i);
+                actions.run("The hologram button " + button.label(), button.action());
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Draws the buttons along the bottom, the one aimed at lightened. */
+    static void drawFooter(HologramPainter painter, List<HologramButton> buttons, double u, double v) {
+        for (int i = 0; i < buttons.size(); i++) {
+            PanelArea area = ColumnLayout.footerButton(i, buttons.size());
+            drawButton(painter, area, label(buttons.get(i).label()), area.contains(u, v), true);
         }
     }
 

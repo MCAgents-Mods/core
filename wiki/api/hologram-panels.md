@@ -14,6 +14,14 @@ for (Tool tool : tools) {
 }
 Hologram menu = Hologram.of("mymod.tools", new ButtonGrid("mymod.tools.title", buttons));
 
+// A list of conversations with a NEW button on its nav bar; the ones already open are faded.
+Hologram picker = Hologram.of("mymod.sessions",
+        new PickList("mymod.sessions", () -> store.sessions().stream()
+                .map(s -> new PickRow(s.name(), !Holograms.isOpen("mymod.chat." + s.id())))
+                .toList(),
+                index -> openChat(store.sessions().get(index)),
+                List.of(new HologramButton("mymod.new", this::openNewChat))));
+
 // A chat: three tall panels side by side, reading what the mod already holds in memory.
 Hologram chat = Hologram.of("mymod.chat",
         new SelectList("mymod.sessions", store::sessionNames, store::selectedIndex, store::select,
@@ -23,9 +31,10 @@ Hologram chat = Hologram.of("mymod.chat",
                 () -> !store.waiting(), store::ask));
 ```
 
-There are two shapes of panel. The **button grid** is wide and short: a menu. The **list**,
+There are two shapes of panel. The **button grid** is wide and short: a menu. The **lists**,
 the **transcript** and the **prompt** are tall, made to stand side by side: each has its title
-in a band across the top and a sunken box under it with a scrollbar down its right side.
+in a band across the top and a sunken box under it with a scrollbar down its right side. A
+pick list's band is a nav bar, with the title on the left and buttons on the right.
 
 **Suppliers are read every frame**, on the client thread. They must answer at once from
 memory: never read a file or a database, or wait on a future, inside one. A supplier that
@@ -74,7 +83,7 @@ characters fit.
 
 ## The tall panels
 
-The list, the transcript and the prompt are each 160 by 230 pixels, so 1.6 by 2.3 blocks.
+The lists, the transcript and the prompt are each 160 by 230 pixels, so 1.6 by 2.3 blocks.
 Three of them stand in an arc around the player, the outer two turned towards them.
 
 ### SelectList
@@ -97,16 +106,47 @@ Fourteen rows show when there are buttons under the list, and the rest scroll a 
 with the mouse wheel, or jump to a click on the scrollbar. The list opens scrolled to the
 chosen row.
 
+### PickList
+
+`record PickList(String title, Supplier<List<PickRow>> rows, IntConsumer onPick, List<HologramButton> navButtons) implements HologramPanel`
+
+A list to pick from, such as the conversations a player can open, with a nav bar across the
+top. Nothing stays chosen: a click only tells the mod which row.
+
+| Member | Meaning |
+|---|---|
+| `title` | The title, on the left of the nav bar. Drawn smaller, down to half size, and then cut, when the buttons leave it too little room. |
+| `rows` | The rows, top to bottom. Read every frame. |
+| `onPick` | Called with a row's index when the player clicks an enabled row. |
+| `navButtons` | Up to `MAX_NAV_BUTTONS` buttons on the right of the nav bar, 52 pixels wide each, left of the close button. Copied; may be empty. |
+| `MAX_NAV_BUTTONS` | `2`. |
+| `PickList(title, rows, onPick)` | A pick list with nothing on its nav bar but the title. |
+
+`record PickRow(String label, boolean enabled)`
+
+| Member | Meaning |
+|---|---|
+| `label` | What the row says, shown as given: not translated and not upper-cased. A row too wide is cut and ends in three dots. |
+| `enabled` | Whether the player can pick it. A row that is not is drawn faded, in grey on a paler band, never lightens, and a click on it does nothing; it keeps its place in the list. |
+| `PickRow.of(label)` | An enabled row. |
+
+Sixteen rows show, and the rest scroll a row at a time with the mouse wheel, or jump to a click
+on the scrollbar.
+
 ### Transcript
 
-`record Transcript(String title, Supplier<List<TranscriptEntry>> entries) implements HologramPanel`
+`record Transcript(String title, Supplier<List<TranscriptEntry>> entries, Supplier<String> heading, List<HologramButton> buttons) implements HologramPanel`
 
 A conversation to read.
 
 | Member | Meaning |
 |---|---|
-| `title` | The title in the top band. |
+| `title` | The title in the top band, whenever `heading` gives nothing; also the name the log gives the panel. |
 | `entries` | The entries, oldest first. Read every frame, and wrapped again only when the list differs from the last one read. |
+| `heading` | What the top band shows instead of `title`, such as the conversation's name, which can change while the panel stands. Read every frame; `title` shows while it gives `null` or blank text. A translation key or the text itself, in upper case like any title. |
+| `buttons` | Up to `MAX_BUTTONS` buttons in a row under the entries, sharing their width. Copied; may be empty. |
+| `MAX_BUTTONS` | `3`. |
+| `Transcript(title, entries)` | A transcript under its title, with no buttons. |
 
 `record TranscriptEntry(String speaker, String text)`
 
@@ -115,10 +155,10 @@ A conversation to read.
 | `speaker` | Who said it, shown as `<speaker>` on a line of its own, as given. |
 | `text` | What they said, wrapped under the speaker at spaces, a word too long for a line cut between two characters, and line breaks kept. |
 
-A blank line separates two entries. Nineteen lines show; the mouse wheel moves three lines a
-notch, and the scrollbar jumps. While the last line shows, new entries keep the view on the
-last line. Once the player scrolls up, the view stays where they put it until they scroll back
-to the bottom.
+A blank line separates two entries. Nineteen lines show, or seventeen with buttons under
+them; the mouse wheel moves three lines a notch, and the scrollbar jumps. While the last line
+shows, new entries keep the view on the last line. Once the player scrolls up, the view stays
+where they put it until they scroll back to the bottom.
 
 ### PromptInput
 

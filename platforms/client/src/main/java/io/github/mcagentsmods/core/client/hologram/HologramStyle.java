@@ -30,6 +30,8 @@ final class HologramStyle {
     static final int BOX = 0xFFF8F8FA;
     static final int ROW_HOVER = 0xFFE6E6EC;
     static final int ROW_SELECTED = 0xFFB4B4BE;
+    static final int ROW_FADED = 0xFFEEEEF1;
+    static final int TEXT_FADED = 0xFFA6A6AE;
     static final int FOCUS = 0xFF3F6FA8;
     static final int CARET = 0xFF16161A;
     static final int DISABLED = 0xFFD2D2D8;
