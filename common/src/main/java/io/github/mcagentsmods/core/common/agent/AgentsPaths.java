@@ -54,6 +54,11 @@ public final class AgentsPaths {
     }
 
     /** Creates {@link #dataDirectory()} and its parents if they do not exist yet. */
+    /** Where the global model is kept: {@code models.properties} beside the settings. */
+    public Path modelsFile() {
+        return dataDirectory.resolve("models.properties");
+    }
+
     public Path createDataDirectory() throws IOException {
         return Files.createDirectories(dataDirectory);
     }

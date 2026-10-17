@@ -96,7 +96,7 @@ AgentsRuntime.start(FabricLoader.getInstance().getGameDir());       // FMLPaths.
 |---|---|
 | `AgentsKeys.create(KeyMapping.Category)` | Builds the key that shows the agents menu, `key.mcagents_core.agents`, bound to G, in core's category beside the move key. Called first in client start-up, for the same reason. |
 | `AgentsKeys.onEndTick(Minecraft)` | Shows or hides the menu when the key was pressed. Called at the end of every client tick. |
-| `AgentsRuntime.start(Path gameDirectory)` | Creates `{game_dir}/MCAgents/agents/`, then loads and applies the player's settings through `Agents.start` ([`settings.md`](settings.md)). Only the first call does anything. A failure at either step is logged and the game carries on, with the default settings if they could not be loaded. A `null` directory throws `NullPointerException`. |
+| `AgentsRuntime.start(Path gameDirectory)` | Creates `{game_dir}/MCAgents/agents/`, then loads and applies the player's settings through `Agents.start` ([`settings.md`](settings.md)) and reads the global model through `Models.start` ([`global-models.md`](global-models.md)). Only the first call does anything. A failure at either step is logged and the game carries on, with the default settings if they could not be loaded. A `null` directory throws `NullPointerException`. |
 | `AgentsRuntime.paths()` | `Optional<AgentsPaths>`: the layout on disk, once `start` has run; empty before. |
 
 `AgentsPaths`, in `core-common` under `…core.common.agent`, is that layout. It knows nothing
@@ -109,4 +109,5 @@ about Minecraft, so a test hands it a temporary directory.
 | `AgentsPaths.under(Path gameDirectory)` | Static. Describes the layout under the game directory. Creates nothing; a `null` directory throws `NullPointerException`. |
 | `dataDirectory()` | `{game_dir}/MCAgents/agents`. |
 | `settingsFile()` | `{game_dir}/MCAgents/agents/settings.properties`, what the player set in game. |
+| `modelsFile()` | `{game_dir}/MCAgents/agents/models.properties`, the global model ([`global-models.md`](global-models.md)). |
 | `createDataDirectory()` | Creates the data directory and its parents. Safe to repeat. Throws `IOException`. |
