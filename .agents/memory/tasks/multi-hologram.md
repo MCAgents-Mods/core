@@ -5,7 +5,7 @@ description: Letting several holograms stand in the world at once, adding the pi
 
 # Task: several holograms at once
 
-**Status:** in progress
+**Status:** done
 
 ## The request
 
@@ -43,10 +43,10 @@ own task record, `session-picker.md`, released as chat 0.10.0 against this relea
 
 | # | Title | Branch | PR |
 |---|---|---|---|
-| 1 | Task record | `chore/multi-hologram-plan` | |
-| 2 | Several holograms at once | `feat/multiple-holograms` | |
-| 3 | Pick list and transcript buttons | `feat/pick-list` | |
-| 4 | Release 0.11.0 | `release/0.11.0` | |
+| 1 | Task record | `chore/multi-hologram-plan` | #52 |
+| 2 | Several holograms at once | `feat/multiple-holograms` | #53 |
+| 3 | Pick list and transcript buttons | `feat/pick-list` | #54 |
+| 4 | Release 0.11.0 | `release/0.11.0` | #55 |
 
 ### Task 1 — chore/multi-hologram-plan
 
@@ -81,3 +81,15 @@ title while it gives text, and up to 3 buttons under the entries; `Transcript(ti
 still builds one with neither. `ColumnPanelView` shares the band and the footer buttons
 between the list, the pick list and the transcript. `wiki/api/hologram-panels.md` describes
 both, with an example of a picker that fades the conversations already open.
+
+### Task 4 — release/0.11.0
+
+`project-version` is `0.11.0`, a minor release: new API (`PickList`, `PickRow`, the
+`Transcript` buttons and heading, `Holograms.replacing`), and `Holograms.openId()` is
+replaced by `openIds()`. `wiki/logs/0/11/0/` says what players and mod authors do and what was
+added; the logs index has its row, and the repository rule, map, state and overview name the
+version. The `PR` column is filled. In the Fabric, NeoForge and Forge 26.3 dev clients, with
+chat's session picker on top, G then CHAT replaced the menu with the session list, NEW CHAT
+opened chat holograms beside it, two of them took typed questions, their rows were faded (and,
+on Fabric, ignored clicks), and closing one with its X brought its row back. Screenshots are in the
+project's shared files under `reports/multi-hologram/`.
