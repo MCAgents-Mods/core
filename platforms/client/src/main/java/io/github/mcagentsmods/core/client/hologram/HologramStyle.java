@@ -36,6 +36,11 @@ final class HologramStyle {
     static final int CARET = 0xFF16161A;
     static final int DISABLED = 0xFFD2D2D8;
 
+    /** A form's notes and toggles: dark enough to read on the light face. */
+    static final int GOOD = 0xFF2C7A3F;
+    static final int BAD = 0xFFB33A3A;
+    static final int WARN = 0xFF96650E;
+
     private HologramStyle() {
     }
 }

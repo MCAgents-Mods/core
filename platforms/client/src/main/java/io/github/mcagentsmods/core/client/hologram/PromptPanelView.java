@@ -16,7 +16,7 @@ import java.util.function.Consumer;
  * A {@link PromptInput}: the box the player types into and the send button. The keys reach it
  * through {@link TypingScreen}, which a click on the box opens.
  */
-final class PromptPanelView extends ColumnPanelView {
+final class PromptPanelView extends ColumnPanelView implements TypingTarget {
 
     /** Lines the mouse wheel moves per notch. */
     private static final int SCROLL_LINES = 3;
@@ -24,9 +24,12 @@ final class PromptPanelView extends ColumnPanelView {
     /** What the empty box says until the player clicks it. */
     private static final String HINT = "hologram.mcagents_core.prompt.hint";
 
+    /** The line shown over the world while the player types here. */
+    private static final String TYPING = "hologram.mcagents_core.typing";
+
     private final PromptInput spec;
     private final Actions actions;
-    private final Consumer<PromptPanelView> startTyping;
+    private final Consumer<TypingTarget> startTyping;
     private final TextBuffer buffer;
     private final PanelArea box = ColumnLayout.box(true);
     private final ScrollWindow window;
@@ -36,7 +39,7 @@ final class PromptPanelView extends ColumnPanelView {
     private boolean typing;
     private boolean disposed;
 
-    PromptPanelView(PromptInput spec, Actions actions, Consumer<PromptPanelView> startTyping) {
+    PromptPanelView(PromptInput spec, Actions actions, Consumer<TypingTarget> startTyping) {
         super(spec.title());
         this.spec = spec;
         this.actions = actions;
@@ -115,15 +118,41 @@ final class PromptPanelView extends ColumnPanelView {
         disposed = true;
     }
 
-    /** @return whether the hologram this box belongs to has closed */
-    boolean disposed() {
+    @Override
+    public boolean disposed() {
         return disposed;
     }
 
-    /** Marks whether the keys come here now, which rings the box and shows the caret. */
-    void typing(boolean typing) {
+    @Override
+    public void typing(boolean typing) {
         this.typing = typing;
         caretMoved = true;
+    }
+
+    @Override
+    public void insert(String typed) {
+        buffer.insert(typed);
+    }
+
+    /** Shift+Enter starts a new line; Enter sends, and stops typing once the text has gone. */
+    @Override
+    public boolean enter(boolean shift) {
+        if (shift) {
+            buffer.insert("\n");
+            caretMoved = true;
+            return false;
+        }
+        return send();
+    }
+
+    @Override
+    public TypingTarget next() {
+        return null;
+    }
+
+    @Override
+    public String hint() {
+        return TYPING;
     }
 
     /**
@@ -145,13 +174,14 @@ final class PromptPanelView extends ColumnPanelView {
         return true;
     }
 
-    /** @return the text being typed, for {@link TypingScreen} to edit */
-    TextBuffer buffer() {
+    @Override
+    public TextBuffer buffer() {
         return buffer;
     }
 
     /** Keeps the caret in view after {@link TypingScreen} moves it. */
-    void caretMoved() {
+    @Override
+    public void edited() {
         caretMoved = true;
     }
 

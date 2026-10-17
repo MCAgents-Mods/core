@@ -43,9 +43,10 @@ public final class HologramSpace {
     /**
      * The turns, in degrees and in the order tried, that {@link #clearOf} turns a new
      * hologram's place around the player by: straight ahead, then right and left in widening
-     * steps. A positive turn is to the player's right.
+     * steps of 20 degrees, so a small hologram such as a dialog opens just past the edge of the
+     * one in the way rather than far beyond it. A positive turn is to the player's right.
      */
-    static final double[] TURNS = {0, 40, -40, 80, -80, 120, -120};
+    static final double[] TURNS = {0, 20, -20, 40, -40, 60, -60, 80, -80, 100, -100, 120, -120};
 
     /**
      * Where a hologram opens when others already stand: in front of the player as

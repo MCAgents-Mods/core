@@ -92,6 +92,22 @@ public final class TextBuffer {
     }
 
     /**
+     * Deletes everything between the start of the caret's line and the caret, so a field is
+     * emptied from its end in one key press.
+     *
+     * @return whether anything was deleted
+     */
+    public boolean backspaceLine() {
+        int start = text.lastIndexOf("\n", caret - 1) + 1;
+        if (start == caret) {
+            return false;
+        }
+        text.delete(start, caret);
+        caret = start;
+        return true;
+    }
+
+    /**
      * Deletes the character after the caret.
      *
      * @return whether one was deleted

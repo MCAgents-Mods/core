@@ -28,7 +28,7 @@ abstract class ColumnPanelView extends PanelView {
     }
 
     @Override
-    final int width() {
+    int width() {
         return ColumnLayout.WIDTH;
     }
 
@@ -66,7 +66,8 @@ abstract class ColumnPanelView extends PanelView {
     /** Draws the frame and the empty title band. */
     final void drawBand(HologramPainter painter) {
         drawFrame(painter);
-        PanelArea header = ColumnLayout.HEADER;
+        PanelArea header = new PanelArea(ColumnLayout.HEADER.left(), ColumnLayout.HEADER.top(),
+                width() - (ColumnLayout.WIDTH - ColumnLayout.HEADER.right()), ColumnLayout.HEADER.bottom());
         painter.rect((float) header.left(), (float) header.top(), (float) header.right(),
                 (float) header.bottom(), 2, HologramStyle.HEADER);
         painter.rect((float) header.left(), (float) header.bottom() - 1, (float) header.right(),

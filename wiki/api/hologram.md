@@ -20,13 +20,16 @@ Holograms.toggle(menu);
 
 ## Hologram
 
-`record Hologram(String id, List<HologramPanel> panels)`
+`record Hologram(String id, List<HologramPanel> panels, Runnable onClose)`
 
 | Member | Meaning |
 |---|---|
 | `id` | Which hologram it is: 1 to 64 lowercase letters, digits, dots, dashes or underscores, conventionally `{modid}.{name}`. One hologram per id is open at a time; a mod that shows several of a kind gives each its own id, such as `{modid}.{name}.{key}`. |
 | `panels` | The panels, left to right, copied. At least one and at most `MAX_PANELS`. |
-| `of(String id, HologramPanel... panels)` | The same, from a list of arguments. |
+| `onClose` | Run once when the hologram closes, whatever closes it: its X, the mod, the player walking away or leaving the world, a ninth hologram opening, or a hologram with the same id opening in its place. Runs on the client thread and must not block; one that throws is logged. |
+| `Hologram(String id, List<HologramPanel> panels)` | A hologram that does nothing when it closes. |
+| `withOnClose(Runnable onClose)` | The same hologram, running `onClose` when it closes. |
+| `of(String id, HologramPanel... panels)` | A hologram that does nothing when it closes, from a list of arguments. |
 | `MAX_PANELS` | `3`. More would run off the sides of the screen. |
 
 The constructor throws `IllegalArgumentException` for an id or a panel count outside those
@@ -68,9 +71,10 @@ blocks away, or further for a wider hologram so that its edges stay on screen. S
 stand in an arc around the player, the outer ones turned towards them. It then stays at that
 place in the world until the player moves it.
 
-When a hologram already stands on that spot, the new one turns around the player instead: 40°
-to the player's right, then 40° to the left, then 80° and 120° each way, and opens on the first
-spot that is clear. When none is clear, it opens straight ahead, in front of the other. A spot
+When a hologram already stands on that spot, the new one turns around the player instead: 20°
+to the player's right, then 20° to the left, then 40°, 60° and so on up to 120° each way, and
+opens on the first spot that is clear, so a small one such as a dialog stands just past the
+edge of the one in the way. When none is clear, it opens straight ahead, in front of the other. A spot
 is clear when the two holograms' widths, measured on the ground around their middles, do not
 meet.
 
@@ -83,7 +87,7 @@ survive leaving the world.
 |---|---|
 | Aims the crosshair at a panel, within 12 blocks and with nothing nearer in the way | The button under the crosshair lightens. Where holograms stand one behind another, the nearest one is aimed at. |
 | Left-clicks a button | Its action runs. The block behind the hologram is not hit. |
-| Left-clicks a list's row, or a prompt's box | The mod is told which row was chosen, or typing starts; see [`hologram-panels.md`](hologram-panels.md). |
+| Left-clicks a list's row, or a prompt's or a form's box | The mod is told which row was chosen, or typing starts; see [`hologram-panels.md`](hologram-panels.md). |
 | Turns the mouse wheel while aiming at a panel | The panel scrolls, and the hotbar slot does not change. |
 | Holds the move key while aiming at a hologram | That hologram follows the crosshair at the distance it was taken from, turned to face the player. One hologram is carried at a time. |
 | Lets go of the move key | The hologram stays where it is. |
