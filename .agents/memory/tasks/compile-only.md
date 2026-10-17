@@ -46,3 +46,14 @@ in order.
 ### Task 1 — chore/compile-only-plan
 
 This record, and its row in the memory index.
+
+### Task 2 — build/compile-only
+
+The Fabric, Forge and NeoForge modules declare `tool`, `api`, `common`, `shared` and `client`
+(and, on Fabric, Fabric Loader and Fabric API; on Forge, Forge) as `compileOnly`, each with a
+`runtimeOnly` twin for `runClient`, and a comment on each block says why. No Gradle file in
+core declares `implementation` any more (`testImplementation` aside). `./gradlew build` is
+green, and the three loader jars hold exactly the entries of the v0.11.0 release jars. In the
+Fabric, NeoForge and Forge 26.3 dev clients, core loaded beside chat 0.10.0 and the template
+into a world, and G then CHAT opened chat's Chat Sessions hologram with its database open.
+Screenshots are in the project's shared files under `reports/compile-only/`.
