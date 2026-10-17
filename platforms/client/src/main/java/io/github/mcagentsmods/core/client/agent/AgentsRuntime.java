@@ -2,6 +2,7 @@ package io.github.mcagentsmods.core.client.agent;
 
 import io.github.mcagentsmods.core.common.agent.Agents;
 import io.github.mcagentsmods.core.common.agent.AgentsPaths;
+import io.github.mcagentsmods.core.common.model.Models;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -14,7 +15,7 @@ import java.util.logging.Logger;
  * The agent layer's start-up on the client, shared by every loader.
  *
  * <p>Each loader's client entry point finds the game directory and calls {@link #start(Path)},
- * after it registers the G key. It loads the player's settings; the tool registry, the worker
+ * after it registers the G key. It loads the player's settings and the global model; the tool registry, the worker
  * pool and the menu's buttons need no start-up and are ready before it runs.
  */
 public final class AgentsRuntime {
@@ -51,6 +52,13 @@ public final class AgentsRuntime {
             Agents.start(paths.settingsFile());
         } catch (RuntimeException e) {
             LOGGER.log(Level.WARNING, "Could not load the agents settings; using the defaults", e);
+        }
+        try {
+            // The global model every task with no model of its own uses. A mod may have read
+            // the same file first; then this does nothing.
+            Models.start(paths.modelsFile());
+        } catch (RuntimeException e) {
+            LOGGER.log(Level.WARNING, "Could not load the global model; using the defaults", e);
         }
         LOGGER.info("Agents started, settings in " + paths.dataDirectory());
     }

@@ -28,6 +28,7 @@ scope per page; a page that would need an unrelated heading is split.
 | [`../../wiki/api/model-client.md`](../../wiki/api/model-client.md) | `ModelClient` and `OpenRouterClient`: tools, embeddings, caching, retries, key rotation. |
 | [`../../wiki/api/model-exchange.md`](../../wiki/api/model-exchange.md) | The model client's request, message, tool and answer types. |
 | [`../../wiki/api/model-routing.md`](../../wiki/api/model-routing.md) | `ModelName`, `ModelPlatform`, `ModelChoice`, `ModelProvider`, `ProviderRoutes` and `ApiKeySource`: where a request goes and with which key. |
+| [`../../wiki/api/global-models.md`](../../wiki/api/global-models.md) | `GlobalModels`, `GlobalModelStore` and `Models`: the global model every task without its own falls back to, custom providers, and their file. |
 | [`../../wiki/api/http.md`](../../wiki/api/http.md) | The HTTP seam and `JdkHttpTransport`'s limits. |
 | [`../../wiki/api/failures.md`](../../wiki/api/failures.md) | `AgentException` and `ModelException`: what a failed future means and what to do. |
 | [`../../wiki/api/test-fixtures.md`](../../wiki/api/test-fixtures.md) | `StubTransport` and `StubKeySource`, for a consumer's tests. |

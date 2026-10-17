@@ -64,3 +64,14 @@ provider (old constructors kept), `ModelClient.embed(ModelChoice, text)` is a de
 `OpenRouterClient` routes a chosen provider exactly and `ToolAgent` sends every step to the
 question's provider. `ChosenProviderTest` and `ModelChoiceTest` cover it; the routing, agent,
 exchange and client pages say so.
+
+### Task 3 — feat/global-models
+
+`GlobalModels` (chat and embedding choices, custom providers; `chatOr`/`embeddingOr`,
+`providers()`, `withProvider`/`withoutProvider`, `routes(...)`) and `GlobalModelStore`
+(`current`, `save`, `saved`, `inMemory`) in `core-api`. `Models` in `core-common` is the access
+point over `{game_dir}/MCAgents/agents/models.properties` (`AgentsPaths.modelsFile()`), read by
+`AgentsRuntime.start` or by a mod that starts it first; `ModelSettingsFile` reads and writes it,
+skipping what it cannot use. `GlobalModelsTest` and `ModelSettingsFileTest` cover it;
+`wiki/api/global-models.md` documents it. Chat moves its stored models in and edits it from its
+Models page.
