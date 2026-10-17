@@ -5,7 +5,7 @@ description: Adding the form panel so every agents menu button can open a hologr
 
 # Task: forms on holograms
 
-**Status:** in progress
+**Status:** done
 
 ## The request
 
@@ -42,10 +42,10 @@ part (its Keys, Models, Persona and Wallets pages and their dialogs) is chat's o
 
 | # | Title | Branch | PR |
 |---|---|---|---|
-| 1 | Task record | `chore/hologram-forms-plan` | |
-| 2 | Form panel | `feat/hologram-form` | |
-| 3 | Settings hologram | `refactor/settings-hologram` | |
-| 4 | Release | `release/{version}` | |
+| 1 | Task record | `chore/hologram-forms-plan` | #59 |
+| 2 | Form panel | `feat/hologram-form` | #60 |
+| 3 | Settings hologram | `refactor/settings-hologram` | #61 |
+| 4 | Release 0.12.0 | `release/0.12.0` | #62 |
 
 ### Task 1 — chore/hologram-forms-plan
 
@@ -71,3 +71,14 @@ two steppers with their help lines and a two-line status, DEFAULTS and SAVE alon
 Each opening reads `Agents.settings()` into its own draft; SAVE calls `Agents.update` and puts
 *Saving...*, then *Saved.* or the failure, on the hologram, which stays open. The `gui` package
 and `AgentsSettingsScreen` are gone. Updated `wiki/api/buttons.md` and `wiki/api/settings.md`.
+
+### Task 4 — release/0.12.0
+
+`project-version` 0.12.0, `wiki/logs/0/12/0/CHANGELOG.md` and its row in the logs index, and
+the version wherever the state file, the repository rule, the repository map and the overview
+name it. `FormField`'s stars builder is `hidden()`, because a record cannot have a builder named
+like its `secret` component. Trying the pages in game added two things: Ctrl+Backspace deletes
+back to the start of the line (a field had no quick way to be emptied), and a new hologram turns
+aside in 20° steps instead of 40°, because a dialog beside a wide page opened about 100° away,
+out of sight. Settings is a wide form, so its stepper labels fit. Built green; the Settings hologram and chat's pages were tried on
+Fabric, NeoForge and Forge 26.3. The `PR` column is filled.
