@@ -58,7 +58,7 @@ too.
 
 ## AgentRequest
 
-`record AgentRequest(String model, String prompt, List<PromptMessage> conversation, Set<String> categories, int toolRounds)`,
+`record AgentRequest(String model, String prompt, List<PromptMessage> conversation, Set<String> categories, int toolRounds, String provider)`,
 in `io.github.mcagentsmods.core.api.agent`. `PromptMessage` is core's; see
 [model exchange](model-exchange.md).
 
@@ -69,10 +69,13 @@ in `io.github.mcagentsmods.core.api.agent`. `PromptMessage` is core's; see
 | `conversation` | The messages the answer is written from, oldest first. `null` or empty becomes the prompt alone, as a user message. | The prompt alone. |
 | `categories` | The category ids the agent may use. Empty means every category. | Every category. |
 | `toolRounds` | How many times the model may ask for tools before it must answer: 1 to `MAX_TOOL_ROUNDS`, or `PLAYER_SETTING`. | `PLAYER_SETTING`. |
+| `provider` | The provider every step is sent to ([`model-routing.md`](model-routing.md#modelchoice)). Blank means none chosen: the model is routed by its name alone. The five-argument constructor leaves it blank. | Blank. |
 
 | Member | What it does |
 |---|---|
 | `AgentRequest.of(String model, String prompt)` | Static. One question, answered from the prompt alone, with every category and the player's tool rounds. |
+| `AgentRequest.of(ModelChoice choice, String prompt)` | Static. The same, asked of that model at that provider, such as `Models.global().chatOr(own)` ([`global-models.md`](global-models.md)). |
+| `withProvider(String provider)` | Sends every step to that provider; blank means none chosen. |
 | `withConversation(List<PromptMessage> messages)` | Answers from a whole conversation, such as a persona and earlier turns, which should end with the question. The prompt is still what steps 1 and 2 read. |
 | `withCategories(Collection<String> ids)` | Limits the question to those categories, such as your mod's own. A category with no tool in it is ignored; an empty collection means every category again. |
 | `withToolRounds(int rounds)` | This question's own number of rounds instead of the player's. |

@@ -18,8 +18,12 @@ import java.util.Objects;
  *                 {@link ModelName}
  * @param messages the conversation, oldest first
  * @param tools    what the model may call; empty means it is not offered any
+ * @param provider the provider the request is sent to, see {@link ModelChoice}; empty means
+ *                 none was chosen, and the model client routes by the model name alone, as it
+ *                 did before providers were chosen
  */
-public record ChatRequest(String model, List<PromptMessage> messages, List<ToolDefinition> tools) {
+public record ChatRequest(String model, List<PromptMessage> messages, List<ToolDefinition> tools,
+                          String provider) {
 
     public ChatRequest {
         Objects.requireNonNull(model, "model");
@@ -32,6 +36,12 @@ public record ChatRequest(String model, List<PromptMessage> messages, List<ToolD
         }
         messages = List.copyOf(messages);
         tools = tools == null ? List.of() : List.copyOf(tools);
+        provider = provider == null || provider.isBlank() ? "" : ModelPlatform.normalise(provider);
+    }
+
+    /** A request with no provider chosen, routed by the model name alone. */
+    public ChatRequest(String model, List<PromptMessage> messages, List<ToolDefinition> tools) {
+        this(model, messages, tools, "");
     }
 
     /** A request offering the model no tools. */
@@ -41,6 +51,18 @@ public record ChatRequest(String model, List<PromptMessage> messages, List<ToolD
 
     /** This request continued with {@code messages}, keeping the same model and tools. */
     public ChatRequest continuedWith(List<PromptMessage> messages) {
-        return new ChatRequest(model, messages, tools);
+        return new ChatRequest(model, messages, tools, provider);
+    }
+
+    /** This request sent to {@code provider}; blank means none chosen. */
+    public ChatRequest withProvider(String provider) {
+        return new ChatRequest(model, messages, tools, provider);
+    }
+
+    /** The provider and model, when a provider was chosen. */
+    public java.util.Optional<ModelChoice> choice() {
+        return provider.isEmpty()
+                ? java.util.Optional.empty()
+                : java.util.Optional.of(new ModelChoice(provider, model));
     }
 }

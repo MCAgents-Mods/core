@@ -53,3 +53,14 @@ released against this release.
 ### Task 1 — chore/model-providers-plan
 
 This record, and its row in the memory index.
+
+### Task 2 — feat/provider-routing
+
+`ModelChoice` (provider and stored model, `qualified`, `orElse`) and `ModelProvider` (id and
+address, `builtIns()`) in `core-api`. `ProviderRoute.to(provider, model)` names the model the
+way the provider does; `ProviderRoutes.route(ModelChoice)` goes to that provider and fails
+naming it when no address is known. `ChatRequest` and `AgentRequest` carry an optional
+provider (old constructors kept), `ModelClient.embed(ModelChoice, text)` is a default method,
+`OpenRouterClient` routes a chosen provider exactly and `ToolAgent` sends every step to the
+question's provider. `ChosenProviderTest` and `ModelChoiceTest` cover it; the routing, agent,
+exchange and client pages say so.

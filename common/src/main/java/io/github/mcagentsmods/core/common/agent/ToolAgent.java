@@ -179,7 +179,8 @@ public final class ToolAgent implements Agent {
     }
 
     private CompletableFuture<ChatCompletion> complete(Question question, ChatRequest request) {
-        return client.complete(request).thenApply(completion -> {
+        // Every step goes to the provider the question was asked of, whichever step built it.
+        return client.complete(request.withProvider(question.request.provider())).thenApply(completion -> {
             question.add(completion.usage());
             return completion;
         });

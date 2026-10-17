@@ -67,6 +67,30 @@ public record ProviderRoute(String platform, String baseUrl, String modelId) {
         return new ProviderRoute(name.platform(), baseUrl, name.bare());
     }
 
+    /**
+     * The route to {@code provider} for {@code storedModelName}: the provider's own address, and
+     * the name it knows the model by.
+     *
+     * <p>Through OpenRouter that is the whole stored name. At any other provider it is the bare
+     * id when the stored name's platform is that provider ({@code deepseek/deepseek-v4-flash}
+     * at {@code deepseek} is {@code deepseek-v4-flash}), and the whole stored name otherwise,
+     * because a host serving other platforms' models, Together for one, names them
+     * {@code {platform}/{model}} itself.
+     */
+    public static ProviderRoute to(ModelProvider provider, String storedModelName) {
+        Objects.requireNonNull(provider, "provider");
+        Objects.requireNonNull(storedModelName, "storedModelName");
+        String stored = ModelName.normalise(storedModelName);
+        if (provider.isOpenRouter()) {
+            return new ProviderRoute(ModelPlatform.OPENROUTER, provider.baseUrl(), stored);
+        }
+        String sent = ModelName.parse(stored)
+                .filter(name -> name.platform().equals(provider.id()))
+                .map(ModelName::bare)
+                .orElse(stored);
+        return new ProviderRoute(provider.id(), provider.baseUrl(), sent);
+    }
+
     /** Whether this route goes through the gateway rather than to a platform directly. */
     public boolean isThroughOpenRouter() {
         return ModelPlatform.isOpenRouter(platform);
