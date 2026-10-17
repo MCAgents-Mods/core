@@ -5,7 +5,7 @@ description: Replacing every implementation dependency in the loader modules wit
 
 # Task: compileOnly instead of implementation
 
-**Status:** in progress
+**Status:** done
 
 ## The request
 
@@ -39,9 +39,9 @@ in order.
 
 | # | Title | Branch | PR |
 |---|---|---|---|
-| 1 | Task record | `chore/compile-only-plan` | |
-| 2 | compileOnly in loader modules | `build/compile-only` | |
-| 3 | Release 0.11.1 | `release/0.11.1` | |
+| 1 | Task record | `chore/compile-only-plan` | #56 |
+| 2 | compileOnly in loader modules | `build/compile-only` | #57 |
+| 3 | Release 0.11.1 | `release/0.11.1` | #58 |
 
 ### Task 1 — chore/compile-only-plan
 
@@ -57,3 +57,10 @@ green, and the three loader jars hold exactly the entries of the v0.11.0 release
 Fabric, NeoForge and Forge 26.3 dev clients, core loaded beside chat 0.10.0 and the template
 into a world, and G then CHAT opened chat's Chat Sessions hologram with its database open.
 Screenshots are in the project's shared files under `reports/compile-only/`.
+
+### Task 3 — release/0.11.1
+
+`project-version` is `0.11.1`, a patch release: a build change, no API change, and jars with
+the same entries as 0.11.0's. `wiki/logs/0/11/1/` says players and mod authors need do nothing;
+the logs index has its row, and the repository rule, map, state and overview name the version.
+The `PR` column is filled.
