@@ -5,6 +5,7 @@ import io.github.mcagentsmods.core.api.hologram.ButtonGrid;
 import io.github.mcagentsmods.core.api.hologram.Hologram;
 import io.github.mcagentsmods.core.api.hologram.HologramButton;
 import io.github.mcagentsmods.core.api.hologram.HologramPanel;
+import io.github.mcagentsmods.core.api.hologram.PickList;
 import io.github.mcagentsmods.core.api.hologram.PromptInput;
 import io.github.mcagentsmods.core.api.hologram.SelectList;
 import io.github.mcagentsmods.core.api.hologram.Transcript;
@@ -293,7 +294,8 @@ public final class HologramClient {
         return switch (panel) {
             case ButtonGrid grid -> new GridPanelView(grid, HologramClient::hint, HologramClient::press);
             case SelectList list -> new ListPanelView(list, HologramClient::run);
-            case Transcript transcript -> new TranscriptPanelView(transcript);
+            case PickList list -> new PickListPanelView(list, HologramClient::run);
+            case Transcript transcript -> new TranscriptPanelView(transcript, HologramClient::run);
             case PromptInput prompt -> new PromptPanelView(prompt, HologramClient::run,
                     HologramClient::startTyping);
         };

@@ -70,4 +70,28 @@ class ColumnLayoutTest {
         assertFalse(first.contains(first.right() + 1, first.top() + 1), "the gap belongs to neither");
         assertEquals(ColumnLayout.FOOTER.right(), ColumnLayout.sendButton().right());
     }
+
+    @Test
+    void navButtonsStandAtTheRightOfTheTitleBandClearOfTheCloseButton() {
+        PanelArea only = ColumnLayout.navButton(0, 1);
+        PanelArea first = ColumnLayout.navButton(0, 2);
+        PanelArea second = ColumnLayout.navButton(1, 2);
+
+        assertEquals(ColumnLayout.NAV_RIGHT, only.right());
+        assertEquals(ColumnLayout.NAV_RIGHT, second.right());
+        assertTrue(first.right() + ColumnLayout.BUTTON_GAP <= second.left());
+        assertTrue(ColumnLayout.HEADER.top() < only.top());
+        assertTrue(only.bottom() < ColumnLayout.HEADER.bottom());
+        // The close button takes the last 20 pixels of the band.
+        assertTrue(only.right() <= ColumnLayout.WIDTH - 20);
+    }
+
+    @Test
+    void theNavTitleStopsShortOfTheButtons() {
+        assertEquals(ColumnLayout.NAV_RIGHT - ColumnLayout.NAV_TITLE_LEFT, ColumnLayout.navTitleRoom(0));
+        assertTrue(ColumnLayout.NAV_TITLE_LEFT + ColumnLayout.navTitleRoom(1)
+                < ColumnLayout.navButton(0, 1).left());
+        assertTrue(ColumnLayout.navTitleRoom(2) < ColumnLayout.navTitleRoom(1));
+        assertFalse(ColumnLayout.navTitleRoom(2) <= 0);
+    }
 }

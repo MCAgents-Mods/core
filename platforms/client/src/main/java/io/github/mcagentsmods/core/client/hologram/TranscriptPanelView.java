@@ -14,7 +14,8 @@ import java.util.Objects;
 
 /**
  * A {@link Transcript}: each entry's speaker on a line of its own and its text wrapped under
- * it, scrolling, and kept at the bottom while the player has not scrolled up.
+ * it, scrolling, and kept at the bottom while the player has not scrolled up; the buttons, if
+ * any, under it.
  */
 final class TranscriptPanelView extends ColumnPanelView {
 
@@ -22,14 +23,17 @@ final class TranscriptPanelView extends ColumnPanelView {
     private static final int SCROLL_LINES = 3;
 
     private final Transcript spec;
-    private final PanelArea box = ColumnLayout.box(false);
+    private final Actions actions;
+    private final PanelArea box;
     private final ScrollWindow window;
     private List<TranscriptEntry> shown;
     private List<String> lines = List.of();
 
-    TranscriptPanelView(Transcript spec) {
+    TranscriptPanelView(Transcript spec, Actions actions) {
         super(spec.title());
         this.spec = spec;
+        this.actions = actions;
+        this.box = ColumnLayout.box(!spec.buttons().isEmpty());
         this.window = new ScrollWindow(ColumnLayout.capacity(box, ColumnLayout.LINE_HEIGHT), true);
     }
 
@@ -56,6 +60,13 @@ final class TranscriptPanelView extends ColumnPanelView {
             painter.plainText(lines.get(index), (float) content.left(), top + 1, 6, HologramStyle.TEXT);
         }
         drawScrollbar(painter, box, window, u, v);
+        drawFooter(painter, spec.buttons(), u, v);
+    }
+
+    @Override
+    String heading() {
+        String heading = read(spec.heading(), null);
+        return heading == null || heading.isBlank() ? title() : heading;
     }
 
     private static List<String> wrap(List<TranscriptEntry> entries, HologramPainter painter, int width) {
@@ -76,7 +87,7 @@ final class TranscriptPanelView extends ColumnPanelView {
 
     @Override
     boolean click(double u, double v) {
-        return clickScrollbar(box, window, u, v);
+        return clickFooter(spec.buttons(), actions, u, v) || clickScrollbar(box, window, u, v);
     }
 
     @Override
