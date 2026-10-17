@@ -5,7 +5,7 @@ description: Routing each request to the provider the player picked, custom prov
 
 # Task: model providers and the global model
 
-**Status:** in progress
+**Status:** done (2026-10-17), released as 0.13.0
 
 ## The request
 
@@ -45,10 +45,10 @@ released against this release.
 
 | # | Title | Branch | PR |
 |---|---|---|---|
-| 1 | Task record | `chore/model-providers-plan` | |
-| 2 | Routing by provider | `feat/provider-routing` | |
-| 3 | Global models | `feat/global-models` | |
-| 4 | Release 0.13.0 | `release/0.13.0` | |
+| 1 | Task record | `chore/model-providers-plan` | #63 |
+| 2 | Routing by provider | `feat/provider-routing` | #64 |
+| 3 | Global models | `feat/global-models` | #65 |
+| 4 | Release 0.13.0 | `release/0.13.0` | #66 |
 
 ### Task 1 — chore/model-providers-plan
 
@@ -75,3 +75,8 @@ point over `{game_dir}/MCAgents/agents/models.properties` (`AgentsPaths.modelsFi
 skipping what it cannot use. `GlobalModelsTest` and `ModelSettingsFileTest` cover it;
 `wiki/api/global-models.md` documents it. Chat moves its stored models in and edits it from its
 Models page.
+
+### Task 4 — release/0.13.0
+
+`project-version` 0.13.0, `wiki/logs/0/13/0/CHANGELOG.md`, its row in the logs index, and the
+version in the repository state, rules, map and overview.
