@@ -51,6 +51,7 @@ match on it before opening anything. Writing here needs no approval; see
 | [`../memory/tasks/hologram-forms.md`](../memory/tasks/hologram-forms.md) | `platforms/client/`, `api/hologram`, holograms, the agents menu | Adding the form panel so every agents menu button can open a hologram, core's Settings as one, and releasing 0.12.0. |
 | [`../memory/tasks/model-providers.md`](../memory/tasks/model-providers.md) | `api/model`, `common/model`, model routing and settings | Routing each request to the provider the player picked, custom providers, the global model every task falls back to, and releasing 0.13.0. |
 | [`../memory/tasks/own-modules.md`](../memory/tasks/own-modules.md) | Gradle builds, `platforms/` | Making each loader module declare core's own submodules with `implementation`, keeping the loader and Fabric API `compileOnly`, with no jar changing, and releasing 0.13.1. |
+| [`../memory/tasks/flat-platforms.md`](../memory/tasks/flat-platforms.md) | Gradle builds, `platforms/` | Giving every platform module one `build.gradle` and one `src/`, with no `26.3/` folder or `{module}.gradle` script left, and releasing 0.13.2. |
 
 ## Decisions
 
