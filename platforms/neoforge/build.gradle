@@ -1,10 +1,18 @@
 // The NeoForge mod jar: core's tool, api, common, shared and client code, plus the NeoForge
 // entry point. The only module that may reference NeoForge types.
-//
-// Applied by each Minecraft version subproject, platforms/neoforge/{version}, after it
-// applies ModDevGradle; that subproject builds the jar for its version.
 
-apply from: '../../minecraft.gradle'
+plugins {
+    id 'net.neoforged.moddev'
+}
+
+// The one Minecraft version core supports, the latest release, as the catalog names it.
+def minecraftVersion = libs.versions.minecraft.get()
+
+// The first Minecraft version this one does not cover, for the closed range the loader
+// metadata declares: 26.3 -> 26.4.
+def minecraftNext = minecraftVersion.tokenize('.').with { parts ->
+    "${parts[0]}.${(parts[1] as int) + 1}"
+}
 
 def clientModule = ':platforms:client'
 
@@ -18,7 +26,7 @@ def bundledModules = [':tool', ':api', ':common', ':platforms:shared', clientMod
 bundledModules.each { path -> evaluationDependsOn(path) }
 
 neoForge {
-    version = versionFor('neoforge')
+    version = libs.versions.neoforge.get()
 
     // A development client: ./gradlew :platforms:neoforge:runClient, in run/.
     runs {
@@ -51,6 +59,8 @@ dependencies {
 }
 
 tasks.named('jar', Jar) {
+    // {Name}-0.13.2+26.3.jar: the mod's version, then the game's.
+    archiveVersion = "${project.version}+${minecraftVersion}"
     bundledModules.each { path ->
         from project(path).sourceSets.main.output
     }

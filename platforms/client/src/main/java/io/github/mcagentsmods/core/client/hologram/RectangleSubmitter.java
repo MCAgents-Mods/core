@@ -7,7 +7,7 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import java.util.List;
 
 /**
- * Sends a panel's rectangles to the game, for Minecraft 26.3. It sits in the version folder
+ * Sends a panel's rectangles to the game, for Minecraft 26.3. It is a class of its own
  * because the way a coloured rectangle is drawn changes between Minecraft releases: 26.3
  * removed the render type the release before it drew with.
  *

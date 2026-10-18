@@ -29,8 +29,7 @@ Full description: [`../../../wiki/information/overview.md`](../../../wiki/inform
 | `platforms/shared/` | What every loader shares: `CoreRuntime`, the side-guard machinery, and the client and server halves as packages. Plain Java. |
 | `platforms/client/` | The holograms: drawing, aiming, clicks, the wheel, the Z key and the two-chunk range, against vanilla Minecraft through Loom; the agents menu, the G key, the Settings form hologram and `AgentsRuntime` (`client.agent`); and the `en_us` lang file for the keys, the footer, the menu and the settings. Client only; no loader type. |
 | `platforms/{forge,neoforge,fabric}/` | One entry point and one manifest per loader, a client half that wires the hologram and the agents menu to the loader's events, and Forge's drawing mixin; each with its own toolchain and its own mod jar. |
-| `platforms/{client,forge,neoforge,fabric}/{minecraft}/` | The Gradle subproject for the one Minecraft version core supports (26.3), `:platforms:{module}`: a `build.gradle` that applies the toolchain and `../{module}.gradle`, and a `src/` with only what is particular to that version. The shared sources are in `platforms/{module}/src/`. |
-| `platforms/minecraft.gradle` | What each version subproject applies: its version from the folder name, the catalog lookups by version suffix, the two source folders, and the `+{minecraft}` jar name. |
+| `platforms/{client,forge,neoforge,fabric,shared}/build.gradle` | Each platform module's whole build, `:platforms:{module}`, next to its one `src/`. No version subfolder and no applied script: the Minecraft-facing ones read the version from the catalog's `minecraft` entry and name the jar `+{minecraft}`. |
 | `gradle/libs.versions.toml` | Every dependency coordinate. Never declare one inline in a module. |
 | `.agents/` | This repository's own instructions, plus the index, agent-wiki, and memory trees. The universal conventions are **not** here — they come from the connector. |
 | `wiki/` | Human documentation, including `wiki/api/` (one page per public API scope) and `wiki/logs/` release history. |
@@ -112,13 +111,12 @@ None of these are tracked. Do not commit them, and do not document a path under
   without one, shows a warning at start-up, and crashes when a world is created; NeoForge
   and Fabric build the metadata themselves. Its `min_format` and `max_format` copy Forge's
   own `pack.mcmeta` and change with the Minecraft version, so it lives in
-  `platforms/forge/{minecraft}/src/main/resources/`, copied from that Forge build.
-* **Only the latest Minecraft release is supported, as a subproject.** A Minecraft-facing
-  module is built for the one version in `settings.gradle`'s list, from shared sources
-  plus that version's folder. Code whose Minecraft API changes between releases goes in
-  a class in the version folder; shared code never checks the version. Moving to a new
-  release replaces the list entry, the catalog block and each module's version folder;
-  the old version is never kept beside it.
+  `platforms/forge/src/main/resources/`, copied from that Forge build.
+* **Only the latest Minecraft release is supported.** A Minecraft-facing module is built
+  for the one version the catalog's `minecraft` entry names, from its own `src/`. Code whose
+  Minecraft API changes between releases goes in a small class of its own; shared code never
+  checks the version. Moving to a new release replaces the catalog block and the classes and
+  `pack.mcmeta` the new release breaks; the old version is never kept beside it.
 * **The client and server halves share a module.** Nothing outside
   `…shared.client` may import it, and the same for `…shared.server`;
   `SideSeparationTest` fails the build otherwise.

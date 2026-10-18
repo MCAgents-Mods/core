@@ -4,13 +4,17 @@
 // appear here. Minecraft 26.x ships unobfuscated, so the same classes link against every
 // loader's game. Each loader module bundles this one into its jar and wires its events to it.
 //
-// Applied by each Minecraft version subproject, platforms/client/{version}, after it applies
-// Loom (used for the vanilla game alone: no loader, no mod metadata, no run configs).
+// Loom is used for the vanilla game alone: no loader, no mod metadata, no run configs.
 
-apply from: '../../minecraft.gradle'
+plugins {
+    id 'net.fabricmc.fabric-loom'
+}
+
+// The one Minecraft version core supports, the latest release, as the catalog names it.
+def minecraftVersion = libs.versions.minecraft.get()
 
 dependencies {
-    minecraft libraryFor('minecraft')
+    minecraft libs.minecraft
 
     // The shared layers are bundled once, by each loader's jar. This module
     // declares them compileOnly so its own jar never carries a second copy.
@@ -23,6 +27,11 @@ tasks.withType(JavaCompile).configureEach {
     // on this module's classpath, and javac warns once per class that reads it with no lint
     // switch to turn that off. Errors still fail the build.
     options.warnings = false
+}
+
+tasks.named('jar', Jar) {
+    // {Name}-0.13.2+26.3.jar: the mod's version, then the game's.
+    archiveVersion = "${project.version}+${minecraftVersion}"
 }
 
 base {

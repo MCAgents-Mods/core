@@ -33,15 +33,14 @@ The default branch is `master`.
 ```
 
 That compiles every module, runs the tests, and produces one jar per module under
-`{module}/build/libs/`, or `{module}/{minecraft}/build/libs/` for the modules built against
-Minecraft (see [`../information/modules.md`](../information/modules.md)). The ones
+`{module}/build/libs/` (see [`../information/modules.md`](../information/modules.md)). The ones
 that matter are the mod jars, one per loader:
 
 | Loader | Jar |
 |---|---|
-| Forge | `platforms/forge/{minecraft}/build/libs/MCAgentsCoreForge-{version}+{minecraft}.jar` |
-| NeoForge | `platforms/neoforge/{minecraft}/build/libs/MCAgentsCoreNeoforge-{version}+{minecraft}.jar` |
-| Fabric | `platforms/fabric/{minecraft}/build/libs/MCAgentsCoreFabric-{version}+{minecraft}.jar` |
+| Forge | `platforms/forge/build/libs/MCAgentsCoreForge-{version}+{minecraft}.jar` |
+| NeoForge | `platforms/neoforge/build/libs/MCAgentsCoreNeoforge-{version}+{minecraft}.jar` |
+| Fabric | `platforms/fabric/build/libs/MCAgentsCoreFabric-{version}+{minecraft}.jar` |
 
 `{minecraft}` is the Minecraft version, `26.3`: core supports only the latest release. Drop
 the jar matching your loader into the game's `mods/` folder. Fabric also needs Fabric API.
@@ -57,7 +56,7 @@ Useful variants:
 
 ## Run a development client
 
-Each loader starts a development client with core loaded, in its version subproject's own
+Each loader starts a development client with core loaded, in its module's own
 `run/` directory, which git ignores:
 
 ```sh
@@ -69,7 +68,7 @@ Each loader starts a development client with core loaded, in its version subproj
 The client loads the mod the way its jar would: `tool`, `api`, `common` and `shared` are part of
 `mcagents_core`, not separate pieces. NeoForge is told so through the mod's source sets;
 Forge treats the directory holding `mods.toml` as the whole mod, so its run task first
-copies every bundled module into `platforms/forge/{minecraft}/build/devMod/` and starts the
+copies every bundled module into `platforms/forge/build/devMod/` and starts the
 game from there. The first run of each loader downloads the game's assets.
 
 ## The request timeouts
@@ -157,9 +156,8 @@ runs each time a Publish run on `master` finishes:
 1. It reads `project-version` and looks for the tag `v{version}`. If the tag does not
    exist, or already has a GitHub release, the run stops: a merge that leaves the version
    alone releases nothing.
-2. Otherwise it checks out the tag, runs `./gradlew assemble`, and takes one jar from each
-   Minecraft version subproject of `platforms/forge`, `platforms/fabric` and
-   `platforms/neoforge` — `MCAgentsCoreForge-{version}+{minecraft}.jar`,
+2. Otherwise it checks out the tag, runs `./gradlew assemble`, and takes one jar from each of
+   `platforms/forge`, `platforms/fabric` and `platforms/neoforge` — `MCAgentsCoreForge-{version}+{minecraft}.jar`,
    `MCAgentsCoreFabric-{version}+{minecraft}.jar` and
    `MCAgentsCoreNeoforge-{version}+{minecraft}.jar`.
 3. It creates the `v{version}` release with those jars attached and that version's

@@ -26,9 +26,9 @@ had already asked for every branch to be opened as a pull request and rebase-mer
 
 ## Decisions
 
-- **`platforms/minecraft.gradle` stays** as the one helper every Minecraft-facing module
-  applies: it names the jar `{Name}-{version}+{minecraft}.jar` and works out the next
-  Minecraft version for the loader metadata. It is not a loader script.
+- **`platforms/minecraft.gradle` goes too.** Its few remaining lines (the version, the next
+  version for the loader metadata, the `+{minecraft}` jar name) are written into each module's
+  `build.gradle`, so a module's whole build is in one file, as in chat and template.
 - **The catalog names the Minecraft version**, in its `minecraft` entry; the `-26-3` suffixes go,
   since only one version is ever built. It is the one place a new release changes.
 - **`platforms/client` is flattened too**, as a platform module like the others.
@@ -50,7 +50,7 @@ This record, and its row in the memory index.
 ### Task 2 — build/flat-platforms
 
 Every version folder's sources move up to `platforms/{module}/src`, each `{module}.gradle` becomes
-the module's own `build.gradle`, the catalog loses its version suffixes, `settings.gradle`
+the module's own `build.gradle` with `minecraft.gradle`'s lines written in, the catalog loses its version suffixes, `settings.gradle`
 includes the module roots, and the Release workflow takes one jar from each loader module.
 
 ### Task 3 — release/0.13.2
