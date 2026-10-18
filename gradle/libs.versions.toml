@@ -9,21 +9,19 @@ fabric-loader = "0.19.5"
 fabric-loom = "1.18.4"
 moddevgradle = "2.0.148"
 forgegradle = "7.0.40"
-# The block for the one Minecraft version core supports, the latest release,
-# each entry suffixed with the version (26.3 -> -26-3). Every Minecraft-facing
-# module has a subproject for it, platforms/{module}/{version}, which finds its
-# entries by that suffix; the version itself is listed in settings.gradle.
-# Moving to a new release replaces this block, that entry and each module's
-# version folder; the old version is not kept. Check each loader's own maven
-# first: Fabric (meta.fabricmc.net), NeoForge (maven.neoforged.net) and Forge
+# The one Minecraft version core supports, the latest release, and the loader
+# builds for it. Every platform module's build.gradle reads the version from
+# the minecraft entry, so moving to a new release replaces this block alone; the
+# old version is not kept. Check each loader's own maven first: Fabric
+# (meta.fabricmc.net), NeoForge (maven.neoforged.net) and Forge
 # (maven.minecraftforge.net) must all publish a build for it. Minecraft 26.x
 # ships unobfuscated, so no module declares a mappings coordinate. The Forge
-# pack.mcmeta in platforms/forge/{version} moves with it: copy its formats from
-# that Forge build's own pack.mcmeta.
-minecraft-26-3 = "26.3"
-fabric-api-26-3 = "0.162.0+26.3"
-neoforge-26-3 = "26.3.0.76"
-forge-26-3 = "26.3-66.0.11"
+# pack.mcmeta in platforms/forge/src/main/resources moves with it: copy its
+# formats from that Forge build's own pack.mcmeta.
+minecraft = "26.3"
+fabric-api = "0.162.0+26.3"
+neoforge = "26.3.0.76"
+forge = "26.3-66.0.11"
 # JSON codec used to read and write the vendor wire formats. Provided by
 # Minecraft at runtime, so it is only ever a compileOnly dependency.
 gson = "2.14.0"
@@ -33,8 +31,8 @@ junit = "6.1.3"
 
 [libraries]
 fabric-loader = { module = "net.fabricmc:fabric-loader", version.ref = "fabric-loader" }
-minecraft-26-3 = { module = "com.mojang:minecraft", version.ref = "minecraft-26-3" }
-fabric-api-26-3 = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "fabric-api-26-3" }
+minecraft = { module = "com.mojang:minecraft", version.ref = "minecraft" }
+fabric-api = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "fabric-api" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 
 # Versionless on purpose: the BOM above pins both, so there is exactly one

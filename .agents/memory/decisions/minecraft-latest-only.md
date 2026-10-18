@@ -13,10 +13,10 @@ description: The owner's permanent decision that every MCAgents mod supports onl
 - Jar names keep the game's version as a suffix: `MCAgentsCoreFabric-{version}+26.3.jar`.
 - Gradle project names and artifact ids do not carry it: `:platforms:client`,
   `mcagents-core-client`.
-- The build keeps one folder per Minecraft-facing module for the version,
-  `platforms/{module}/{minecraft}/`, listed once in `settings.gradle`, with one catalog block.
-  Moving to a new release replaces that entry, the block and the folders in one change, and
-  bumps the minor version; the old version's files are deleted in the same change.
+- The version is named once, by the catalog's Minecraft block; since 0.13.2 each
+  Minecraft-facing module is a single folder, `platforms/{module}/`, with no version folder.
+  Moving to a new release replaces that block, and whatever the release breaks, in one change,
+  and bumps the minor version; the old version's files are deleted in the same change.
 
 **Why:** the owner: "we will not have another version support". Keeping two versions doubled
 every build, release and dev-client check for players who can update the game.

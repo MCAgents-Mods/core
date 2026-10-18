@@ -1,14 +1,24 @@
 // The Forge mod jar: core's tool, api, common, shared and client code, plus the Forge entry
 // point. The only module that may reference Forge types.
 //
-// Applied by each Minecraft version subproject, platforms/forge/{version}, after it
-// applies ForgeGradle; that subproject builds the jar for its version, and keeps the
-// pack.mcmeta for it.
+// src/main/resources/pack.mcmeta carries the resource formats of the Minecraft version this
+// module builds for, and moves with it.
 
-apply from: '../../minecraft.gradle'
+plugins {
+    id 'net.minecraftforge.gradle'
+}
+
+// The one Minecraft version core supports, the latest release, as the catalog names it.
+def minecraftVersion = libs.versions.minecraft.get()
+
+// The first Minecraft version this one does not cover, for the closed range the loader
+// metadata declares: 26.3 -> 26.4.
+def minecraftNext = minecraftVersion.tokenize('.').with { parts ->
+    "${parts[0]}.${(parts[1] as int) + 1}"
+}
 
 def clientModule = ':platforms:client'
-def forgeVersion = versionFor('forge')
+def forgeVersion = libs.versions.forge.get()
 
 repositories {
     minecraft.mavenizer(it)
@@ -80,6 +90,8 @@ tasks.withType(JavaExec).matching { it.name == 'runClient' }.configureEach {
 }
 
 tasks.named('jar', Jar) {
+    // {Name}-0.13.2+26.3.jar: the mod's version, then the game's.
+    archiveVersion = "${project.version}+${minecraftVersion}"
     // Forge has no event for drawing in the level, so a mixin draws the holograms.
     manifest {
         attributes('MixinConfigs': 'mcagents_core.mixins.json')

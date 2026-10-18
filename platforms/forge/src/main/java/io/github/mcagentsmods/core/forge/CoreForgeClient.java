@@ -36,8 +36,8 @@ final class CoreForgeClient {
             AgentsKeys.onEndTick(Minecraft.getInstance());
         });
         // The attack key's event changes between Minecraft releases, so AttackListener
-        // sits in the version folder. A listener that returns true cancels the event: the block behind
-        // a hologram is not hit, and the hotbar slot does not change.
+        // is a class of its own. A listener that returns true cancels the event: the block
+        // behind a hologram is not hit, and the hotbar slot does not change.
         AttackListener.listen();
         InputEvent.MouseScrollingEvent.BUS.addListener(event -> {
             return HologramClient.onScroll(event.getDeltaY());
