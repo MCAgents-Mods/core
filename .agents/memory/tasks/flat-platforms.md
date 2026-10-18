@@ -5,7 +5,7 @@ description: Giving every platform module one build.gradle and one src/ at its r
 
 # Task: one build file per platform module
 
-**Status:** in progress
+**Status:** done
 
 ## The request
 
@@ -39,9 +39,9 @@ had already asked for every branch to be opened as a pull request and rebase-mer
 
 | # | Title | Branch | PR |
 |---|---|---|---|
-| 1 | Task record | `chore/flat-platforms-plan` | |
-| 2 | One build file per platform module | `build/flat-platforms` | |
-| 3 | Release 0.13.2 | `release/0.13.2` | |
+| 1 | Task record | `chore/flat-platforms-plan` | #70 |
+| 2 | One build file per platform module | `build/flat-platforms` | #71 |
+| 3 | Release 0.13.2 | `release/0.13.2` | #72 |
 
 ### Task 1 — chore/flat-platforms-plan
 
@@ -55,4 +55,6 @@ includes the module roots, and the Release workflow takes one jar from each load
 
 ### Task 3 — release/0.13.2
 
-`project-version` is `0.13.2`, with its changelog and logs-index row.
+`project-version` is `0.13.2`, a patch release: a build change, no API change, and jars with the
+same entries as 0.13.1's. `wiki/logs/0/13/2/` says players and mod authors need do nothing; the
+logs index has its row, and the repository rule, map, state and overview name the version.
