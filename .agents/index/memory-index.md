@@ -52,6 +52,7 @@ match on it before opening anything. Writing here needs no approval; see
 | [`../memory/tasks/model-providers.md`](../memory/tasks/model-providers.md) | `api/model`, `common/model`, model routing and settings | Routing each request to the provider the player picked, custom providers, the global model every task falls back to, and releasing 0.13.0. |
 | [`../memory/tasks/own-modules.md`](../memory/tasks/own-modules.md) | Gradle builds, `platforms/` | Making each loader module declare core's own submodules with `implementation`, keeping the loader and Fabric API `compileOnly`, with no jar changing, and releasing 0.13.1. |
 | [`../memory/tasks/flat-platforms.md`](../memory/tasks/flat-platforms.md) | Gradle builds, `platforms/` | Giving every platform module one `build.gradle` and one `src/`, with no `26.3/` folder or `{module}.gradle` script left, and releasing 0.13.2. |
+| [`../memory/tasks/config-paths.md`](../memory/tasks/config-paths.md) | `common/agent`, `platforms/shared/store`, files on disk | Moving every file core keeps into `MCAgents/core/`, moving a player's old files there on first start, and releasing 0.14.0. |
 
 ## Decisions
 
