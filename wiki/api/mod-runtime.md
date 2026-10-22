@@ -48,8 +48,8 @@ render or tick loop.
 | `SideEntrypoint` | What a half implements: `side()`, `start(ModContext)`, `stop()`, `describe()`. |
 | `ModContext(side, gameDirectory, logger, requestTimeout)` | What a half starts with. `ModContext.of(side, gameDirectory, logger)` uses the 60-second `LlmCredentials.DEFAULT_TIMEOUT`. |
 | `ModBootstrap` | Loads a half by class name, so a dedicated server never links a client class. `start(ModContext)` loads and starts; `entrypointFor(side)` gives the name, `CLIENT_ENTRYPOINT` or `DEDICATED_SERVER_ENTRYPOINT`. |
-| `…shared.client.ClientEntrypoint` | The client half. Opens the shared key file under the game directory and the [token commands](token-commands.md) over it. |
-| `…shared.server.ServerEntrypoint` | The server half. Opens `config/mcagents.json` under the server's run directory, and checks every command against permission level 4. |
+| `…shared.client.ClientEntrypoint` | The client half. Moves the key file an older core left loose in the game directory, then opens it at `MCAgents/core/mcagents.json` and the [token commands](token-commands.md) over it. |
+| `…shared.server.ServerEntrypoint` | The server half. Moves `config/mcagents.json` an older core used, then opens `MCAgents/core/mcagents.json` under the server's run directory, and checks every command against permission level 4. |
 
 The `client` and `server` packages never import each other, and nothing else in the module
 imports either; `SideSeparationTest` fails the build otherwise. Where each half keeps its key
@@ -96,7 +96,7 @@ AgentsRuntime.start(FabricLoader.getInstance().getGameDir());       // FMLPaths.
 |---|---|
 | `AgentsKeys.create(KeyMapping.Category)` | Builds the key that shows the agents menu, `key.mcagents_core.agents`, bound to G, in core's category beside the move key. Called first in client start-up, for the same reason. |
 | `AgentsKeys.onEndTick(Minecraft)` | Shows or hides the menu when the key was pressed. Called at the end of every client tick. |
-| `AgentsRuntime.start(Path gameDirectory)` | Creates `{game_dir}/MCAgents/agents/`, then loads and applies the player's settings through `Agents.start` ([`settings.md`](settings.md)) and reads the global model through `Models.start` ([`global-models.md`](global-models.md)). Only the first call does anything. A failure at either step is logged and the game carries on, with the default settings if they could not be loaded. A `null` directory throws `NullPointerException`. |
+| `AgentsRuntime.start(Path gameDirectory)` | Creates `{game_dir}/MCAgents/core/`, moves the files an older core left in `MCAgents/agents/` into it (`moveLegacyFiles()`), then loads and applies the player's settings through `Agents.start` ([`settings.md`](settings.md)) and reads the global model through `Models.start` ([`global-models.md`](global-models.md)). Only the first call does anything. A failure at either step is logged and the game carries on, with the default settings if they could not be loaded. A `null` directory throws `NullPointerException`. |
 | `AgentsRuntime.paths()` | `Optional<AgentsPaths>`: the layout on disk, once `start` has run; empty before. |
 
 `AgentsPaths`, in `core-common` under `…core.common.agent`, is that layout. It knows nothing
@@ -105,9 +105,20 @@ about Minecraft, so a test hands it a temporary directory.
 | Member | What it is |
 |---|---|
 | `DATA_DIRECTORY` | `MCAgents`, the directory every MCAgents mod keeps its files under, inside the game directory. |
-| `AGENTS_DIRECTORY` | `agents`, the agent layer's own directory inside it. The agents mod used the same one before it became part of core, so a player's settings carried over. |
+| `MOD_DIRECTORY` | `core`, core's own directory inside it. Every MCAgents mod keeps its files in `MCAgents/{mod}/`, named for its repository. |
+| `LEGACY_DIRECTORY` | `agents`, where core kept its files before 0.14.0, named for the agents mod the agent layer came from. |
 | `AgentsPaths.under(Path gameDirectory)` | Static. Describes the layout under the game directory. Creates nothing; a `null` directory throws `NullPointerException`. |
-| `dataDirectory()` | `{game_dir}/MCAgents/agents`. |
-| `settingsFile()` | `{game_dir}/MCAgents/agents/settings.properties`, what the player set in game. |
-| `modelsFile()` | `{game_dir}/MCAgents/agents/models.properties`, the global model ([`global-models.md`](global-models.md)). |
+| `dataDirectory()` | `{game_dir}/MCAgents/core`. |
+| `settingsFile()` | `{game_dir}/MCAgents/core/settings.properties`, what the player set in game. |
+| `modelsFile()` | `{game_dir}/MCAgents/core/models.properties`, the global model ([`global-models.md`](global-models.md)). |
+| `legacyDirectory()` | `{game_dir}/MCAgents/agents`, where both files were kept before 0.14.0. |
 | `createDataDirectory()` | Creates the data directory and its parents. Safe to repeat. Throws `IOException`. |
+| `moveLegacyFiles()` | Moves `settings.properties` and `models.properties` from the legacy directory into the data directory, each only when it is not there yet, then removes the legacy directory if that emptied it. Returns the files it moved. Safe to repeat and to call from several mods; a mod that calls `Models.start` before core's start-up calls this first. Throws `IOException` when a needed move fails. |
+
+`ModFiles`, in `core-common` under `…core.common.file`, is how any MCAgents mod moves a file
+an older version kept elsewhere into its own `MCAgents/{mod}/` directory.
+
+| Member | What it does |
+|---|---|
+| `moveIfAbsent(Path legacy, Path target)` | Static. Moves a file or a directory from `legacy` to `target` when `legacy` exists and `target` does not, creating `target`'s parents; `true` when it moved. A file already at `target` is never overwritten. Throws `IOException` when a needed move fails, leaving `legacy` as it was. |
+| `deleteIfEmpty(Path directory)` | Static. Deletes the directory if it is empty; `true` when it did. |

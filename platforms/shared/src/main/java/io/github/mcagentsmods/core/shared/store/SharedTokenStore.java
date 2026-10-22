@@ -10,6 +10,7 @@ import com.google.gson.JsonParseException;
 import io.github.mcagentsmods.core.api.llm.LlmCredentials;
 import io.github.mcagentsmods.core.api.llm.LlmVendor;
 import io.github.mcagentsmods.core.api.token.TokenStore;
+import io.github.mcagentsmods.core.common.file.ModFiles;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -32,8 +33,8 @@ import java.util.stream.Stream;
 /**
  * The credential store shared by every MCAgents mod on a client.
  *
- * <p>Backed by a single {@value MinecraftDirectory#FILE_NAME} in the Minecraft
- * directory. One file, one name, deliberately: a player configures a token once
+ * <p>Backed by a single {@value MinecraftDirectory#FILE_NAME} in core's directory
+ * under the Minecraft directory, {@code MCAgents/core/}. One file, one name, deliberately: a player configures a token once
  * and every MCAgents mod they install finds it, rather than each mod keeping its
  * own copy of the same key and each needing to be updated separately.</p>
  *
@@ -169,6 +170,30 @@ public final class SharedTokenStore implements TokenStore {
                 writeTemplate();
             }
         }
+    }
+
+    /**
+     * Moves a credential file from where core kept it before 0.14.0 to where it
+     * keeps it now, when only the old one exists. Never throws: a failure is
+     * logged, and the store then starts on an empty file at the new place.
+     *
+     * @param legacy Where the file was kept.
+     * @param file Where it is kept now.
+     * @param logger Where to report the move, or why it failed.
+     * @return {@code true} when this call moved it.
+     */
+    public static boolean moveLegacyFile(Path legacy, Path file, Logger logger) {
+        Objects.requireNonNull(logger, "logger cannot be null");
+        try {
+            if (ModFiles.moveIfAbsent(legacy, file)) {
+                logger.info("Moved " + legacy + " to " + file + ".");
+                return true;
+            }
+        } catch (IOException | RuntimeException e) {
+            logger.warning("Could not move " + legacy + " to " + file + " (" + e.getMessage()
+                    + "). Move it by hand to keep the tokens in it.");
+        }
+        return false;
     }
 
     /**

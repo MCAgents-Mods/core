@@ -130,7 +130,7 @@ single player world runs server logic. So:
 
 | | Client | Dedicated server |
 |---|---|---|
-| Credential file | `mcagents.json` under the player's Minecraft directory, **shared** by every MCAgents mod they install | `config/mcagents.json` under the server's run directory |
+| Credential file | `MCAgents/core/mcagents.json` under the player's Minecraft directory, **shared** by every MCAgents mod they install | `MCAgents/core/mcagents.json` under the server's run directory |
 | Resolved by | `MinecraftDirectory` | `ServerRunDirectory` |
 | Who may manage it | The player, unconditionally | Permission level 4 only, checked on every operation |
 | Fallback when the loader reports no directory | The conventional Minecraft directory for the operating system | The process working directory — **never** a home directory |

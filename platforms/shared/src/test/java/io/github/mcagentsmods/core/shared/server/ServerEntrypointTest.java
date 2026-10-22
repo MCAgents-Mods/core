@@ -101,11 +101,25 @@ class ServerEntrypointTest {
         ServerEntrypoint entrypoint = started(runDirectory);
 
         Path expected = runDirectory
-                .resolve(ServerRunDirectory.CONFIG_FOLDER)
+                .resolve("MCAgents")
+                .resolve("core")
                 .resolve(MinecraftDirectory.FILE_NAME);
 
         assertEquals(expected, entrypoint.credentialFile());
         assertTrue(Files.exists(expected), "the server credential file should have been created");
+    }
+
+    @Test
+    @DisplayName("moves the credential file it kept in config/ before")
+    void movesTheLegacyFile(@TempDir Path runDirectory) throws Exception {
+        Path legacy = ServerRunDirectory.legacyFile(runDirectory);
+        Files.createDirectories(legacy.getParent());
+        Files.writeString(legacy, "{\"openrouter\":{\"token\":[\"sk-or-v1-kept\"]}}");
+
+        ServerEntrypoint entrypoint = started(runDirectory);
+
+        assertFalse(Files.exists(legacy));
+        assertTrue(Files.readString(entrypoint.credentialFile()).contains("sk-or-v1-kept"));
     }
 
     @Test

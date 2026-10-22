@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -89,11 +90,25 @@ class ClientEntrypointTest {
 
         entrypoint.start(ModContext.of(PhysicalSide.CLIENT, gameDirectory, quietLogger()));
 
-        Path expected = gameDirectory.resolve(MinecraftDirectory.FILE_NAME);
+        Path expected = gameDirectory.resolve("MCAgents").resolve("core").resolve(MinecraftDirectory.FILE_NAME);
         assertEquals(expected, entrypoint.credentialFile());
         assertTrue(Files.exists(expected), "the shared credential file should have been created");
         assertNotNull(entrypoint.commands());
         assertTrue(entrypoint.describe().contains(expected.toString()));
+    }
+
+    @Test
+    @DisplayName("moves the credential file it kept loose in the game directory before")
+    void movesTheLegacyFile(@TempDir Path gameDirectory) throws Exception {
+        ModEnvironment.install(PhysicalSide.CLIENT);
+        Path legacy = gameDirectory.resolve(MinecraftDirectory.FILE_NAME);
+        Files.writeString(legacy, "{\"openrouter\":{\"token\":[\"sk-or-v1-kept\"]}}");
+        ClientEntrypoint entrypoint = new ClientEntrypoint();
+
+        entrypoint.start(ModContext.of(PhysicalSide.CLIENT, gameDirectory, quietLogger()));
+
+        assertFalse(Files.exists(legacy));
+        assertTrue(Files.readString(entrypoint.credentialFile()).contains("sk-or-v1-kept"));
     }
 
     @Test

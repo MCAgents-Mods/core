@@ -55,3 +55,16 @@ Chat (`fix/config-paths`, released as 0.15.0) and the template (`fix/config-path
 ### Task 1 — chore/config-paths-plan
 
 This record, and its row in the memory index.
+
+### Task 2 — fix/config-paths
+
+`AgentsPaths` resolves `MCAgents/core/` (`MOD_DIRECTORY`; `AGENTS_DIRECTORY` is gone, and
+`LEGACY_DIRECTORY` names `agents`), and `moveLegacyFiles()` moves `settings.properties` and
+`models.properties` across, which `AgentsRuntime.start` calls before loading either. The new
+`common.file.ModFiles` does the moving for any mod. `MinecraftDirectory.resolveFile` and
+`ServerRunDirectory.resolveFile` both end in `MCAgents/core/mcagents.json`; their `legacyFile`
+names the old place, and `ClientEntrypoint` and `ServerEntrypoint` move the file with
+`SharedTokenStore.moveLegacyFile` on start. `MinecraftDirectory.isUsable` now accepts a
+directory whose nearest existing parent is writable, since `MCAgents/core/` is two levels
+deep. The rule is in `.agents/rules/repository.md`; `wiki/api` and `mod-sides.md` name the
+new paths. Chat must call `AgentsPaths.moveLegacyFiles()` before its own `Models.start`.

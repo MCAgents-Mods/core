@@ -1,5 +1,7 @@
 package io.github.mcagentsmods.core.shared.store;
 
+import io.github.mcagentsmods.core.common.agent.AgentsPaths;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -8,6 +10,11 @@ import java.util.Optional;
 
 /**
  * Finds the Minecraft directory the shared credential file lives in.
+ *
+ * <p>The file is {@code {minecraft_dir}/MCAgents/core/mcagents.json}, in core's own directory
+ * beside its other files, as every MCAgents mod keeps its files in {@code MCAgents/{mod}/}.
+ * Before 0.14.0 it was loose in the Minecraft directory; {@link #legacyFile(Path)} names that
+ * place so the client can move it on start.</p>
  *
  * <p>There is no fixed path. It differs by operating system, and launchers and
  * modpacks relocate it constantly — MultiMC, Prism, and the modern Mojang
@@ -57,11 +64,26 @@ public final class MinecraftDirectory {
      *         yet; the parent directory is not created here.
      */
     public static Path resolveFile(Path loaderDirectory) {
+        return resolveDirectory(loaderDirectory)
+                .resolve(AgentsPaths.DATA_DIRECTORY)
+                .resolve(AgentsPaths.MOD_DIRECTORY)
+                .resolve(FILE_NAME);
+    }
+
+    /**
+     * Resolves where the shared credential file was kept before 0.14.0: loose in the Minecraft
+     * directory, which {@link #resolveDirectory(Path)} finds the same way.
+     *
+     * @param loaderDirectory The directory the mod loader reported, or
+     *                        {@code null}.
+     * @return The old path to {@value #FILE_NAME}, which may not exist.
+     */
+    public static Path legacyFile(Path loaderDirectory) {
         return resolveDirectory(loaderDirectory).resolve(FILE_NAME);
     }
 
     /**
-     * Resolves the directory the shared credential file belongs in.
+     * Resolves the Minecraft directory the shared credential file is kept under.
      *
      * @param loaderDirectory The directory the mod loader reported, or
      *                        {@code null}.
@@ -131,16 +153,16 @@ public final class MinecraftDirectory {
      *
      * @param directory The directory to check.
      * @return {@code true} when the directory exists and is writable, or can be
-     *         created.
+     *         created: its nearest existing parent is a writable directory.
      */
     public static boolean isUsable(Path directory) {
         if (directory == null) {
             return false;
         }
-        if (Files.isDirectory(directory)) {
-            return Files.isWritable(directory);
+        Path existing = directory.toAbsolutePath();
+        while (existing != null && !Files.exists(existing)) {
+            existing = existing.getParent();
         }
-        Path parent = directory.getParent();
-        return parent != null && Files.isDirectory(parent) && Files.isWritable(parent);
+        return existing != null && Files.isDirectory(existing) && Files.isWritable(existing);
     }
 }

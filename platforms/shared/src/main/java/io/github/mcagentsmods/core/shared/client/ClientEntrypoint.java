@@ -8,6 +8,7 @@ import io.github.mcagentsmods.core.shared.environment.SideEntrypoint;
 import io.github.mcagentsmods.core.shared.environment.SideGuard;
 import io.github.mcagentsmods.core.shared.environment.WrongSideException;
 import io.github.mcagentsmods.core.shared.store.MinecraftDirectory;
+import io.github.mcagentsmods.core.shared.store.SharedTokenStore;
 
 import java.nio.file.Path;
 import java.util.Objects;
@@ -16,7 +17,7 @@ import java.util.Objects;
  * The client half's entry point.
  *
  * <p>On a client the credentials are the <em>player's own</em>. They live in the
- * shared {@code mcagents.json} under the Minecraft directory, where every
+ * shared {@code MCAgents/core/mcagents.json} under the Minecraft directory, where every
  * MCAgents mod the player installs finds the same file, and they are managed
  * from the player's own commands. None of that is true on a dedicated server,
  * which is the whole reason this half exists separately —
@@ -87,6 +88,9 @@ public final class ClientEntrypoint implements SideEntrypoint {
         }
 
         this.credentialFile = MinecraftDirectory.resolveFile(context.gameDirectory());
+        // Before 0.14.0 the file was loose in the Minecraft directory.
+        SharedTokenStore.moveLegacyFile(MinecraftDirectory.legacyFile(context.gameDirectory()),
+                credentialFile, context.logger());
         this.commands = new ModTokenCommands(context.gameDirectory(), context.logger(), context.requestTimeout());
 
         context.logger().info("MCAgents client ready. Credentials: " + credentialFile);

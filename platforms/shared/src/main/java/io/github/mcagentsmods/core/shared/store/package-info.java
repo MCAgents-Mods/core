@@ -5,7 +5,7 @@
  * Minecraft directory — which is not at a fixed path, differs by operating
  * system, and is relocated freely by launchers and modpacks — and
  * {@link io.github.mcagentsmods.core.shared.store.SharedTokenStore} reads and writes
- * {@code mcagents.json} inside it.</p>
+ * {@code MCAgents/core/mcagents.json} inside it.</p>
  *
  * <p>The file belongs to core, not to any one mod. A player configures a token
  * once and every MCAgents mod finds it, because none of them keeps credentials

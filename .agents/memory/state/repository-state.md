@@ -26,8 +26,9 @@ history, read `wiki/logs/`.
 - The agent layer, folded in from the agents mod for 0.10.0 (see
   [`../tasks/agents-merge.md`](../tasks/agents-merge.md)): the `tool` module, `Agents` and
   `ToolAgent` in `common.agent`, and in `platforms/client` the agents menu G shows, its settings
-  screen and `AgentsRuntime`, which every loader's client half starts. The settings file stays
-  at `MCAgents/agents/settings.properties`. All three manifests refuse `mcagents_agents`.
+  screen and `AgentsRuntime`, which every loader's client half starts. The settings and the
+  global model live in `MCAgents/core/` since 0.14.0, moved on start from `MCAgents/agents/`
+  ([`../tasks/config-paths.md`](../tasks/config-paths.md)). All three manifests refuse `mcagents_agents`.
 - Holograms, in `platforms/client`: panels a mod opens in the level with
   `Holograms.open`, described by the records in `api.hologram`. The player aims and
   left-clicks, scrolls with the wheel, holds Z to carry one, and clicks its X to close
@@ -39,7 +40,7 @@ history, read `wiki/logs/`.
   replace the web console, removed for 0.6.0 with `api.web` and `common.web`: nothing
   in core listens on a port.
 - Credential pooling, rotation, and storage owned entirely by `core`: the shared
-  `mcagents.json` and the `/agents` client command logic with masked handles in tab
+  `MCAgents/core/mcagents.json` (a server's under its run directory) and the `/agents` client command logic with masked handles in tab
   completion. Reviewed for security on 2026-10-11 (task 7 in
   [`../tasks/mods-foundation.md`](../tasks/mods-foundation.md)): only a 401 or 402 evicts a
   key, keys must be printable ASCII, no redirect is followed, answers are size- and

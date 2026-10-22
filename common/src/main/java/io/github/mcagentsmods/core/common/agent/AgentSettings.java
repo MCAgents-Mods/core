@@ -17,7 +17,7 @@ import java.util.Properties;
  * What the player sets in game: how many tool calls run at once, and how many rounds of tool
  * calls one question may take.
  *
- * <p>Kept in {@code {game_dir}/MCAgents/agents/settings.properties}. A file that is missing,
+ * <p>Kept in {@code {game_dir}/MCAgents/core/settings.properties}. A file that is missing,
  * unreadable or holds a value out of range is not an error: the value falls back to its default
  * or is clamped into range, so a hand-edited file can never stop the mod.
  *

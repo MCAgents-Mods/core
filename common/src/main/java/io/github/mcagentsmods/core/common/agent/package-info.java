@@ -6,6 +6,7 @@
  * categories, then tools, then calling them through core's model client.
  *
  * <p>Formerly the agents mod ({@code mcagents_agents}), folded into core so one foundation mod
- * remains. The settings file keeps that mod's path, {@code MCAgents/agents/settings.properties}.
+ * remains. The settings file is {@code MCAgents/core/settings.properties}; until 0.14.0 it kept
+ * that mod's path, {@code MCAgents/agents/}, and core moves it from there on start.
  */
 package io.github.mcagentsmods.core.common.agent;

@@ -47,6 +47,16 @@ public final class AgentsRuntime {
             LOGGER.log(Level.WARNING, "Could not create " + paths.dataDirectory(), e);
         }
         try {
+            // Before 0.14.0 the files were in MCAgents/agents/; a player who updates keeps them.
+            for (Path moved : paths.moveLegacyFiles()) {
+                LOGGER.info("Moved " + moved.getFileName() + " from " + paths.legacyDirectory()
+                        + " to " + paths.dataDirectory());
+            }
+        } catch (IOException | RuntimeException e) {
+            LOGGER.log(Level.WARNING, "Could not move the files in " + paths.legacyDirectory()
+                    + " to " + paths.dataDirectory(), e);
+        }
+        try {
             // The player's worker limit and tool rounds; a missing or broken file gives the
             // defaults, 2 workers and 1 round.
             Agents.start(paths.settingsFile());
