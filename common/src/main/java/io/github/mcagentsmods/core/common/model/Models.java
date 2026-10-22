@@ -22,9 +22,10 @@ import java.util.concurrent.atomic.AtomicReference;
  * client.complete(new ChatRequest(chat.model(), messages).withProvider(chat.provider()));
  * </pre>
  *
- * <p>Kept in {@code {game_dir}/MCAgents/agents/models.properties} once {@link #start(Path)} has
+ * <p>Kept in {@code {game_dir}/MCAgents/core/models.properties} once {@link #start(Path)} has
  * named the file; core does that when the client starts, and a mod that needs the global model
- * earlier may call it first with the same file. Until then, and in tests, the global model is
+ * earlier may call it first with the same file, after
+ * {@link io.github.mcagentsmods.core.common.agent.AgentsPaths#moveLegacyFiles()}. Until then, and in tests, the global model is
  * {@link GlobalModels#DEFAULTS} in memory.
  */
 public final class Models {

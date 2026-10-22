@@ -1,5 +1,6 @@
 package io.github.mcagentsmods.core.shared.server;
 
+import io.github.mcagentsmods.core.common.agent.AgentsPaths;
 import io.github.mcagentsmods.core.shared.environment.ServerOnly;
 import io.github.mcagentsmods.core.shared.store.MinecraftDirectory;
 
@@ -14,8 +15,11 @@ import java.nio.file.Paths;
  * directory, found by every MCAgents mod they install, holding the keys they
  * pay for. A server has no business reading that — it is a different machine,
  * a different owner, and a different bill. So the server's file lives under the
- * server's own run directory, in {@value #CONFIG_FOLDER}, which is where both
- * loaders already put mod configuration.</p>
+ * server's own run directory, in {@code MCAgents/core/} — the same place relative
+ * to its run directory that a client keeps it relative to the Minecraft
+ * directory, since every MCAgents mod keeps its files in {@code MCAgents/{mod}/}.
+ * Before 0.14.0 it was in {@value #LEGACY_FOLDER}; {@link #legacyFile(Path)}
+ * names that place so the server can move it on start.</p>
  *
  * <h2>The fallback is the working directory, not the home directory</h2>
  *
@@ -29,9 +33,10 @@ import java.nio.file.Paths;
 public final class ServerRunDirectory {
 
     /**
-     * The folder under the run directory that mod configuration lives in.
+     * The folder under the run directory the credential file was kept in before
+     * 0.14.0.
      */
-    public static final String CONFIG_FOLDER = "config";
+    public static final String LEGACY_FOLDER = "config";
 
     /**
      * Not instantiable — this class is a resolver.
@@ -44,12 +49,11 @@ public final class ServerRunDirectory {
      *
      * @param runDirectory The run directory the loader reported, or
      *                     {@code null} when it reported none.
-     * @return The configuration directory. Never {@code null}, and not
+     * @return {@code {run_dir}/MCAgents/core}. Never {@code null}, and not
      *         necessarily existing yet.
      */
     public static Path resolveDirectory(Path runDirectory) {
-        Path base = runDirectory != null ? runDirectory : workingDirectory();
-        return base.resolve(CONFIG_FOLDER);
+        return base(runDirectory).resolve(AgentsPaths.DATA_DIRECTORY).resolve(AgentsPaths.MOD_DIRECTORY);
     }
 
     /**
@@ -62,6 +66,21 @@ public final class ServerRunDirectory {
      */
     public static Path resolveFile(Path runDirectory) {
         return resolveDirectory(runDirectory).resolve(MinecraftDirectory.FILE_NAME);
+    }
+
+    /**
+     * Resolves where the server's credential file was kept before 0.14.0.
+     *
+     * @param runDirectory The run directory the loader reported, or
+     *                     {@code null}.
+     * @return {@code {run_dir}/config/mcagents.json}, which may not exist.
+     */
+    public static Path legacyFile(Path runDirectory) {
+        return base(runDirectory).resolve(LEGACY_FOLDER).resolve(MinecraftDirectory.FILE_NAME);
+    }
+
+    private static Path base(Path runDirectory) {
+        return runDirectory != null ? runDirectory : workingDirectory();
     }
 
     /**

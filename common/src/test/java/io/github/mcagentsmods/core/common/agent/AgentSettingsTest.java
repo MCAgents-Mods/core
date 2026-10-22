@@ -56,7 +56,7 @@ class AgentSettingsTest {
 
     @Test
     void theSettingsFileLivesInTheModsDirectory() {
-        assertEquals(directory.resolve("MCAgents").resolve("agents").resolve("settings.properties"),
+        assertEquals(directory.resolve("MCAgents").resolve("core").resolve("settings.properties"),
                 AgentsPaths.under(directory).settingsFile());
     }
 

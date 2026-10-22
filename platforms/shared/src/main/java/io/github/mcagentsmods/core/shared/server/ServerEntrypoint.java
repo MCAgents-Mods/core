@@ -83,6 +83,9 @@ public final class ServerEntrypoint implements SideEntrypoint {
         Objects.requireNonNull(context, "context cannot be null");
 
         this.credentialFile = ServerRunDirectory.resolveFile(context.gameDirectory());
+        // Before 0.14.0 the file was in config/.
+        SharedTokenStore.moveLegacyFile(ServerRunDirectory.legacyFile(context.gameDirectory()),
+                credentialFile, context.logger());
         // The exact file, so the store cannot follow the client's MCAGENTS_DIR override
         // somewhere other than the path logged below.
         this.commands = new ModTokenCommands(SharedTokenStore.atFile(credentialFile, context.logger()),

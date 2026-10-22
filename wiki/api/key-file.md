@@ -1,8 +1,8 @@
 # Key File
 
-Every MCAgents mod on a client reads its API keys from one file, `mcagents.json` in the
-player's Minecraft directory, so a player adds a key once and every mod finds it. A dedicated
-server keeps its own file, `config/mcagents.json` under its run directory. `SharedTokenStore`
+Every MCAgents mod on a client reads its API keys from one file, `MCAgents/core/mcagents.json`
+in the player's Minecraft directory, so a player adds a key once and every mod finds it. A
+dedicated server keeps its own file, `MCAgents/core/mcagents.json` under its run directory. `SharedTokenStore`
 reads and writes either; it is a [`TokenStore`](tokens.md), so registering it with the
 provider hands the keys to core.
 
@@ -34,13 +34,18 @@ space or an unusual character is skipped with one warning.
 
 | Side | File | Resolved by |
 |---|---|---|
-| Client | `mcagents.json` in the `MCAGENTS_DIR` environment variable's directory when set, else the game directory the loader reported, else the operating system's Minecraft directory | `MinecraftDirectory.resolveFile(loaderDirectory)` |
-| Dedicated server | `config/mcagents.json` under the run directory the loader reported, else under the working directory, never a home directory | `ServerRunDirectory.resolveFile(runDirectory)` |
+| Client | `MCAgents/core/mcagents.json` under the `MCAGENTS_DIR` environment variable's directory when set, else the game directory the loader reported, else the operating system's Minecraft directory | `MinecraftDirectory.resolveFile(loaderDirectory)` |
+| Dedicated server | `MCAgents/core/mcagents.json` under the run directory the loader reported, else under the working directory, never a home directory | `ServerRunDirectory.resolveFile(runDirectory)` |
+
+Before 0.14.0 the client's file was `mcagents.json` loose in that directory and the server's
+was `config/mcagents.json`. `MinecraftDirectory.legacyFile` and `ServerRunDirectory.legacyFile`
+name those places, and each side moves its file from there on start with
+`SharedTokenStore.moveLegacyFile(legacy, file, logger)` when the new one does not exist yet.
 
 The operating system's Minecraft directory is `%APPDATA%\.minecraft` on Windows,
 `~/Library/Application Support/minecraft` on macOS, and `~/.minecraft` elsewhere.
 `MinecraftDirectory.isUsable(directory)` says whether a directory exists and can be written,
-or can be created.
+or can be created under its nearest existing parent.
 
 A server never reads a player's file: it is a different machine, owner and bill.
 

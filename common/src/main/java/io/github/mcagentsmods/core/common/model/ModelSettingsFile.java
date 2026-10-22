@@ -20,7 +20,7 @@ import java.util.Properties;
 import java.util.TreeSet;
 
 /**
- * The global model on disk: {@code {game_dir}/MCAgents/agents/models.properties}.
+ * The global model on disk: {@code {game_dir}/MCAgents/core/models.properties}.
  *
  * <pre>
  * chat.provider=deepseek

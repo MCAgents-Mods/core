@@ -25,13 +25,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ServerRunDirectoryTest {
 
     @Test
-    @DisplayName("puts the credential file under the run directory's config folder")
-    void usesTheConfigFolder(@TempDir Path runDirectory) {
+    @DisplayName("puts the credential file in core's own folder under the run directory")
+    void usesCoresFolder(@TempDir Path runDirectory) {
         Path resolved = ServerRunDirectory.resolveFile(runDirectory);
 
-        assertEquals(
-                runDirectory.resolve(ServerRunDirectory.CONFIG_FOLDER).resolve(MinecraftDirectory.FILE_NAME),
+        assertEquals(runDirectory.resolve("MCAgents").resolve("core").resolve(MinecraftDirectory.FILE_NAME),
                 resolved);
+    }
+
+    @Test
+    @DisplayName("names the config folder the file was kept in before")
+    void namesTheLegacyFile(@TempDir Path runDirectory) {
+        assertEquals(runDirectory.resolve("config").resolve(MinecraftDirectory.FILE_NAME),
+                ServerRunDirectory.legacyFile(runDirectory));
     }
 
     @Test
@@ -47,7 +53,7 @@ class ServerRunDirectoryTest {
         Path resolved = ServerRunDirectory.resolveDirectory(null);
 
         Path working = Paths.get(System.getProperty("user.dir", "."));
-        assertEquals(working.resolve(ServerRunDirectory.CONFIG_FOLDER), resolved);
+        assertEquals(working.resolve("MCAgents").resolve("core"), resolved);
     }
 
     @Test

@@ -3,7 +3,7 @@
 The player sets two numbers in game: how many tool calls run at once, and how many rounds of
 tool calls one question may take. `Agents.settings()` reads them, and `Agents.update(settings)`
 changes them, applies them at once and saves them to
-`{game_dir}/MCAgents/agents/settings.properties`.
+`{game_dir}/MCAgents/core/settings.properties`.
 
 ```java
 AgentSettings now = Agents.settings();          // AgentSettings[workerLimit=2, toolRounds=1]
@@ -34,7 +34,8 @@ leaves the settings as they were.
 
 ## The file
 
-`{game_dir}/MCAgents/agents/settings.properties`, a Java properties file. After the update
+`{game_dir}/MCAgents/core/settings.properties`, a Java properties file. Before 0.14.0 it was
+in `MCAgents/agents/`; core moves it on start. After the update
 above it holds:
 
 ```properties

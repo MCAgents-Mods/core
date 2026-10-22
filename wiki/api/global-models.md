@@ -60,7 +60,8 @@ fixed, so its key never goes anywhere else.
 
 ## The file
 
-`{game_dir}/MCAgents/agents/models.properties`, beside the agents [`settings.md`](settings.md):
+`{game_dir}/MCAgents/core/models.properties`, beside the agents [`settings.md`](settings.md). Before
+0.14.0 it was in `MCAgents/agents/`; core moves it on start (`AgentsPaths.moveLegacyFiles()`).
 
 ```properties
 chat.provider=deepseek
