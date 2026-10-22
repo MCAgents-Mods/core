@@ -5,7 +5,7 @@ description: Moving every file core keeps on disk into MCAgents/core/ — settin
 
 # Task: core's files in MCAgents/core/
 
-**Status:** in progress
+**Status:** done (2026-10-22), released as 0.14.0
 
 ## The request
 
@@ -45,9 +45,9 @@ request and rebase-merged in order.
 
 | # | Title | Branch | PR |
 |---|---|---|---|
-| 1 | Task record | `chore/config-paths-plan` | |
-| 2 | Core's files in MCAgents/core/ | `fix/config-paths` | |
-| 3 | Release 0.14.0 | `release/0.14.0` | |
+| 1 | Task record | `chore/config-paths-plan` | #73 |
+| 2 | Core's files in MCAgents/core/ | `fix/config-paths` | #74 |
+| 3 | Release 0.14.0 | `release/0.14.0` | #75 |
 
 Chat (`fix/config-paths`, released as 0.15.0) and the template (`fix/config-paths`, staying
 0.0.0) follow in that order.
@@ -68,3 +68,14 @@ names the old place, and `ClientEntrypoint` and `ServerEntrypoint` move the file
 directory whose nearest existing parent is writable, since `MCAgents/core/` is two levels
 deep. The rule is in `.agents/rules/repository.md`; `wiki/api` and `mod-sides.md` name the
 new paths. Chat must call `AgentsPaths.moveLegacyFiles()` before its own `Models.start`.
+
+### Task 3 — release/0.14.0
+
+`project-version` is `0.14.0`, a minor release: files move and `AGENTS_DIRECTORY` is replaced,
+no file format changes. `wiki/logs/0/14/0/` tells players and server owners where their files
+go and that the first start moves them; the logs index has its row, and the repository rule,
+map, state and overview name the version. The `PR` column is filled.
+
+Done: `./gradlew build` was green, with the new `ModFilesTest`, the moves in `AgentsPathsTest`
+and the client's and server's key-file moves in their entry point tests. The in-game check is
+in chat's record and `reports/config-paths/` in the project's shared files.
