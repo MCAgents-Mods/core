@@ -15,13 +15,15 @@ tool                pure Java tools: the registry, the worker pool, the executor
 
 platforms/shared    loader-agnostic mod code, both physical sides
 platforms/client    loader-agnostic client code against vanilla Minecraft
+platforms/server    loader-agnostic dedicated server commands against vanilla Minecraft
  ├── platforms/forge      Forge entry point     → MCAgentsCoreForge-{version}+{minecraft}.jar
  ├── platforms/neoforge   NeoForge entry point  → MCAgentsCoreNeoforge-{version}+{minecraft}.jar
  └── platforms/fabric     Fabric entry points   → MCAgentsCoreFabric-{version}+{minecraft}.jar
 ```
 
-Each loader module depends on both `platforms/shared` and `platforms/client`, and
-`platforms/client` compiles against `api` and `common`.
+Each loader module depends on `platforms/shared`, `platforms/client` and `platforms/server`;
+`platforms/client` compiles against `api` and `common`, and `platforms/server` against those and
+`platforms/shared`.
 
 ## What each module holds
 
@@ -34,6 +36,7 @@ Each loader module depends on both `platforms/shared` and `platforms/client`, an
 | `platforms:client` | `…core.client` | What core draws in the game and the input that drives it: `…client.hologram` draws the open hologram, takes the player's clicks, wheel and move key, and closes it out of range, and `Holograms` is what a mod calls; `…client.agent` is the agents menu, the G key that shows it, its Settings hologram, the start-up that loads the player's settings, and `ClientThreadTools`. Compiled against vanilla Minecraft through Loom; no loader type. Client only. |
 | `platforms:forge` | `…core.forge` | Only what Forge needs: the `@Mod` class, `META-INF/mods.toml`, and `pack.mcmeta`, whose formats are the Minecraft version's, without which Forge refuses the jar's resources and crashes when a world is created. NeoForge and Fabric build that metadata themselves. |
 | `platforms:neoforge` | `…core.neoforge` | Only what NeoForge needs: the `@Mod` class and `META-INF/neoforge.mods.toml`. |
+| `platforms:server` | `…core.server` | What core adds to a dedicated server: `AgentsCommand`, the `/agents` command over the server's credential file, hidden from and refused to every caller below permission level 4. Compiled against vanilla Minecraft through Loom; no loader type. Server only, and not published. |
 | `platforms:fabric` | `…core.fabric` | Only what Fabric needs: the main and client entry points and `fabric.mod.json`. |
 
 ## The Minecraft version
@@ -92,7 +95,9 @@ they announce an entry point, which is a much smaller difference than the one
 between the two sides.
 
 `platforms:client` is client only as a whole. Each loader reaches it only from
-its own client half, so a dedicated server never links it.
+its own client half, so a dedicated server never links it. `platforms:server` is the mirror
+image: each loader registers its `/agents` command only on a dedicated server, so a client
+never links it.
 
 How the right half is started without linking the other is on
 [`mod-sides.md`](mod-sides.md).

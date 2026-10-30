@@ -165,6 +165,22 @@ class ServerEntrypointTest {
     }
 
     @Test
+    @DisplayName("suggests handles only to a caller who may remove a credential")
+    void suggestsHandlesOnlyToTheOwner(@TempDir Path runDirectory) {
+        ServerEntrypoint entrypoint = started(runDirectory);
+        String token = "sk-or-v1-0123456789abcdef";
+        entrypoint.addToken(CommandCaller.console(), "openrouter", token);
+
+        List<String> owner = entrypoint.removableHandles(CommandCaller.console(), "openrouter");
+        List<String> player = entrypoint.removableHandles(
+                CommandCaller.player(UUID.randomUUID(), "Steve", 2), "openrouter");
+
+        assertEquals(1, owner.size());
+        assertFalse(owner.get(0).contains(token), owner.get(0));
+        assertTrue(player.isEmpty(), "a player below the owner level must see no handles");
+    }
+
+    @Test
     @DisplayName("lets the owner through")
     void letsTheOwnerThrough(@TempDir Path runDirectory) {
         ServerEntrypoint entrypoint = started(runDirectory);

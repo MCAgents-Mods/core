@@ -1,4 +1,4 @@
-// The NeoForge mod jar: core's tool, api, common, shared and client code, plus the NeoForge
+// The NeoForge mod jar: core's tool, api, common, shared, client and server code, plus the NeoForge
 // entry point. The only module that may reference NeoForge types.
 
 plugins {
@@ -15,11 +15,12 @@ def minecraftNext = minecraftVersion.tokenize('.').with { parts ->
 }
 
 def clientModule = ':platforms:client'
+def serverModule = ':platforms:server'
 
-// tool, api, common, shared and client are core's own modules, so their classes are
+// tool, api, common, shared, client and server are core's own modules, so their classes are
 // merged into the mod jar. Every loader jar does the same, which is what makes
 // each one self-contained.
-def bundledModules = [':tool', ':api', ':common', ':platforms:shared', clientModule]
+def bundledModules = [':tool', ':api', ':common', ':platforms:shared', clientModule, serverModule]
 
 // The dev client loads the bundled modules as part of this mod, as the jar
 // does; loaded apart, NeoForge would give them a class loader of their own.
@@ -53,6 +54,7 @@ dependencies {
     implementation project(':common')
     implementation project(':platforms:shared')
     implementation project(clientModule)
+    implementation project(serverModule)
 
     // NeoForge itself is not declared here: ModDevGradle compiles against it and runs the dev
     // client on it, and the game provides it at runtime.

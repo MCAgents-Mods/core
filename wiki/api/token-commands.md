@@ -1,10 +1,11 @@
 # Token Commands
 
-`ModTokenCommands` is the logic behind a `/agents` command that manages the [key file](key-file.md):
+`ModTokenCommands` is the logic behind the `/agents` command that manages the [key file](key-file.md):
 list each vendor's state, add a key, remove one, and reload. It answers in plain strings that
 never contain a key, and it registers the file's keys with `MCAgentsProvider.instance` so they
-are used at once. The loader owns the Brigadier wiring, and as of 0.6.0 no core loader
-registers a command, so a mod that wants one wires these methods itself.
+are used at once. Since 0.15.0 every core loader registers `/agents` on a **dedicated server**
+(see [below](#the-agents-command)); on a client no command is registered, and a mod that wants
+one wires these methods itself.
 
 ```java
 ModTokenCommands commands = clientEntrypoint.commands();
@@ -62,3 +63,23 @@ with a refusal instead of running it:
 
 Even viewing the status needs level 4: which platforms a server owner pays for is not a
 player's business.
+
+## The `/agents` command
+
+`AgentsCommand` in `io.github.mcagentsmods.core.server` (the `platforms/server` module) is
+registered by Fabric, NeoForge and Forge on a dedicated server only:
+
+| Command | Runs |
+|---|---|
+| `/agents` or `/agents status` | `ServerEntrypoint.status` |
+| `/agents reload` | `ServerEntrypoint.reload` |
+| `/agents {platform} token add {token}` | `ServerEntrypoint.addToken` |
+| `/agents {platform} token remove {handle}` | `ServerEntrypoint.removeToken`; tab completion offers the masked handles from `removableHandles`, and only to a caller allowed to remove a key |
+
+It is guarded twice. Brigadier's `requires` hides the whole command from any source below
+permission level 4 (`CommandCaller.OWNER_LEVEL`), so a player cannot see, complete or run it;
+and each call still goes through `ServerEntrypoint`'s authority check, so a second route into
+the same methods is refused the same way. The caller is built from the source the server
+authenticated, with its level read from the source's permission set. Every reply goes to the
+caller alone and never contains a key. A key typed into chat still passes through the client
+and the server log, so prefer the server console for `token add`.

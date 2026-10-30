@@ -69,3 +69,20 @@ The drop-down a form field opens moved out of `FormPanelView` into the package-p
 scrollbar and how it is drawn. `FormPanelView` keeps deciding when the list opens and closes
 and what a pick does (`openList`, `closeList`, `pick`). Nothing drawn or clicked changes.
 `FormPanelView` is down from 785 to 710 lines.
+
+### Task 4 — feat/server-command
+
+- New module `platforms/server` (`…core.server`), compiled against vanilla Minecraft through
+  Loom like `platforms/client`, bundled into each loader jar and not published.
+  `AgentsCommand.register(dispatcher)` builds `/agents`, `/agents status`, `/agents reload` and
+  `/agents {platform} token add|remove …`.
+- Guarded twice: `requires` at `CommandCaller.OWNER_LEVEL` (the source's permission set read as
+  0–4), and every call through `ServerEntrypoint`, whose authority refuses the same callers.
+  Replies go to the caller alone (`sendSuccess(…, false)`).
+- `ServerEntrypoint.removableHandles(caller, platform)` feeds `remove`'s suggestions, empty for
+  a caller who may not remove a key; covered by `ServerEntrypointTest`.
+- Registered on dedicated servers only: Fabric's `CoreFabricMod` (already server-only) through
+  `CommandRegistrationCallback`, NeoForge's `CoreNeoForgeMod` and Forge's `CoreForgeMod` through
+  `RegisterCommandsEvent` when the side is the dedicated server.
+- Docs: `wiki/api/token-commands.md`, `wiki/information/modules.md`, `mod-sides.md`, the README
+  and the repository map.
