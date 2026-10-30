@@ -53,3 +53,11 @@ follow in that order.
 ### Task 1 — plan/code-cleanup
 
 This record, and its row in the memory index.
+
+### Task 2 — refactor/token-rotation
+
+The rotation retry moved out of `MCAgentsProvider` into the package-private
+`common/TokenRotation`: `chat` (pool lookup and the early refusal), `attempt` (reject on an
+auth failure, rotate on a rate limit, retry while credentials remain), `checkUsable`,
+`exhausted` and `unwrap`. `MCAgentsProvider.chat` delegates to it; every public method and
+every message is unchanged. The provider is down from 653 to 517 lines.
