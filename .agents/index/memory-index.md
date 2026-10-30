@@ -53,6 +53,7 @@ match on it before opening anything. Writing here needs no approval; see
 | [`../memory/tasks/own-modules.md`](../memory/tasks/own-modules.md) | Gradle builds, `platforms/` | Making each loader module declare core's own submodules with `implementation`, keeping the loader and Fabric API `compileOnly`, with no jar changing, and releasing 0.13.1. |
 | [`../memory/tasks/flat-platforms.md`](../memory/tasks/flat-platforms.md) | Gradle builds, `platforms/` | Giving every platform module one `build.gradle` and one `src/`, with no `26.3/` folder or `{module}.gradle` script left, and releasing 0.13.2. |
 | [`../memory/tasks/config-paths.md`](../memory/tasks/config-paths.md) | `common/agent`, `platforms/shared/store`, files on disk | Moving every file core keeps into `MCAgents/core/`, moving a player's old files there on first start, and releasing 0.14.0. |
+| [`../memory/tasks/code-cleanup.md`](../memory/tasks/code-cleanup.md) | `common/`, `platforms/`, commands | Splitting core's two largest mixed-purpose classes, registering `/agents` on dedicated servers behind permission level 4, and releasing 0.15.0. |
 
 ## Decisions
 
