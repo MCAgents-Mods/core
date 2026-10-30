@@ -61,3 +61,11 @@ The rotation retry moved out of `MCAgentsProvider` into the package-private
 auth failure, rotate on a rate limit, retry while credentials remain), `checkUsable`,
 `exhausted` and `unwrap`. `MCAgentsProvider.chat` delegates to it; every public method and
 every message is unchanged. The provider is down from 653 to 517 lines.
+
+### Task 3 — refactor/form-choices
+
+The drop-down a form field opens moved out of `FormPanelView` into the package-private
+`client/hologram/ChoiceList`: where the list stands, which choice is under a point, its
+scrollbar and how it is drawn. `FormPanelView` keeps deciding when the list opens and closes
+and what a pick does (`openList`, `closeList`, `pick`). Nothing drawn or clicked changes.
+`FormPanelView` is down from 785 to 710 lines.

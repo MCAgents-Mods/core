@@ -46,9 +46,6 @@ final class FormPanelView extends ColumnPanelView {
     /** What a field with choices draws in its arrow. */
     private static final String ARROW = "▼";
 
-    /** Layers the open list of choices is drawn on, over every row. */
-    private static final int LIST_LAYER = 9;
-
     private final Form spec;
     private final Actions actions;
     private final Consumer<TypingTarget> startTyping;
@@ -61,9 +58,8 @@ final class FormPanelView extends ColumnPanelView {
 
     /** The field whose choices are open, or null. */
     private FieldRow listOpen;
-    private List<String> choices = List.of();
-    private PanelArea listArea;
-    private ScrollWindow listWindow;
+    /** Its open list, set while {@link #listOpen} is. */
+    private ChoiceList list;
 
     private boolean disposed;
 
@@ -123,7 +119,7 @@ final class FormPanelView extends ColumnPanelView {
     @Override
     void draw(HologramPainter painter, double u, double v) {
         drawColumn(painter);
-        boolean overList = listOpen != null && listArea.contains(u, v);
+        boolean overList = listOpen != null && list.contains(u, v);
         double rowU = overList ? Double.NaN : u;
         double rowV = overList ? Double.NaN : v;
         for (RowView row : rows) {
@@ -135,7 +131,7 @@ final class FormPanelView extends ColumnPanelView {
             drawFormButton(painter, buttons.get(i), area, rowU, rowV);
         }
         if (listOpen != null) {
-            drawChoices(painter, u, v);
+            list.draw(painter, u, v, read(listOpen.spec.value(), ""));
         }
     }
 
@@ -143,8 +139,8 @@ final class FormPanelView extends ColumnPanelView {
     boolean click(double u, double v) {
         if (listOpen != null) {
             FieldRow field = listOpen;
-            if (listArea.contains(u, v)) {
-                clickChoices(u, v);
+            if (list.contains(u, v)) {
+                pick(list.click(u, v));
                 return true;
             }
             closeList();
@@ -170,8 +166,8 @@ final class FormPanelView extends ColumnPanelView {
 
     @Override
     void scroll(double u, double v, int amount) {
-        if (listOpen != null && listArea.contains(u, v)) {
-            listWindow.scrollBy(amount);
+        if (listOpen != null && list.contains(u, v)) {
+            list.scroll(amount);
             return;
         }
         for (RowView row : rows) {
@@ -222,95 +218,24 @@ final class FormPanelView extends ColumnPanelView {
     // ------------------------------------------------------------------ choices
 
     private void openList(FieldRow field) {
-        choices = List.copyOf(read(field.spec.choices(), List.of()));
-        if (choices.isEmpty()) {
-            return;
-        }
-        listOpen = field;
-        listArea = FormLayout.choices(field.box, choices.size(), FormLayout.bottom(false));
-        listWindow = new ScrollWindow(FormLayout.choiceCapacity(listArea), false);
-        listWindow.setTotal(choices.size());
-        int current = choices.indexOf(read(field.spec.value(), ""));
-        if (current >= 0) {
-            listWindow.reveal(current);
-        }
+        list = ChoiceList.open(field.box, read(field.spec.choices(), List.of()),
+                read(field.spec.value(), ""));
+        listOpen = list == null ? null : field;
     }
 
     private void closeList() {
         listOpen = null;
-        choices = List.of();
+        list = null;
     }
 
-    private int choiceAt(double u, double v) {
-        if (!listArea.contains(u, v) || u >= choiceRight()) {
-            return -1;
-        }
-        int slot = (int) ((v - listArea.top() - 2) / FormLayout.CHOICE_HEIGHT);
-        int index = listWindow.offset() + slot;
-        return slot >= 0 && slot < listWindow.visible() && index < choices.size() ? index : -1;
-    }
-
-    /** The right end of the choices' rows: short of the scrollbar when there is one. */
-    private double choiceRight() {
-        return listWindow.total() > listWindow.visible()
-                ? ColumnLayout.scrollbar(listArea).left()
-                : listArea.right() - 1;
-    }
-
-    private void clickChoices(double u, double v) {
-        if (listWindow.total() > listWindow.visible()
-                && ColumnLayout.scrollbar(listArea).contains(u, v)) {
-            PanelArea track = ColumnLayout.scrollbar(listArea);
-            listWindow.scrollToTrack(v - track.top() - 1, (int) track.height() - 2, ColumnLayout.MIN_THUMB);
-            return;
-        }
-        int index = choiceAt(u, v);
-        if (index < 0) {
+    /** Closes the list and hands the choice to its field; a null choice keeps the list open. */
+    private void pick(String choice) {
+        if (choice == null) {
             return;
         }
         FieldRow field = listOpen;
-        String choice = choices.get(index);
         closeList();
         actions.run("Picking a choice in " + title(), () -> field.spec.onPick().accept(choice));
-    }
-
-    private void drawChoices(HologramPainter painter, double u, double v) {
-        float left = (float) listArea.left();
-        float top = (float) listArea.top();
-        float right = (float) listArea.right();
-        float bottom = (float) listArea.bottom();
-        painter.rect(left, top, right, bottom, LIST_LAYER, HologramStyle.FOCUS);
-        painter.rect(left + 1, top + 1, right - 1, bottom - 1, LIST_LAYER + 1, HologramStyle.BOX);
-        String current = read(listOpen.spec.value(), "");
-        int hovered = choiceAt(u, v);
-        float rowRight = (float) choiceRight();
-        float room = rowRight - left - 2 * ColumnLayout.PADDING;
-        for (int slot = 0; slot < listWindow.visible(); slot++) {
-            int index = listWindow.offset() + slot;
-            if (index >= choices.size()) {
-                break;
-            }
-            float rowTop = top + 2 + slot * FormLayout.CHOICE_HEIGHT;
-            String choice = choices.get(index);
-            if (index == hovered || choice.equals(current)) {
-                painter.rect(left + 1, rowTop, rowRight, rowTop + FormLayout.CHOICE_HEIGHT, LIST_LAYER + 2,
-                        index == hovered ? HologramStyle.ROW_HOVER : HologramStyle.ROW_SELECTED);
-            }
-            painter.plainText(painter.fit(choice, room), left + ColumnLayout.PADDING, rowTop + 2,
-                    LIST_LAYER + 3, HologramStyle.TEXT);
-        }
-        if (listWindow.total() > listWindow.visible()) {
-            PanelArea track = ColumnLayout.scrollbar(listArea);
-            float trackLeft = (float) track.left();
-            float trackTop = (float) track.top();
-            painter.rect(trackLeft, trackTop, (float) track.right(), (float) track.bottom(),
-                    LIST_LAYER + 2, HologramStyle.TRACK);
-            int length = (int) track.height() - 2;
-            float thumbTop = trackTop + 1 + listWindow.thumbStart(length, ColumnLayout.MIN_THUMB);
-            float thumbBottom = thumbTop + listWindow.thumbLength(length, ColumnLayout.MIN_THUMB);
-            painter.rect(trackLeft + 1, thumbTop, (float) track.right() - 1, thumbBottom, LIST_LAYER + 3,
-                    track.contains(u, v) ? HologramStyle.THUMB_HOVER : HologramStyle.THUMB);
-        }
     }
 
     // --------------------------------------------------------------------- rows
