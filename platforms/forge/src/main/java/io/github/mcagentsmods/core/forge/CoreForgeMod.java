@@ -1,8 +1,10 @@
 package io.github.mcagentsmods.core.forge;
 
+import io.github.mcagentsmods.core.server.AgentsCommand;
 import io.github.mcagentsmods.core.shared.CoreRuntime;
 import io.github.mcagentsmods.core.shared.environment.PhysicalSide;
 import net.minecraftforge.event.GameShuttingDownEvent;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.loading.FMLPaths;
@@ -23,5 +25,10 @@ public final class CoreForgeMod {
         }
         CoreRuntime.start(side, FMLPaths.GAMEDIR.get());
         GameShuttingDownEvent.BUS.addListener(event -> CoreRuntime.stop());
+        if (side == PhysicalSide.DEDICATED_SERVER) {
+            // Dedicated servers only: in single player the player owns the keys and manages
+            // them on the Settings hologram.
+            RegisterCommandsEvent.BUS.addListener(event -> AgentsCommand.register(event.getDispatcher()));
+        }
     }
 }

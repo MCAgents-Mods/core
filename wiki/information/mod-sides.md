@@ -34,6 +34,7 @@ platforms/shared              io.github.mcagentsmods.core.shared
  ├── …shared.server               server only
  └── everything else              both sides, no side-specific assumptions
 platforms/client              io.github.mcagentsmods.core.client     client only, as a whole
+platforms/server              io.github.mcagentsmods.core.server     server only, as a whole
 platforms/forge               Forge entry point
 platforms/neoforge            NeoForge entry point
 platforms/fabric              Fabric entry points
@@ -93,6 +94,10 @@ loads `CoreFabricClient` only as a `client` entry point, NeoForge constructs
 which draws the hologram, is listed under `client` in its configuration, so Mixin
 skips it on a server. Those four classes are the only ones that name
 `platforms:client`, so on a dedicated server nothing asks for it.
+
+`platforms:server` is kept off the client the same way, mirrored. Fabric's `CoreFabricMod`
+returns before registering `/agents` unless Fabric reports a server, and `CoreNeoForgeMod` and
+`CoreForgeMod` register it only for a dedicated server, so in single player nothing names it.
 
 ### 3. Failing legibly when the wiring is wrong
 

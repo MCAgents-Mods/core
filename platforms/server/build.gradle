@@ -1,0 +1,43 @@
+// The commands core registers on a dedicated server. Server side only.
+//
+// Compiled against vanilla Minecraft and nothing else; no Fabric, NeoForge or Forge type may
+// appear here. Minecraft 26.x ships unobfuscated, so the same classes link against every
+// loader's game. Each loader module bundles this one into its jar and registers its commands
+// from its server entry point.
+//
+// Loom is used for the vanilla game alone: no loader, no mod metadata, no run configs.
+
+plugins {
+    id 'net.fabricmc.fabric-loom'
+}
+
+// The one Minecraft version core supports, the latest release, as the catalog names it.
+def minecraftVersion = libs.versions.minecraft.get()
+
+dependencies {
+    minecraft libs.minecraft
+
+    // The shared layers are bundled once, by each loader's jar. This module
+    // declares them compileOnly so its own jar never carries a second copy.
+    compileOnly project(':api')
+    compileOnly project(':common')
+    compileOnly project(':platforms:shared')
+}
+
+tasks.withType(JavaCompile).configureEach {
+    // Loom's game jar carries Fabric's @Environment annotation, whose enum is deliberately not
+    // on this module's classpath, and javac warns once per class that reads it with no lint
+    // switch to turn that off. Errors still fail the build.
+    options.warnings = false
+}
+
+tasks.named('jar', Jar) {
+    // {Name}-0.15.0+26.3.jar: the mod's version, then the game's.
+    archiveVersion = "${project.version}+${minecraftVersion}"
+}
+
+base {
+    archivesName = 'MCAgentsCoreServer'
+}
+
+// Not published: no mod compiles against core's commands, and every loader jar bundles them.

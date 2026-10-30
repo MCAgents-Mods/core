@@ -21,7 +21,7 @@ wants and replays it.
 ## What is here today
 
 - A Gradle multi project build on **Java 25**: `tool`, `api`, `common`,
-  `platforms/shared`, `platforms/client`, and one module per mod loader —
+  `platforms/shared`, `platforms/client`, `platforms/server`, and one module per mod loader —
   `platforms/forge`, `platforms/neoforge` and `platforms/fabric` — each building
   its own jar for Minecraft 26.3, the only version core supports, all under
   `io.github.mcagentsmods.core`. See

@@ -186,6 +186,22 @@ public final class ServerEntrypoint implements SideEntrypoint {
     }
 
     /**
+     * Lists the masked handles of a platform's stored credentials, for a caller allowed to
+     * remove one — the suggestions for {@code remove}.
+     *
+     * @param caller Who is asking, as the server knows them.
+     * @param platform The platform code.
+     * @return One handle per stored credential, or empty when the caller may not remove one,
+     *         the platform is unknown, or it has none. Never contains a credential.
+     * @throws IllegalStateException When called before {@link #start(ModContext)}.
+     */
+    public List<String> removableHandles(CommandCaller caller, String platform) {
+        return authority.allows(caller, ServerAction.REMOVE_TOKEN)
+                ? commands().suggestRemovable(platform)
+                : List.of();
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
