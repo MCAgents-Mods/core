@@ -5,7 +5,7 @@ description: Splitting core's two largest mixed-purpose classes, registering the
 
 # Task: code cleanup and command permissions
 
-**Status:** in progress
+**Status:** done (2026-10-30), released as 0.15.0
 
 ## The request
 
@@ -40,11 +40,11 @@ opened as a pull request, rebase-merged in order and checked in CI.
 
 | # | Title | Branch | PR |
 |---|---|---|---|
-| 1 | Task record | `plan/code-cleanup` | |
-| 2 | Token rotation out of the provider | `refactor/token-rotation` | |
-| 3 | Choice list out of the form panel | `refactor/form-choices` | |
-| 4 | `/agents` on dedicated servers | `feat/server-command` | |
-| 5 | Release 0.15.0 | `release/0.15.0` | |
+| 1 | Task record | `plan/code-cleanup` | #76 |
+| 2 | Token rotation out of the provider | `refactor/token-rotation` | #77 |
+| 3 | Choice list out of the form panel | `refactor/form-choices` | #78 |
+| 4 | `/agents` on dedicated servers | `feat/server-command` | #79 |
+| 5 | Release 0.15.0 | `release/0.15.0` | #80 |
 
 The template (`plan/code-cleanup`, `docs/command-permissions`, `release/0.0.0`) and chat
 (`plan/code-cleanup`, `refactor/wallet-http`, `refactor/mcp-watcher`, `release/0.15.1`)
@@ -86,3 +86,14 @@ and what a pick does (`openList`, `closeList`, `pick`). Nothing drawn or clicked
   `RegisterCommandsEvent` when the side is the dedicated server.
 - Docs: `wiki/api/token-commands.md`, `wiki/information/modules.md`, `mod-sides.md`, the README
   and the repository map.
+
+### Task 5 — release/0.15.0
+
+`project-version` 0.15.0, `wiki/logs/0/15/0/CHANGELOG.md` and its row in the logs index, the
+version in the repository rule, state, map and overview, and the PR column above. Checked on a
+Fabric dedicated server (`:platforms:fabric:runServer`): from the console, `/agents` listed the
+key file and each platform, `token add` stored `#1:1234` and `token remove #1:1234` removed it.
+
+Left open, reported to the owner and not changed here: a dedicated server logs "MCAgents core
+has no provider installed", so keys a server stores are not put into use on the server; and
+removing a key by command logs it as "rejected", the wording for a key the provider refused.
